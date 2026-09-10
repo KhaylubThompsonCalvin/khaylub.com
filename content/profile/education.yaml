@@ -1,0 +1,20 @@
+# Institution, program, dates, and completed courses. No grades, GPA, or scores: the schema has no such fields.
+# Source: résumé revision 2.2 (2026-09-09).
+entries:
+  - institution: Portland Community College
+    program: Computer Information Systems
+    location: Portland, OR
+    start: 2023-12
+    end: present
+    note: Full-time
+    courses:
+      - { name: Data Analytics (CIS277A), completed: Summer 2026 }
+    highlights:
+      - PCC AI Hackathon (Mar 2026), trained a JetBot robot with a collision-detection model.
+  - institution: University of Arizona
+    program: Law Studies (attended)
+    location: Tucson, AZ
+    start: 2016
+    end: 2017
+    courses: []
+    highlights: []

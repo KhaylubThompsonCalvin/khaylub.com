@@ -1,0 +1,18 @@
+# Controlled tag vocabulary. An artifact using a tag not listed here fails the build.
+terms:
+  - { slug: three-js, label: three.js, description: Real-time 3D on the web. }
+  - { slug: react, label: React, description: Component-based user interface library. }
+  - { slug: blender, label: Blender, description: 3D modeling, rigging, and rendering. }
+  - { slug: performance, label: Performance, description: Load time, payload, and Core Web Vitals. }
+  - { slug: accessibility, label: Accessibility, description: WCAG, keyboard, screen readers. }
+  - { slug: security, label: Security, description: Headers, policies, scanning, disclosure. }
+  - { slug: preservation, label: Preservation, description: Keeping earlier work recoverable. }
+  - { slug: git, label: Git, description: Version control practice. }
+  - { slug: github, label: GitHub, description: Repositories, releases, rulesets, Actions. }
+  - { slug: python, label: Python, description: Python programming. }
+  - { slug: sql, label: SQL, description: Relational queries and schemas. }
+  - { slug: regression, label: Regression, description: Linear models and diagnostics. }
+  - { slug: reproducibility, label: Reproducibility, description: Clean-room re-runs and documented steps. }
+  - { slug: data-storytelling, label: Data storytelling, description: Explaining findings for an audience. }
+  - { slug: portfolio, label: Portfolio, description: About this site and its history. }
+  - { slug: estimating, label: Estimating, description: Turning measurements into defensible bids. }

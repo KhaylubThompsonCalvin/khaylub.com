@@ -1,0 +1,7 @@
+# Interest groups shown on Home and About. Each item links to a tag or a URL.
+# The owner fills these in; an empty group is not rendered.
+groups:
+  - { name: Reading, items: [] }
+  - { name: Listening, items: [] }
+  - { name: Watching, items: [] }
+  - { name: Building, items: [{ label: This site, tag: portfolio }, { label: 3D for the web, tag: three-js }] }

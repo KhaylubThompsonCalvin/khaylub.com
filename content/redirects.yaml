@@ -1,0 +1,6 @@
+# Permanent redirects. Slugs never change; a rename adds a line here and the build fails without it.
+# render.yaml routes are kept in sync with this file (scripts/check-redirects.mjs).
+redirects:
+  - { from: /work, to: /work/, note: V1 anchor target and the non-slash form }
+  - { from: /contact, to: /contact/, note: V1 anchor target and the non-slash form }
+  - { from: /resume.pdf, to: /resume/Khaylub-Thompson-Calvin-Resume.pdf, note: short alias for the unchanged PDF path }

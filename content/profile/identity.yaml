@@ -1,0 +1,17 @@
+# Identity card, contact page, footer, security.txt, and the JSON-LD Person record read this file.
+# Keys are fixed by src/lib/profile.ts; an unknown key fails the build.
+name: Khaylub Thompson-Calvin
+site_name: Khaylub.com
+role_line: Computer Information Systems student · Builder · Lifelong learner
+location: Hillsboro, OR
+email: khaylubthompsoncalvin@gmail.com
+github: https://github.com/KhaylubThompsonCalvin
+linkedin: https://www.linkedin.com/in/khaylub-thompson-calvin-40543b294/
+# Expected reply time shown on the contact page. Left empty until the owner sets it; nothing renders when empty.
+response_time: ''
+# Optional photo for the identity card (path under public/). Empty means no photo is rendered.
+photo: ''
+photo_alt: ''
+security_contact: mailto:khaylubthompsoncalvin@gmail.com
+# security.txt Expires is computed as security_as_of plus one year at build time (decision D-20).
+security_as_of: 2026-09-09
