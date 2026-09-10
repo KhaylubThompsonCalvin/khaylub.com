@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, 'feat/**', 'fix/**']
   schedule:
     - cron: '0 9 * * 1' # weekly: external links and dependency audit
 
@@ -37,7 +37,8 @@ jobs:
       - name: Internal links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --no-progress "dist/**/*.html"
+          # --root-dir lets lychee resolve root-relative links such as /work/ against dist/
+          args: --offline --no-progress --root-dir "${{ github.workspace }}/dist" "dist/**/*.html"
           fail: true
       - name: Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -93,5 +94,5 @@ jobs:
       - run: npm ci && npm run build
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress "dist/**/*.html"
+          args: --no-progress --root-dir "${{ github.workspace }}/dist" "dist/**/*.html"
           fail: false
