@@ -1,0 +1,103 @@
+# Render Blueprint for Khaylub.com V2. This file is committed as configuration only.
+# No Render service exists for V2 until the owner approves one (Phase 19). Until then the same
+# headers are applied by scripts/serve-with-headers.mjs so Playwright can assert them locally.
+#
+# Header policy (Phase 2, documents 23 and 31):
+#   CSP is Report-Only from the first preview and enforced before cutover; never unsafe-inline for
+#   scripts. The climb paths (/ and /climb/) allow blob: media and WebAssembly for the ported scene.
+#   Cache tiers: hashed assets one year immutable, HTML no-cache, media one week, PDF one day,
+#   discovery files one hour.
+
+services:
+  - type: web
+    name: khaylub-com-v2
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+    routes:
+      # Redirects, kept in sync with content/redirects.yaml by scripts/check-redirects.mjs
+      - type: redirect
+        source: /work
+        destination: /work/
+      - type: redirect
+        source: /contact
+        destination: /contact/
+      - type: redirect
+        source: /resume.pdf
+        destination: /resume/Khaylub-Thompson-Calvin-Resume.pdf
+    headers:
+      # Security headers on every response
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), browsing-topics=(), autoplay=(self)
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Cross-Origin-Opener-Policy
+        value: same-origin
+      # Content Security Policy: Report-Only at Phase 9. Switch the name to Content-Security-Policy
+      # before cutover (Phase 19) once the report log is clean.
+      - path: /*
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'; upgrade-insecure-requests"
+      # The climb paths: the ported scene creates blob: URLs and decodes meshopt with WebAssembly.
+      - path: /
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'; upgrade-insecure-requests"
+      - path: /climb/
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'; upgrade-insecure-requests"
+      # Cache tiers
+      - path: /_astro/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*.html
+        name: Cache-Control
+        value: no-cache
+      - path: /*/
+        name: Cache-Control
+        value: no-cache
+      - path: /
+        name: Cache-Control
+        value: no-cache
+      - path: /resume/*.pdf
+        name: Cache-Control
+        value: public, max-age=86400
+      - path: /*.png
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.jpg
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.svg
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.mp4
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /robots.txt
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /sitemap-index.xml
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /sitemap-0.xml
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /.well-known/security.txt
+        name: Cache-Control
+        value: public, max-age=3600
