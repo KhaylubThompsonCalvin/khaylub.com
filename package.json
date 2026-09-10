@@ -1,0 +1,48 @@
+{
+  "name": "khaylub.com",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Khaylub.com V2: a static profile and public library built with Astro.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:preview": "cross-env PUBLIC_SITE_ENV=preview astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "validate": "node scripts/validate.mjs",
+    "serve:headers": "node scripts/serve-with-headers.mjs",
+    "test": "playwright test",
+    "test:report": "playwright show-report",
+    "lhci": "lhci autorun",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.3.0",
+    "@astrojs/sitemap": "^3.4.0",
+    "astro": "^5.12.0",
+    "js-yaml": "^4.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@axe-core/playwright": "^4.10.0",
+    "@lhci/cli": "^0.15.0",
+    "@playwright/test": "^1.54.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "cross-env": "^7.0.3",
+    "gray-matter": "^4.0.3",
+    "html-validate": "^9.0.0",
+    "pdf-parse": "^1.1.1",
+    "prettier": "^3.6.0",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.8.0"
+  }
+}
