@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { term, entries } = Astro.props;
 ---
 
-<BaseLayout title={`Tag: ${term.label}`} description={term.description ?? `Everything tagged ${term.label}.`} current="library">
+<BaseLayout title={`Tag: ${term.label}`} description={`Everything on this site tagged ${term.label}. ${term.description ?? ''}`.trim()} current="library">
   <div class="measure">
     <p class="eyebrow">Tag</p>
     <h1>{term.label}</h1>

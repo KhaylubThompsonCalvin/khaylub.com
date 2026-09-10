@@ -27,6 +27,15 @@ const canonical = new URL(path, site).href;
 const fullTitle = path === '/' ? `${id.name} | ${id.site_name}` : `${title} | ${id.site_name}`;
 const preview = isPreview();
 const image = new URL(ogImage ?? '/og-default.png', site).href;
+// Every page carries at least a WebPage record; artifact pages pass richer records.
+const structured = jsonLd ?? {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: fullTitle,
+  description,
+  url: canonical,
+  isPartOf: { '@type': 'WebSite', name: id.site_name, url: `${site}/` },
+};
 ---
 
 <!doctype html>
@@ -51,7 +60,7 @@ const image = new URL(ogImage ?? '/og-default.png', site).href;
     <meta name="twitter:image" content={image} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(structured)} />
   </head>
   <body>
     <SkipLink />

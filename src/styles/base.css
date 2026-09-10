@@ -68,6 +68,16 @@ dl {
   margin: 0 0 var(--space-2);
 }
 
+p,
+li,
+dd,
+dt,
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+
 a {
   color: var(--ink);
   text-decoration: underline;

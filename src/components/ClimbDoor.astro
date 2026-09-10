@@ -7,7 +7,7 @@ interface Props {
 const { standalone = false } = Astro.props;
 ---
 
-<div class="climb-door" data-climb-door>
+<div class="climb-door" data-climb-door data-standalone={standalone ? 'true' : undefined}>
   <button class="btn btn-dashed" type="button" aria-describedby="climb-hint" data-climb-enter>
     {standalone ? 'Tap to explore' : 'Enter the climb'}
   </button>

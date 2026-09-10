@@ -11,17 +11,19 @@ const links = [
 ];
 ---
 
-<ul class="recruiter-row" aria-label="Quick links">
-  {
-    links.map((l) => (
-      <li>
-        <a href={l.href} rel={l.external ? 'noopener noreferrer' : undefined}>
-          {l.label}
-        </a>
-      </li>
-    ))
-  }
-</ul>
+<nav aria-label="Quick links">
+  <ul class="recruiter-row">
+    {
+      links.map((l) => (
+        <li>
+          <a href={l.href} rel={l.external ? 'noopener noreferrer' : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 
 <style>
   .recruiter-row {
@@ -35,7 +37,9 @@ const links = [
   .recruiter-row a {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 44px;
+    min-width: 44px;
     padding: 0.5rem 0;
   }
 </style>
