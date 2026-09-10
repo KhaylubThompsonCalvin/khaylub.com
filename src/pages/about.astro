@@ -1,0 +1,59 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { identity, now, monthLabel, interests } from '@lib/profile';
+const id = identity();
+const n = now();
+const groups = interests().groups.filter((g) => g.items.length > 0);
+---
+
+<BaseLayout title="About" description="Who Khaylub Thompson-Calvin is, what he believes about building, and where to find him elsewhere." current="about">
+  <article class="measure-reading">
+    <h1>About</h1>
+    <p>
+      I build for a better future, so the next generation starts further ahead than I did. I am a
+      Computer Information Systems student making interactive 3D and tools for the web, with seven
+      years of hands-on hardware repair, calibration, and testing behind me. This site is a record
+      of the climb, not the arrival.
+    </p>
+
+    <h2>How I work</h2>
+    <p>
+      Methodically, from documentation, with every number traced to a source. The first version of
+      this site, the data projects, and the notes here are all built the same way: finish the thing,
+      measure it, write down what it cost.
+    </p>
+
+    <h2 class="section-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h2>
+    <ul>{n.lines.map((l) => <li>{l}</li>)}</ul>
+    <p><a href="/now/">The Now page</a> keeps the dated version.</p>
+
+    {
+      groups.length > 0 && (
+        <>
+          <h2>Interests</h2>
+          <ul>
+            {groups.map((g) => (
+              <li>
+                <strong>{g.name}:</strong>{' '}
+                {g.items.map((it, i) => (
+                  <>
+                    <a href={it.url ?? `/tags/${it.tag}/`}>{it.label}</a>
+                    {i < g.items.length - 1 ? ', ' : ''}
+                  </>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href={id.github} rel="noopener noreferrer">GitHub</a></li>
+      <li><a href={id.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
+      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/colophon/">How this site is built</a></li>
+    </ul>
+  </article>
+</BaseLayout>

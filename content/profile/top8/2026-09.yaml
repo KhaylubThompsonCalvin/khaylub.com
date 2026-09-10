@@ -1,13 +1,21 @@
 # Khaylub's Top 8, as of September 2026. Exactly eight slugs in rank order with a one-line reason.
 # Status: proposed at Phase 4 (decision D-11); the owner confirms or edits at Phase 10.
 # A slot whose artifact is not published is skipped at build and the next published item moves up.
-as_of: 2026-09
+as_of: "2026-09"
 items:
-  - { slug: khaylub-com-v1, reason: The shipped 3D experience, kept as the front door by choice. }
-  - { slug: fuel-economy-regression, reason: Reproducible data work with residual diagnostics. }
-  - { slug: sql-python-analytics-pipeline, reason: SQL and Python end to end on public data. }
-  - { slug: the-16-mb-front-door, reason: What the first version taught, with numbers. }
-  - { slug: preserving-v1, reason: How the climb stays safe while the site is rebuilt. }
-  - { slug: wanderer-hero, reason: The character, rendered in Blender. }
-  - { slug: manors-ai, reason: A private beta built on one rule, never invent a number. }
-  - { slug: wanderer-pipeline, reason: How the asset reached the browser. }
+  - slug: khaylub-com-v1
+    reason: "The shipped 3D experience, kept as the front door by choice."
+  - slug: fuel-economy-regression
+    reason: "Reproducible data work with residual diagnostics."
+  - slug: sql-python-analytics-pipeline
+    reason: "SQL and Python end to end on public data."
+  - slug: the-16-mb-front-door
+    reason: "What the first version taught, with numbers."
+  - slug: preserving-v1
+    reason: "How the climb stays safe while the site is rebuilt."
+  - slug: wanderer-hero
+    reason: "The character, rendered in Blender."
+  - slug: manors-ai
+    reason: "A private beta built on one rule: never invent a number."
+  - slug: wanderer-pipeline
+    reason: "How the asset reached the browser."

@@ -3,11 +3,17 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { schemas } from './content/schemas';
+import { z } from 'astro/zod';
 
 const folder = (name: string, pattern = '**/*.md') =>
   glob({ pattern, base: `./content/${name}` });
 
 export const collections = {
+  // The résumé text: one Markdown file rendered at /resume/ and diffed against the PDF in CI.
+  resume: defineCollection({
+    loader: glob({ pattern: 'resume.md', base: './content/profile' }),
+    schema: z.object({ revision: z.string(), as_of: z.coerce.date(), pdf: z.string() }).strict(),
+  }),
   projects: defineCollection({ loader: folder('projects', '**/index.md'), schema: schemas.projects }),
   data: defineCollection({ loader: folder('data', '**/index.md'), schema: schemas.data }),
   notes: defineCollection({ loader: folder('notes'), schema: schemas.notes }),

@@ -1,0 +1,92 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import IdentityCard from '@components/IdentityCard.astro';
+import NowLine from '@components/NowLine.astro';
+import Top8 from '@components/Top8.astro';
+import { interests, onRepeat } from '@lib/profile';
+import { published } from '@lib/catalog';
+import { personAndWebsite } from '@lib/seo';
+
+const groups = interests().groups.filter((g) => g.items.length > 0);
+const repeat = onRepeat();
+const journal = (await published('journal')).slice(0, 5);
+---
+
+<BaseLayout
+  title="Home"
+  description="Khaylub Thompson-Calvin: Computer Information Systems student and builder. Projects, data work, Field Notes, and a library, with the original 3D climb one click away."
+  current="home"
+  jsonLd={personAndWebsite()}
+>
+  <IdentityCard />
+  <NowLine />
+  <Top8 />
+
+  {
+    groups.length > 0 && (
+      <section class="section" aria-labelledby="interests-heading">
+        <h2 id="interests-heading">Interests</h2>
+        <dl class="interests">
+          {groups.map((g) => (
+            <div>
+              <dt>{g.name}</dt>
+              <dd>
+                {g.items.map((it, i) => (
+                  <>
+                    <a href={it.url ?? `/tags/${it.tag}/`}>{it.label}</a>
+                    {i < g.items.length - 1 ? ' · ' : ''}
+                  </>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="journal-heading">
+    <h2 id="journal-heading">Latest from the journal</h2>
+    {
+      journal.length > 0 ? (
+        <ul>
+          {journal.map((e) => (
+            <li>
+              <a href={`/journal/${e.data.slug}/`}>{e.data.title}</a>{' '}
+              <span class="small muted">{e.data.date.toISOString().slice(0, 10)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">No entries yet. The journal opens with the library.</p>
+      )
+    }
+  </section>
+
+  {
+    repeat.title && (
+      <section class="section" aria-labelledby="repeat-heading">
+        <h2 id="repeat-heading">On repeat</h2>
+        <p>
+          {repeat.url ? <a href={repeat.url} rel="noopener noreferrer">{repeat.title}</a> : repeat.title}
+          {repeat.artist && ` by ${repeat.artist}`}
+        </p>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .interests div {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  .interests dt {
+    font-weight: 600;
+    min-width: 6rem;
+  }
+  .interests dd {
+    margin: 0;
+  }
+</style>

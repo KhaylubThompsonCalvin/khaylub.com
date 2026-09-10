@@ -1,0 +1,36 @@
+---
+// One index template for every collection: newest first, status badges, filters as links later.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ArtifactCard from '@components/ArtifactCard.astro';
+import { COLLECTIONS, published } from '@lib/catalog';
+
+export function getStaticPaths() {
+  return COLLECTIONS.map((c) => ({ params: { collection: c.name }, props: { meta: c } }));
+}
+
+const { meta } = Astro.props;
+const entries = await published(meta.name);
+---
+
+<BaseLayout title={meta.label} description={`${meta.label}: ${meta.description}`} current={meta.name}>
+  <div class="measure">
+    <h1>{meta.label}</h1>
+    <p>{meta.description}</p>
+  </div>
+  <section class="section" aria-labelledby="list-heading">
+    <h2 id="list-heading">{entries.length} {entries.length === 1 ? 'item' : 'items'}, newest first</h2>
+    {
+      entries.length > 0 ? (
+        <ul class="card-grid">
+          {entries.map((e) => (
+            <li>
+              <ArtifactCard entry={e} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">Nothing published in this collection yet.</p>
+      )
+    }
+  </section>
+</BaseLayout>

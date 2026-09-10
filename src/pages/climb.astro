@@ -1,0 +1,43 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ClimbDoor from '@components/ClimbDoor.astro';
+import Doors from '@components/Doors.astro';
+---
+
+<BaseLayout
+  title="The climb"
+  description="The original 3D experience of khaylub.com, kept as it shipped in June 2026 and loaded only on request."
+  current="climb"
+  fullBleed
+>
+  <section class="climb-intro container">
+    <h1>The climb</h1>
+    <p class="measure">
+      The first version of this site: one continuous scroll, a traveler walking from night into day,
+      and a Phoenix near the end. It is kept exactly as it launched. Press the button to load it; the
+      home page is fast because nothing here downloads until you ask.
+    </p>
+    <ClimbDoor standalone />
+  </section>
+
+  <section class="after container" aria-labelledby="after-heading">
+    <h2 id="after-heading">After the climb</h2>
+    <p class="measure">Where to go next.</p>
+    <Doors compact />
+    <p class="small muted">
+      The frozen original also lives at
+      <a href="https://v1.khaylub.com" rel="noopener noreferrer">v1.khaylub.com</a>, and the story of how it
+      was preserved is in <a href="/notes/preserving-v1/">Preserving V1</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .climb-intro {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+  .after {
+    padding-bottom: var(--space-6);
+  }
+</style>

@@ -1,0 +1,179 @@
+---
+// One artifact template for every collection. Projects and data pages add their proof links
+// and named sections; everything else renders the body under the header block.
+import { render } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Badge from '@components/Badge.astro';
+import { COLLECTIONS, allVisible, badgeFor, collectionLabel, routeFor, type AnyEntry } from '@lib/catalog';
+import { creativeWork, breadcrumbs } from '@lib/seo';
+
+export async function getStaticPaths() {
+  const entries = await allVisible();
+  return entries.map((entry) => ({
+    params: { collection: entry.collection, slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props as { entry: AnyEntry };
+const { Content } = await render(entry as any);
+const data = entry.data as any;
+const badge = badgeFor(entry);
+const path = routeFor(entry);
+const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
+const isProject = entry.collection === 'projects';
+const isData = entry.collection === 'data';
+const links: { label: string; href: string }[] = [];
+if (isProject) {
+  if (data.links?.code) links.push({ label: 'Code', href: data.links.code });
+  if (data.links?.live) links.push({ label: 'Live', href: data.links.live });
+  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
+}
+if (isData) {
+  if (data.repository) links.push({ label: 'Repository', href: data.repository });
+  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
+  if (data.story_url) links.push({ label: 'Story', href: data.story_url });
+}
+const related: AnyEntry[] = data.related
+  ? (await allVisible()).filter((e) => data.related.includes(e.data.slug))
+  : [];
+const date = data.date.toISOString().slice(0, 10);
+const jsonLd = [
+  creativeWork(entry, path),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: meta.label, path: meta.route },
+    { name: data.title, path },
+  ]),
+];
+---
+
+<BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd}>
+  <article class="artifact">
+    <nav aria-label="Breadcrumb" class="breadcrumb small">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href={meta.route}>{meta.label}</a></li>
+        <li aria-current="page">{data.title}</li>
+      </ol>
+    </nav>
+
+    {
+      data.status !== 'published' && (
+        <p class="banner" role="note">
+          {data.status === 'archived' ? 'Archived: kept for the record; no longer maintained.' : `Preview only: this item is a ${data.status} and does not appear on the live site.`}
+        </p>
+      )
+    }
+
+    <header class="artifact-header measure-reading">
+      <h1>{data.title}</h1>
+      <p class="meta">
+        <Badge text={badge.text} tone={badge.tone} />
+        <span class="muted">{collectionLabel(entry.collection)} · {date}{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
+      </p>
+      {data.outcome && <p class="outcome">{data.outcome}</p>}
+      {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
+      {
+        links.length > 0 && (
+          <p class="proof">
+            {links.map((l) => (
+              <a class="btn" href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                {l.label}
+              </a>
+            ))}
+          </p>
+        )
+      }
+      {
+        isProject && data.stack?.length > 0 && (
+          <p class="small muted">Stack: {data.stack.join(', ')}</p>
+        )
+      }
+      {
+        isData && (
+          <dl class="facts">
+            <dt>Question</dt>
+            <dd>{data.question}</dd>
+            <dt>Data</dt>
+            <dd>{data.dataset.name}. Source: {data.dataset.source}. License: {data.dataset.license}.</dd>
+            <dt>Result</dt>
+            <dd>{data.result}</dd>
+          </dl>
+        )
+      }
+    </header>
+
+    <div class="body measure-reading">
+      <Content />
+    </div>
+
+    <footer class="artifact-footer measure-reading">
+      <p class="small muted">Source: {data.source}</p>
+      {
+        related.length > 0 && (
+          <section aria-labelledby="related-heading">
+            <h2 id="related-heading">Related</h2>
+            <ul>
+              {related.map((r) => (
+                <li>
+                  <a href={routeFor(r)}>{r.data.title}</a> <span class="small muted">({collectionLabel(r.collection)})</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        data.tags?.length > 0 && (
+          <p class="small muted">Tags: {data.tags.join(', ')}</p>
+        )
+      }
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-2);
+  }
+  .breadcrumb li + li::before {
+    content: '›';
+    margin-right: 0.5rem;
+    color: var(--muted);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .outcome {
+    font-weight: 600;
+  }
+  .proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+  }
+  .facts dt {
+    font-weight: 600;
+    margin-top: var(--space-1);
+  }
+  .facts dd {
+    margin: 0;
+  }
+  .body :global(h2) {
+    margin-top: var(--space-4);
+  }
+  .artifact-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--line);
+  }
+</style>

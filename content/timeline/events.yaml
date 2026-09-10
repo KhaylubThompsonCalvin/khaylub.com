@@ -1,11 +1,33 @@
 # Authored timeline events. Artifact dates and Top 8 revisions are added at build time.
 # kind is one of: launch, publication, course-completed, milestone, top8-revision. No private life events.
 events:
-  - { date: 2023-12-01, kind: milestone, title: Started the Computer Information Systems program at Portland Community College }
-  - { date: 2026-06-14, kind: milestone, title: The khaylub-portfolio repository was created, url: https://github.com/KhaylubThompsonCalvin/khaylub-portfolio }
-  - { date: 2026-06-24, kind: launch, title: Khaylub.com V1 launched, url: /projects/khaylub-com-v1/ }
-  - { date: 2026-07-04, kind: publication, title: SQL to Python Analytics Pipeline published, url: /data/sql-python-analytics-pipeline/ }
-  - { date: 2026-08-30, kind: publication, title: Fuel Economy Regression Case Study published, url: /data/fuel-economy-regression/ }
-  - { date: 2026-09-05, kind: course-completed, title: Data Analytics (CIS277A) completed at Portland Community College }
-  - { date: 2026-09-07, kind: milestone, title: V1 preserved with a tag, a locked branch, and a release, url: /notes/preserving-v1/ }
-  - { date: 2026-09-09, kind: milestone, title: Résumé revision 2.2 published, url: /resume/ }
+  - date: 2023-12-01
+    kind: milestone
+    title: "Started the Computer Information Systems program at Portland Community College"
+  - date: 2026-06-14
+    kind: milestone
+    title: "The khaylub-portfolio repository was created"
+    url: https://github.com/KhaylubThompsonCalvin/khaylub-portfolio
+  - date: 2026-06-24
+    kind: launch
+    title: "Khaylub.com V1 launched"
+    url: /projects/khaylub-com-v1/
+  - date: 2026-07-04
+    kind: publication
+    title: "SQL to Python Analytics Pipeline published"
+    url: /data/sql-python-analytics-pipeline/
+  - date: 2026-08-30
+    kind: publication
+    title: "Fuel Economy Regression Case Study published"
+    url: /data/fuel-economy-regression/
+  - date: 2026-09-05
+    kind: course-completed
+    title: "Data Analytics (CIS277A) completed at Portland Community College"
+  - date: 2026-09-07
+    kind: milestone
+    title: "V1 preserved with a tag, a locked branch, and a release"
+    url: /notes/preserving-v1/
+  - date: 2026-09-09
+    kind: milestone
+    title: "Résumé revision 2.2 published"
+    url: /resume/

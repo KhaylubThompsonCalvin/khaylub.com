@@ -1,0 +1,9 @@
+---
+interface Props {
+  text: string;
+  tone?: 'live' | 'default';
+}
+const { text, tone = 'default' } = Astro.props;
+---
+
+<span class:list={['badge', { 'badge-live': tone === 'live' }]}>{text}</span>

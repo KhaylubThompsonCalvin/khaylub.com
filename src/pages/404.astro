@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { COLLECTIONS } from '@lib/catalog';
+---
+
+<BaseLayout title="Page not found" description="That address does not exist on this site. Here is the map.">
+  <article class="measure-reading">
+    <h1>Page not found</h1>
+    <p>There is nothing at this address. Nothing is broken on your side; the page may have moved or never existed.</p>
+    <h2>Try one of these</h2>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/work/">Work</a></li>
+      {COLLECTIONS.slice(0, 3).map((c) => <li><a href={c.route}>{c.label}</a></li>)}
+      <li><a href="/library/">Library</a></li>
+      <li><a href="/search/">Search</a></li>
+    </ul>
+  </article>
+</BaseLayout>
