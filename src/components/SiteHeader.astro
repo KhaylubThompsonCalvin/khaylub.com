@@ -1,0 +1,41 @@
+---
+import PrimaryNav from './PrimaryNav.astro';
+import { identity } from '@lib/profile';
+
+interface Props {
+  current?: string;
+}
+const { current } = Astro.props;
+const id = identity();
+---
+
+<header class="site-header">
+  <div class="container navbar">
+    <a class="brand" href="/">{id.name}</a>
+    <PrimaryNav current={current} />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: var(--header-height);
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    white-space: nowrap;
+  }
+</style>

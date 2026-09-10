@@ -1,0 +1,63 @@
+/* Design tokens from the Phase 6 visual system. Light palette on :root, dark palette under
+   prefers-color-scheme. Text on --bg: ink 12.6:1, muted 6.6:1. Accent is decoration only. */
+:root {
+  color-scheme: light dark;
+  --bg: #e9e1d6;
+  --ink: #241c12;
+  --muted: #5b513f;
+  --accent: #caa46f;
+  --card: #f4efe7;
+  --line: #c9bfae;
+  --focus: #1d4ed8;
+  --scrim: rgba(36, 28, 18, 0.85);
+
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --size-sm: 0.8rem;
+  --size-body: 1rem;
+  --size-h3: 1.25rem;
+  --size-h2: 1.56rem;
+  --size-h1: clamp(2.2rem, 6vw, 4rem);
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+
+  --measure: 60ch;
+  --measure-reading: 65ch;
+  --container: 72rem;
+  --header-height: 56px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --ease: 150ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14110c;
+    --ink: #e9e1d6;
+    --muted: #b8ad9c;
+    --card: #1e1913;
+    --line: #3a3229;
+    --focus: #8ab6e2;
+    --scrim: rgba(20, 17, 12, 0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ease: 0s;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}

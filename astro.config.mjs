@@ -8,7 +8,11 @@ const isPreview = process.env.PUBLIC_SITE_ENV === 'preview';
 export default defineConfig({
   site: 'https://khaylub.com',
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  build: {
+    format: 'directory',
+    // Never inline stylesheets: one external CSS file keeps the Content Security Policy strict.
+    inlineStylesheets: 'never',
+  },
   integrations: [
     // React is used for islands only (the climb, and later the optional graph map and orbit view).
     react(),
@@ -19,8 +23,10 @@ export default defineConfig({
   ],
   vite: {
     build: {
-      // One CSS file, no inline styles beyond Astro's scoped output, so the CSP can stay strict.
+      // One CSS file and no inlined scripts, however small, so the Content Security Policy can
+      // stay strict (no 'unsafe-inline').
       cssCodeSplit: false,
+      assetsInlineLimit: 0,
     },
   },
 });
