@@ -4,11 +4,10 @@
 import { z } from 'astro/zod';
 import { readFileSync, readdirSync } from 'node:fs';
 import { load } from 'js-yaml';
-
-const root = new URL('../../content/', import.meta.url);
+import { contentPath } from '../content/schemas';
 
 function readYaml(rel: string): unknown {
-  return load(readFileSync(new URL(rel, root), 'utf8'));
+  return load(readFileSync(contentPath(rel), 'utf8'));
 }
 
 function parse<T extends z.ZodTypeAny>(rel: string, schema: T): z.infer<T> {
@@ -151,7 +150,7 @@ export const redirects = () => parse('redirects.yaml', redirectsSchema).redirect
 
 /** All Top 8 revision files, newest first. */
 export function top8Revisions() {
-  const dir = new URL('profile/top8/', root);
+  const dir = contentPath('profile', 'top8');
   const files = readdirSync(dir)
     .filter((f) => f.endsWith('.yaml'))
     .sort()

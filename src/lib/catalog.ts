@@ -3,7 +3,7 @@
 // items under review (each with a banner). Nothing else exists to the build.
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { isPreview, currentTop8 } from './profile';
-import { vocabulary } from '../content/schemas';
+import { vocabulary, contentPath } from '../content/schemas';
 
 export type ArtifactCollection =
   | 'projects'
@@ -105,7 +105,7 @@ import { load } from 'js-yaml';
 export function vocabularyTerms(name: 'tags' | 'skills' | 'technologies'): { slug: string; label: string; description?: string }[] {
   // Re-read for labels; schemas.ts validates the same files.
   vocabulary(name);
-  const file = readFileSync(new URL(`../../content/vocabulary/${name}.yaml`, import.meta.url), 'utf8');
+  const file = readFileSync(contentPath('vocabulary', `${name}.yaml`), 'utf8');
   return (load(file) as { terms: { slug: string; label: string; description?: string }[] }).terms;
 }
 

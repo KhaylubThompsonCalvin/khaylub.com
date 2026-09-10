@@ -3,12 +3,17 @@
 // Rule: unknown keys fail (.strict()), which makes private fields impossible by construction.
 import { z } from 'astro/zod';
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { load } from 'js-yaml';
 
 type Vocab = { terms: { slug: string; label: string; description?: string }[] };
 
+// Content paths resolve from the project root, not from the compiled chunk's location, so the
+// same code works in dev, in `astro sync`, and inside the prerender bundle.
+export const contentPath = (...parts: string[]) => resolve(process.cwd(), 'content', ...parts);
+
 export function vocabulary(name: 'tags' | 'skills' | 'technologies'): string[] {
-  const file = readFileSync(new URL(`../../content/vocabulary/${name}.yaml`, import.meta.url), 'utf8');
+  const file = readFileSync(contentPath('vocabulary', `${name}.yaml`), 'utf8');
   const parsed = load(file) as Vocab;
   const slugs = parsed.terms.map((t) => t.slug);
   // Guard: "AI" is never a skill, tool badge, or competency on this site.

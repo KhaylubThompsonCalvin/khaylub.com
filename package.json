@@ -17,14 +17,14 @@
     "serve:headers": "node scripts/serve-with-headers.mjs",
     "test": "playwright test",
     "test:report": "playwright show-report",
-    "lhci": "lhci autorun",
+    "lhci": "npx --yes @lhci/cli@0.15.1 autorun",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/react": "^4.3.0",
-    "@astrojs/sitemap": "^3.4.0",
-    "astro": "^5.12.0",
+    "@astrojs/react": "^6.0.5",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.2",
     "js-yaml": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -32,7 +32,6 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@axe-core/playwright": "^4.10.0",
-    "@lhci/cli": "^0.15.0",
     "@playwright/test": "^1.54.0",
     "@types/js-yaml": "^4.0.9",
     "@types/react": "^19.1.0",
