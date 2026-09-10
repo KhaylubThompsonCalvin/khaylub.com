@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Top8 from '@components/Top8.astro';
+import { top8Revisions } from '@lib/profile';
+const revisions = top8Revisions();
+---
+
+<BaseLayout title="Top 8" description="Khaylub's Top 8: eight things he is proud of right now, ranked, dated, and revised monthly." current="library">
+  <div class="measure">
+    <h1>Top 8</h1>
+    <p>Eight things I am proud of right now, ranked and dated. Revised at the monthly review; previous sets stay on the timeline.</p>
+  </div>
+  <Top8 />
+  <section class="section measure-reading" aria-labelledby="revisions-heading">
+    <h2 id="revisions-heading">Revisions</h2>
+    <ul>{revisions.map((r) => <li>{r.as_of}</li>)}</ul>
+  </section>
+</BaseLayout>

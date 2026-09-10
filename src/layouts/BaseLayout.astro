@@ -1,0 +1,91 @@
+---
+// The shell every page uses: skip link, sticky header with the primary nav, main, footer.
+// Metadata: unique title, description, canonical on the production domain, Open Graph tags,
+// optional JSON-LD, and a noindex meta on preview builds.
+import '../styles/tokens.css';
+import '../styles/base.css';
+import SkipLink from '@components/SkipLink.astro';
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+import { identity, isPreview } from '@lib/profile';
+
+interface Props {
+  title: string;
+  description: string;
+  current?: string;
+  /** Full-bleed pages (the climb) set this to drop the container padding on main. */
+  fullBleed?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  ogImage?: string;
+}
+
+const { title, description, current, fullBleed = false, jsonLd, ogImage } = Astro.props;
+const id = identity();
+const site = 'https://khaylub.com';
+const path = Astro.url.pathname;
+const canonical = new URL(path, site).href;
+const fullTitle = path === '/' ? `${id.name} | ${id.site_name}` : `${title} | ${id.site_name}`;
+const preview = isPreview();
+const image = new URL(ogImage ?? '/og-default.png', site).href;
+// Every page carries at least a WebPage record; artifact pages pass richer records.
+const structured = jsonLd ?? {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: fullTitle,
+  description,
+  url: canonical,
+  isPartOf: { '@type': 'WebSite', name: id.site_name, url: `${site}/` },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {preview && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#e9e1d6" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={id.site_name} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structured)} />
+  </head>
+  <body>
+    <SkipLink />
+    <SiteHeader current={current} />
+    {
+      preview && (
+        <div class="banner container" role="note">
+          Preview build. Not the live site; drafts may be visible here.
+        </div>
+      )
+    }
+    <main id="main" class:list={[{ container: !fullBleed }, 'site-main']} tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .site-main {
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-6);
+    flex: 1 0 auto;
+  }
+  .site-main:focus {
+    outline: none;
+  }
+</style>

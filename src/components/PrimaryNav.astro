@@ -1,0 +1,132 @@
+---
+// Nine links: seven primary, two utility. Under 1024 px they collapse behind a disclosure
+// button (aria-expanded, Escape closes, focus returns). No ARIA menu role: a plain list.
+interface Props {
+  current?: string;
+}
+const { current = '' } = Astro.props;
+
+const links = [
+  { href: '/work/', label: 'Work', key: 'work' },
+  { href: '/projects/', label: 'Projects', key: 'projects' },
+  { href: '/data/', label: 'Data', key: 'data' },
+  { href: '/notes/', label: 'Field Notes', key: 'notes' },
+  { href: '/library/', label: 'Library', key: 'library' },
+  { href: '/about/', label: 'About', key: 'about' },
+  { href: '/contact/', label: 'Contact', key: 'contact' },
+  { href: '/resume/', label: 'Résumé', key: 'resume', utility: true },
+  { href: '/search/', label: 'Search', key: 'search', utility: true },
+];
+---
+
+<nav aria-label="Primary" class="primary-nav">
+  <button
+    class="menu-btn"
+    type="button"
+    aria-expanded="false"
+    aria-controls="primary-nav-list"
+    id="primary-nav-button">Menu</button
+  >
+  <ul class="nav-list" id="primary-nav-list">
+    {
+      links.map((l) => (
+        <li class:list={{ utility: l.utility }}>
+          <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script src="../scripts/nav-disclosure.ts"></script>
+
+<style>
+  .primary-nav {
+    position: relative;
+  }
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 0.75rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .menu-btn[aria-expanded='true'] {
+    border-color: var(--ink);
+  }
+  .nav-list {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    min-width: 14rem;
+    margin: 0;
+    padding: 0.5rem;
+    list-style: none;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
+    z-index: 50;
+  }
+  .nav-list[data-open='true'] {
+    display: block;
+  }
+  .nav-list a {
+    display: block;
+    padding: 0.75rem 0.75rem;
+    min-height: 44px;
+    min-width: 44px;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border-bottom: 2px solid transparent;
+  }
+  .nav-list a:hover {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+  .nav-list a[aria-current='page'] {
+    border-bottom-color: var(--accent);
+  }
+  .utility {
+    border-top: 1px solid var(--line);
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+  }
+  @media (min-width: 1024px) {
+    .menu-btn {
+      display: none;
+    }
+    .nav-list,
+    .nav-list[data-open='true'] {
+      display: flex;
+      position: static;
+      min-width: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      gap: 0.25rem;
+    }
+    .nav-list a {
+      padding: 0.75rem 0.5rem;
+      border-radius: 0;
+    }
+    .utility {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    .utility:first-of-type {
+      margin-left: 0.75rem;
+    }
+  }
+</style>

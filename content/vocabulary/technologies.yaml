@@ -1,0 +1,28 @@
+# Technologies are tools and libraries. Sourced from the résumé and the public repositories.
+terms:
+  - { slug: python, label: Python }
+  - { slug: pandas, label: pandas }
+  - { slug: scikit-learn, label: scikit-learn }
+  - { slug: matplotlib, label: matplotlib }
+  - { slug: seaborn, label: seaborn }
+  - { slug: jupyterlab, label: JupyterLab }
+  - { slug: sql-server, label: SQL Server }
+  - { slug: tableau, label: Tableau }
+  - { slug: excel, label: Microsoft Excel }
+  - { slug: git, label: Git }
+  - { slug: github, label: GitHub }
+  - { slug: html, label: HTML }
+  - { slug: css, label: CSS }
+  - { slug: javascript, label: JavaScript }
+  - { slug: typescript, label: TypeScript }
+  - { slug: react, label: React }
+  - { slug: react-three-fiber, label: React Three Fiber }
+  - { slug: three-js, label: three.js }
+  - { slug: vite, label: Vite }
+  - { slug: astro, label: Astro }
+  - { slug: blender, label: Blender }
+  - { slug: lenis, label: Lenis }
+  - { slug: zustand, label: Zustand }
+  - { slug: render, label: Render }
+  - { slug: windows, label: Windows }
+  - { slug: arena-plm, label: Arena PLM }

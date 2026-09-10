@@ -1,0 +1,33 @@
+---
+import { top8Entries } from '@lib/catalog';
+import ArtifactCard from './ArtifactCard.astro';
+
+const { asOf, entries } = await top8Entries();
+const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+
+<section class="section" aria-labelledby="top8-heading">
+  <h2 id="top8-heading" class="section-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>
+  {
+    entries.length > 0 ? (
+      <ol class="card-grid top8">
+        {entries.map(({ entry }, i) => (
+          <li>
+            <ArtifactCard entry={entry} rank={i + 1} showCollection />
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="muted">The first Top 8 is being chosen.</p>
+    )
+  }
+  <p class="small muted">
+    Eight things I am proud of right now, ranked and dated. <a href="/top8/">Previous sets</a>.
+  </p>
+</section>
+
+<style>
+  .top8 {
+    list-style: none;
+  }
+</style>

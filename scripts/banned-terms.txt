@@ -1,0 +1,25 @@
+# Private terms that never appear in content/, src/, or dist/. One per line; matched case-insensitively.
+# A deliberate public mention needs an allow comment on the same file: <!-- allow-term: TERM -->
+# Enforced by scripts/validate.mjs (decision D-17, requirement P2-SEC-09).
+Summit 40
+Project Summit
+SNAP
+EBT
+Learning_Tracker
+Financial_Dashboard
+Financial Dashboard
+OS State Ledger
+Command Library
+Weekly Review
+Habit Tracker
+ALEKS
+MTH65
+MTH 65
+Exam Prep
+Knowledge Check
+co-parent
+Khaylub Knowledge Base
+.mcp.json
+ai-docs
+price book
+BuilderSim admin

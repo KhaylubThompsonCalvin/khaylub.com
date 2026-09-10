@@ -1,0 +1,46 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Card from '@components/Card.astro';
+import Top8 from '@components/Top8.astro';
+import { collectionCounts } from '@lib/catalog';
+const counts = await collectionCounts();
+---
+
+<BaseLayout title="Library" description="The library entrance: every collection on this site with a count, the current Top 8, and how the library works." current="library">
+  <div class="measure">
+    <h1>Library</h1>
+    <p>
+      Everything on this site lives in a collection. Projects and data work are the proof; Field Notes
+      are the lessons; the rest is what I make when nobody is grading.
+    </p>
+  </div>
+
+  <section class="section" aria-labelledby="collections-heading">
+    <h2 id="collections-heading">Collections</h2>
+    <ul class="card-grid">
+      {
+        counts.map((c) => (
+          <li>
+            <Card href={c.route} title={c.label} summary={c.description} meta={[`${c.count} ${c.count === 1 ? 'item' : 'items'}`]} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <Top8 />
+
+  <section class="section measure-reading" aria-labelledby="how-heading">
+    <h2 id="how-heading">How this library works</h2>
+    <p>
+      Every item is one Markdown file with a fixed set of fields, checked when the site is built.
+      Only published items appear here. Every number cites a source. Media carries a record of where
+      it came from. The <a href="/timeline/">timeline</a> lists everything by date, and
+      <a href="/search/">search</a> covers every published page.
+    </p>
+    <details>
+      <summary>Orbit view (optional)</summary>
+      <p class="muted">A planet-style map of the collections arrives at a later phase. The list above is always the primary way in.</p>
+    </details>
+  </section>
+</BaseLayout>

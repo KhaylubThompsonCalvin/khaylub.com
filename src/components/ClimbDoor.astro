@@ -1,0 +1,63 @@
+---
+// "Enter the climb": the opt-in door. Nothing from the climb (React, the scene, models, video)
+// is requested until this button is activated; the island chunk is imported on click.
+interface Props {
+  standalone?: boolean;
+}
+const { standalone = false } = Astro.props;
+---
+
+<div class="climb-door" data-climb-door data-standalone={standalone ? 'true' : undefined}>
+  <button class="btn btn-dashed" type="button" aria-describedby="climb-hint" data-climb-enter>
+    {standalone ? 'Tap to explore' : 'Enter the climb'}
+  </button>
+  <p class="small muted" id="climb-hint">
+    {
+      standalone
+        ? 'The original 3D experience loads on request (about 16 MB) and runs here.'
+        : 'The original 3D experience. Loads on request (about 16 MB). Also at '
+    }
+    {!standalone && <a href="/climb/">/climb</a>}
+  </p>
+  <div class="climb-mount" data-climb-mount aria-live="polite"></div>
+</div>
+
+<script>
+  // The import below is the only path to the climb's code. It runs after the click, never before.
+  const doors = document.querySelectorAll<HTMLElement>('[data-climb-door]');
+  doors.forEach((door) => {
+    const button = door.querySelector<HTMLButtonElement>('[data-climb-enter]');
+    const mount = door.querySelector<HTMLElement>('[data-climb-mount]');
+    if (!button || !mount) return;
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      button.textContent = 'Loading the climb';
+      const { mountClimb } = await import('../islands/climb-mount');
+      mountClimb(mount, () => {
+        button.disabled = false;
+        button.textContent = door.dataset.standalone ? 'Tap to explore' : 'Enter the climb';
+        button.focus();
+      });
+      button.textContent = 'The climb is open below';
+    });
+  });
+</script>
+
+<style>
+  .climb-door {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .climb-door p {
+    margin: 0;
+    flex: 1 1 16rem;
+  }
+  .climb-mount {
+    flex-basis: 100%;
+  }
+  .climb-mount:empty {
+    display: none;
+  }
+</style>

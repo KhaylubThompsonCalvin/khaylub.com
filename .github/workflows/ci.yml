@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 9 * * 1' # weekly: external links and dependency audit
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Types and content schemas
+        run: npm run check
+      - name: Validation (banned terms, em dashes, paths, provenance, featured set, redirects)
+        run: npm run validate
+      - name: Invalid artifact must fail the build
+        run: node scripts/check-build-fails-on-invalid.mjs
+      - name: Build (production)
+        run: npm run build
+      - name: Validation against the built output
+        run: npm run validate
+      - name: HTML validity
+        run: npx html-validate "dist/**/*.html"
+      - name: Internal links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress "dist/**/*.html"
+          fail: true
+      - name: Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Playwright (structure, nav, home, climb, JS off, targets, headers, security, content, résumé, SEO, axe)
+        run: npx playwright test
+        env:
+          CI: 'true'
+      - name: Lighthouse CI
+        # Run through npx so the Lighthouse toolchain (which carries unfixed transitive advisories)
+        # never enters this repository's dependency tree or the audit gate.
+        run: npx --yes @lhci/cli@0.15.1 autorun
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            playwright-report
+            .lighthouseci
+          if-no-files-found: ignore
+
+  build-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Preview build renders drafts with noindex
+        run: |
+          npm run build:preview
+          grep -q 'name="robots" content="noindex' dist/index.html
+          test -f dist/notes/wanderer-pipeline/index.html
+          grep -q 'Disallow: /' dist/robots.txt
+
+  weekly-external-links:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress "dist/**/*.html"
+          fail: false

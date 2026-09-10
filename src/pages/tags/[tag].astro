@@ -1,0 +1,27 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ArtifactCard from '@components/ArtifactCard.astro';
+import { allVisible, vocabularyTerms } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const terms = vocabularyTerms('tags');
+  const all = await allVisible();
+  return terms.map((t) => ({
+    params: { tag: t.slug },
+    props: { term: t, entries: all.filter((e) => (e.data.tags ?? []).includes(t.slug)) },
+  }));
+}
+const { term, entries } = Astro.props;
+---
+
+<BaseLayout title={`Tag: ${term.label}`} description={`Everything on this site tagged ${term.label}. ${term.description ?? ''}`.trim()} current="library">
+  <div class="measure">
+    <p class="eyebrow">Tag</p>
+    <h1>{term.label}</h1>
+    {term.description && <p class="muted">{term.description}</p>}
+  </div>
+  <section class="section" aria-labelledby="tagged-heading">
+    <h2 id="tagged-heading">{entries.length} {entries.length === 1 ? 'item' : 'items'}</h2>
+    {entries.length > 0 ? <ul class="card-grid">{entries.map((e) => <li><ArtifactCard entry={e} showCollection /></li>)}</ul> : <p class="muted">Nothing published with this tag yet.</p>}
+  </section>
+</BaseLayout>

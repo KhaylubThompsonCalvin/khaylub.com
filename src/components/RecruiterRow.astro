@@ -1,0 +1,45 @@
+---
+import { identity } from '@lib/profile';
+const id = identity();
+const links = [
+  { href: '/about/', label: 'About' },
+  { href: '/work/#skills', label: 'Skills' },
+  { href: '/projects/', label: 'Projects' },
+  { href: id.github, label: 'GitHub', external: true },
+  { href: '/resume/', label: 'Résumé' },
+  { href: '/contact/', label: 'Contact' },
+];
+---
+
+<nav aria-label="Quick links">
+  <ul class="recruiter-row">
+    {
+      links.map((l) => (
+        <li>
+          <a href={l.href} rel={l.external ? 'noopener noreferrer' : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .recruiter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+  }
+  .recruiter-row a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.5rem 0;
+  }
+</style>

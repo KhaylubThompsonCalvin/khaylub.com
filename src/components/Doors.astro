@@ -1,0 +1,32 @@
+---
+// The two primary doors. Equal size, side by side from 560 px, stacked below.
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+---
+
+<div class:list={['doors', { compact }]}>
+  <a class="btn btn-primary door" href="/work/">VIEW MY WORK</a>
+  <a class="btn door" href="/library/">ENTER THE LIBRARY</a>
+</div>
+
+<style>
+  .doors {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+  @media (min-width: 560px) {
+    .doors {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .door {
+    min-height: 56px;
+  }
+  .compact .door {
+    min-height: 48px;
+  }
+</style>

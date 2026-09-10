@@ -1,0 +1,34 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Colophon" description="How this site is built and tested, and its accessibility statement." current="colophon">
+  <article class="measure-reading">
+    <h1>Colophon</h1>
+    <h2>How it is built</h2>
+    <p>
+      Static HTML generated with Astro from Markdown and YAML files. No runtime server, no database,
+      no third-party scripts, fonts, or analytics. React is used for exactly one thing: the climb,
+      the original 3D experience, which loads only when you ask for it.
+    </p>
+    <h2>How it is tested</h2>
+    <p>
+      Every change runs schema validation, a public and private boundary check, an em dash check, a
+      provenance check, HTML validation, Playwright tests for structure, keyboard use, headers, and
+      security, axe accessibility rules, and Lighthouse budgets.
+    </p>
+    <h2>Accessibility statement</h2>
+    <p>
+      The target is WCAG 2.2 AA on every page: a skip link, one heading per page, landmarks, visible
+      focus, 44 pixel targets on primary actions, reduced motion honored, and no content that moves or
+      plays on its own. If something does not work for you, email the address on the
+      <a href="/contact/">contact page</a>.
+    </p>
+    <h2>Version 1</h2>
+    <p>
+      The first version of this site is preserved unchanged at
+      <a href="https://v1.khaylub.com" rel="noopener noreferrer">v1.khaylub.com</a> and as
+      <a href="/climb/">the climb</a>. Its story is in <a href="/projects/khaylub-com-v1/">the case study</a>.
+    </p>
+  </article>
+</BaseLayout>

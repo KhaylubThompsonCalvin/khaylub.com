@@ -1,0 +1,61 @@
+---
+import { identity, availability, monthLabel } from '@lib/profile';
+import RecruiterRow from './RecruiterRow.astro';
+import Doors from './Doors.astro';
+import ClimbDoor from './ClimbDoor.astro';
+
+const id = identity();
+const avail = availability();
+---
+
+<section class="hero" aria-labelledby="site-name">
+  <div class="hero-text">
+    <p class="eyebrow">{id.site_name}</p>
+    <h1 id="site-name">{id.name}</h1>
+    <p class="role muted">{id.role_line} · {id.location}</p>
+    <p class="availability">
+      {avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
+    </p>
+    <RecruiterRow />
+    <Doors />
+    <ClimbDoor />
+  </div>
+  {
+    id.photo && (
+      <div class="hero-photo">
+        <img src={id.photo} alt={id.photo_alt} width="400" height="400" fetchpriority="high" />
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  @media (min-width: 900px) {
+    .hero {
+      grid-template-columns: 2fr 1fr;
+      align-items: start;
+    }
+  }
+  .role {
+    margin: 0 0 var(--space-1);
+  }
+  .availability {
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+  }
+  .hero-photo img {
+    border-radius: 12px;
+    max-width: 280px;
+  }
+  @media (max-width: 360px) {
+    .eyebrow {
+      display: none;
+    }
+  }
+</style>

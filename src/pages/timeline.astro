@@ -1,0 +1,54 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { timelineEvents, top8Revisions } from '@lib/profile';
+import { allVisible, routeFor, collectionLabel } from '@lib/catalog';
+
+type Row = { date: Date; title: string; url?: string; kind: string };
+const authored: Row[] = timelineEvents().map((e) => ({ date: e.date, title: e.title, url: e.url, kind: e.kind }));
+const artifacts: Row[] = (await allVisible())
+  .filter((e) => e.data.status === 'published')
+  .map((e) => ({ date: e.data.date, title: `${e.data.title} (${collectionLabel(e.collection)})`, url: routeFor(e), kind: 'publication' }));
+const top8: Row[] = top8Revisions().map((r) => ({ date: new Date(`${r.as_of}-01T00:00:00Z`), title: `Top 8 revised (${r.as_of})`, url: `/top8/`, kind: 'top8-revision' }));
+const rows = [...authored, ...artifacts, ...top8].sort((a, b) => b.date.getTime() - a.date.getTime());
+const years = [...new Set(rows.map((r) => r.date.getUTCFullYear()))];
+---
+
+<BaseLayout title="Timeline" description="Launches, publications, courses completed, and site milestones, by date." current="timeline">
+  <div class="measure-reading">
+    <h1>Timeline</h1>
+    <p class="muted">Authored events plus every published item, newest first.</p>
+    {
+      years.map((y) => (
+        <section aria-labelledby={`year-${y}`}>
+          <h2 id={`year-${y}`}>{y}</h2>
+          <ul class="events">
+            {rows
+              .filter((r) => r.date.getUTCFullYear() === y)
+              .map((r) => (
+                <li>
+                  <time datetime={r.date.toISOString().slice(0, 10)}>{r.date.toISOString().slice(0, 10)}</time>{' '}
+                  {r.url ? <a href={r.url}>{r.title}</a> : r.title} <span class="small muted">{r.kind}</span>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .events {
+    list-style: none;
+    padding: 0;
+  }
+  .events li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  time {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    margin-right: 0.5rem;
+  }
+</style>

@@ -1,0 +1,21 @@
+---
+// Search page. The Pagefind index and its on-demand UI arrive with the collection engine at a
+// later phase; at Phase 9 this page is the no-JavaScript fallback that stays in place forever.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { COLLECTIONS } from '@lib/catalog';
+import { vocabularyTerms } from '@lib/catalog';
+const tags = vocabularyTerms('tags');
+---
+
+<BaseLayout title="Search" description="Find anything on the site by collection, tag, or date." current="search">
+  <div class="measure-reading">
+    <h1>Search</h1>
+    <p class="muted">Full-text search is added with the library engine. Until then, browse by collection, tag, or date.</p>
+    <h2>Collections</h2>
+    <ul>{COLLECTIONS.map((c) => <li><a href={c.route}>{c.label}</a></li>)}</ul>
+    <h2>Tags</h2>
+    <p>{tags.map((t, i) => <><a href={`/tags/${t.slug}/`}>{t.label}</a>{i < tags.length - 1 ? ' · ' : ''}</>)}</p>
+    <h2>By date</h2>
+    <p><a href="/timeline/">The timeline</a> lists everything in order.</p>
+  </div>
+</BaseLayout>

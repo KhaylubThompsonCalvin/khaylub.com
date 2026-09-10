@@ -1,0 +1,4 @@
+# The "On repeat" text block on Home. Text only; no autoplay. Empty title means the block is not rendered.
+title: ''
+artist: ''
+url: ''

@@ -1,0 +1,36 @@
+---
+// One card pattern for projects, data projects, Field Notes, and library items.
+// The title link is the accessible name and the whole card is its target.
+import Badge from './Badge.astro';
+
+interface Props {
+  href: string;
+  title: string;
+  summary?: string;
+  badge?: { text: string; tone?: 'live' | 'default' };
+  meta?: string[];
+  rank?: number;
+  thumb?: { src: string; alt: string };
+  headingLevel?: 'h3' | 'h2';
+}
+const { href, title, summary, badge, meta = [], rank, thumb, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class="card">
+  {thumb && <div class="thumb"><img src={thumb.src} alt={thumb.alt} loading="lazy" decoding="async" width="400" height="250" /></div>}
+  <Heading>
+    {rank && <span class="visually-hidden">Rank {rank}. </span>}<a href={href}>{title}</a>
+  </Heading>
+  {summary && <p class="summary">{summary}</p>}
+  {
+    (badge || meta.length > 0) && (
+      <div class="meta">
+        {badge && <Badge text={badge.text} tone={badge.tone} />}
+        {meta.map((m) => (
+          <span class="small muted">{m}</span>
+        ))}
+      </div>
+    )
+  }
+</article>
