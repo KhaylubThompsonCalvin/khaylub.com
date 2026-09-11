@@ -135,7 +135,8 @@ available, selected, invoked, for which task, with what evidence), and a state-b
 
 ## Current phase pointer
 
-Phase 10 (Employer experience: Home, Work, About, Now, Resume, Contact on the structured content
-layer) was accepted by the owner on 2026-09-11 and merged as PR #13 (`main` at `eac3607`, post-merge
-verification green). Phase 11 (Collection engine) is next and opens only on the owner's instruction,
-on a new branch from `main`; vault document 34 will be its plan.
+Phase 10 (Employer experience) was accepted and merged on 2026-09-11 (PR #13). Phase 11 (Collection
+and library engine: filtered collection pages, tag, skill, and technology pages, timeline filter,
+Top 8 archives, Pagefind search, feeds, build report) was built on 2026-09-11 on branch
+`feat/phase-11-collection-engine` (vault document 34 is its plan) and awaits the owner's exit-gate
+PASS. Phase 12 (Project case studies) opens only on the owner's instruction.
