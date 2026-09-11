@@ -4,7 +4,8 @@
 import { render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Badge from '@components/Badge.astro';
-import { COLLECTIONS, allVisible, badgeFor, collectionLabel, routeFor, type AnyEntry } from '@lib/catalog';
+import ProjectFacts from '@components/ProjectFacts.astro';
+import { COLLECTIONS, allVisible, badgeFor, collectionLabel, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
 export async function getStaticPaths() {
@@ -21,19 +22,7 @@ const data = entry.data as any;
 const badge = badgeFor(entry);
 const path = routeFor(entry);
 const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
-const isProject = entry.collection === 'projects';
 const isData = entry.collection === 'data';
-const links: { label: string; href: string }[] = [];
-if (isProject) {
-  if (data.links?.code) links.push({ label: 'Code', href: data.links.code });
-  if (data.links?.live) links.push({ label: 'Live', href: data.links.live });
-  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
-}
-if (isData) {
-  if (data.repository) links.push({ label: 'Repository', href: data.repository });
-  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
-  if (data.story_url) links.push({ label: 'Story', href: data.story_url });
-}
 const related: AnyEntry[] = data.related
   ? (await allVisible()).filter((e) => data.related.includes(e.data.slug))
   : [];
@@ -72,24 +61,8 @@ const jsonLd = [
         <Badge text={badge.text} tone={badge.tone} />
         <span class="muted">{collectionLabel(entry.collection)} · {date}{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
       </p>
-      {data.outcome && <p class="outcome">{data.outcome}</p>}
       {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
-      {
-        links.length > 0 && (
-          <p class="proof">
-            {links.map((l) => (
-              <a class="btn" href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
-                {l.label}
-              </a>
-            ))}
-          </p>
-        )
-      }
-      {
-        isProject && data.stack?.length > 0 && (
-          <p class="small muted">Stack: {data.stack.join(', ')}</p>
-        )
-      }
+      <ProjectFacts entry={entry} />
       {
         isData && (
           <dl class="facts">
@@ -125,8 +98,29 @@ const jsonLd = [
         )
       }
       {
+        data.skills?.length > 0 && (
+          <p class="small muted skills-shown">
+            Skills shown:{' '}
+            {data.skills.map((s: string, i: number) => (
+              <>
+                <a href={`/work/#skill-${s}`}>{labelFor('skills', s)}</a>
+                {i < data.skills.length - 1 ? ', ' : ''}
+              </>
+            ))}
+          </p>
+        )
+      }
+      {
         data.tags?.length > 0 && (
-          <p class="small muted">Tags: {data.tags.join(', ')}</p>
+          <p class="small muted tags">
+            Tags:{' '}
+            {data.tags.map((t: string, i: number) => (
+              <>
+                <a href={`/tags/${t}/`}>{labelFor('tags', t)}</a>
+                {i < data.tags.length - 1 ? ', ' : ''}
+              </>
+            ))}
+          </p>
         )
       }
     </footer>
