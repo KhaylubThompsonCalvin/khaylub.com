@@ -33,3 +33,19 @@ console.log(
   `PASS: build fails on the invalid fixture (exit ${result.status}); message names the file` +
     (mentionsPrivateKey ? ' and rejects the private key "gpa".' : '.')
 );
+
+// Second proof: a `related` slug that no artifact carries fails `npm run validate` (section 10).
+const noteTarget = 'content/notes/zz-dangling-related.md';
+cpSync('tests/fixtures/dangling-related/dangling.md', noteTarget);
+let validate;
+try {
+  validate = spawnSync('node', ['scripts/validate.mjs'], { encoding: 'utf8', shell: true });
+} finally {
+  rmSync(noteTarget, { force: true });
+}
+const validateOutput = `${validate.stdout}\n${validate.stderr}`;
+if (validate.status === 0 || !/related slug "no-such-artifact"/.test(validateOutput)) {
+  console.error('FAIL: validate did not reject the dangling related slug.\n' + validateOutput.slice(-1500));
+  process.exit(1);
+}
+console.log('PASS: validate rejects a related slug that no artifact carries.');

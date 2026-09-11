@@ -161,6 +161,25 @@ if (hasDist && existsSync('dist/resume/index.html')) {
   }
 }
 
+// 10. Cross-artifact integrity: every `related` slug names an artifact file; Top 8 slugs should too
+//     (an unpublished or missing Top 8 slot is skipped at build, so that is a warning, not a failure).
+const artifactSlugs = new Set();
+const relatedRefs = [];
+for (const file of walk('content', ['.md'])) {
+  if (file.split(/[\\/]/).includes('profile')) continue;
+  const { data } = matter(readFileSync(file, 'utf8'));
+  if (data.slug) artifactSlugs.add(data.slug);
+  for (const r of data.related ?? []) relatedRefs.push({ file, slug: r });
+}
+for (const { file, slug } of relatedRefs) {
+  if (!artifactSlugs.has(slug)) fail(`related slug "${slug}" in ${file} names no artifact`);
+}
+for (const file of walk('content/profile/top8', ['.yaml'])) {
+  for (const item of load(readFileSync(file, 'utf8')).items ?? []) {
+    if (!artifactSlugs.has(item.slug)) warnings.push(`Top 8 slug "${item.slug}" in ${file} has no artifact yet (the slot is skipped at build)`);
+  }
+}
+
 if (warnings.length) console.log('warnings:\n' + warnings.map((w) => '  ' + w).join('\n'));
 if (failures.length) {
   console.error('validate: FAIL\n' + failures.map((f) => '  ' + f).join('\n'));

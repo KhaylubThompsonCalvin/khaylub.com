@@ -9,7 +9,7 @@ summary: This fixture must fail the build. It is missing required fields and car
 tags: [portfolio]
 employer_visible: true
 source: fixture
-stack: [astro]
+technologies: [astro]
 gpa: 3.9
 ---
 

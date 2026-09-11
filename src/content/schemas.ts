@@ -101,7 +101,8 @@ export const project = rules(
       type: z.enum(['case-study', 'concept', 'exhibit']),
       project_status: z.enum(PROJECT_STATUS),
       links: links.default({}),
-      stack: z.array(term(TECH)).min(1),
+      // The stack is the `technologies` list from the base schema; a project must name at least one.
+      technologies: z.array(term(TECH)).min(1),
       outcome: z.string().max(200).optional(),
     })
     .strict()

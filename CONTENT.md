@@ -36,13 +36,13 @@ content/
 | `updated` | no | on or after `date` |
 | `summary` | yes | 40 to 240 characters; used on cards, search, and feeds |
 | `tags` | yes | one or more slugs from `vocabulary/tags.yaml` |
-| `skills` | no | slugs from `vocabulary/skills.yaml`; never AI |
-| `technologies` | no | slugs from `vocabulary/technologies.yaml` |
+| `skills` | no | slugs from `vocabulary/skills.yaml`; never AI. Each term there carries an `area` that groups the Work page |
+| `technologies` | no (yes for projects) | slugs from `vocabulary/technologies.yaml`; the Work page counts the published items that name each one |
 | `employer_visible` | yes | `false` hides the item from the Work page only |
 | `featured` | no | only the three approved launch projects may be `true`; the build fails otherwise |
 | `source` | yes | where the claims come from (a URL or a short statement) |
 | `cover`, `cover_alt` | no | a cover requires alt text and a provenance record |
-| `related` | no | slugs that must exist |
+| `related` | no | slugs of existing artifacts; `npm run validate` fails on a slug no artifact carries |
 | `series`, `part` | no | for multi-part notes |
 | `ai_assisted` | no | rendered as a sentence when `true` |
 | `license` | no | SPDX id or "All rights reserved" |
@@ -52,7 +52,7 @@ Any other key fails the build. That is how private fields stay impossible.
 
 ## Per collection
 
-- **projects**: `type` (`case-study`, `concept`, `exhibit`), `project_status` (`live`, `prototype`, `private-beta`, `concept`, `archived`), `links` (`code`, `live`, `result`), `stack`, optional `outcome`. A featured project needs at least one proof link.
+- **projects**: `type` (`case-study`, `concept`, `exhibit`), `project_status` (`live`, `prototype`, `private-beta`, `concept`, `archived`), `links` (`code`, `live`, `result`), `technologies` (required here: the stack, at least one term), optional `outcome`. A featured project needs at least one proof link.
 - **data**: `type` (`analysis`, `notebook`, `dataset`, `story`), `question`, `dataset` (`name`, `source`, `license`), `result`, optional `repository`, `story_url`, `sql`, `notebook`, `links`.
 - **notes**: `type` (`field-note`, `retrospective`, `how-to`).
 - **writing**: `type` (`essay`, `poem`, `fiction`, `book-note`). **journal**: `type: entry`.
