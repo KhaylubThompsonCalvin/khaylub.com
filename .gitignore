@@ -29,3 +29,4 @@ Thumbs.db
 .claude/settings.local.json
 .claude/verify-stamp.json
 CLAUDE.local.md
+build-report.json

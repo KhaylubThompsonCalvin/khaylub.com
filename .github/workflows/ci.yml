@@ -32,6 +32,8 @@ jobs:
         run: npm run build
       - name: Validation against the built output
         run: npm run validate
+      - name: Build report (pages, evidence, integrity, index size)
+        run: npm run report
       - name: HTML validity
         run: npx html-validate "dist/**/*.html"
       - name: Internal links
@@ -64,6 +66,7 @@ jobs:
           path: |
             playwright-report
             .lighthouseci
+            build-report.json
           if-no-files-found: ignore
 
   build-preview:

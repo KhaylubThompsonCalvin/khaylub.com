@@ -19,7 +19,8 @@
     "test:report": "playwright show-report",
     "lhci": "npx --yes @lhci/cli@0.15.1 autorun",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "report": "node scripts/build-report.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.5",
