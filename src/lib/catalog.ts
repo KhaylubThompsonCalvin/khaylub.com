@@ -195,6 +195,49 @@ export function filterOptions(name: ArtifactCollection, entries: AnyEntry[]): Fi
   return { types: types.sort(byCount), tags: tags.sort(byCount), series: series.sort(byCount) };
 }
 
+/* ---------- Vocabulary pages (W14): tags, skills, technologies ---------- */
+
+export type TermPageData = Term & {
+  kind: VocabKind;
+  items: AnyEntry[];
+  count: number;
+  first?: Date;
+  latest?: Date;
+  groups: { name: ArtifactCollection; label: string; items: AnyEntry[] }[];
+  relatedTags: Term[];
+};
+
+/** One page per term that has at least one item (doc 28: vocabulary pages for every used term).
+ *  Tags list every visible artifact; skills and technologies list public evidence (evidenceFor). */
+export async function termPages(kind: VocabKind): Promise<TermPageData[]> {
+  const all = await allVisible();
+  const source: { term: Term; items: AnyEntry[] }[] =
+    kind === 'tags'
+      ? vocabularyTerms('tags').map((t) => ({ term: t, items: all.filter((e) => e.data.tags.includes(t.slug)) }))
+      : (await evidenceFor(kind)).map((t) => ({ term: t, items: t.items }));
+  return source
+    .filter((s) => s.items.length > 0)
+    .map(({ term, items }) => {
+      const sorted = sortEntries(items, 'newest');
+      const times = sorted.map((e) => e.data.date.getTime());
+      const groups = COLLECTIONS.map((c) => ({ name: c.name, label: c.label, items: sorted.filter((e) => e.collection === c.name) })).filter((g) => g.items.length > 0);
+      const related = kind === 'tags' ? relatedTags(sorted, term.slug) : [];
+      return { ...term, kind, items: sorted, count: sorted.length, first: new Date(Math.min(...times)), latest: new Date(Math.max(...times)), groups, relatedTags: related };
+    });
+}
+
+/** Tags that co-occur on the given items (W14 "Related tags"), most shared first. Not a graph edge. */
+export function relatedTags(items: AnyEntry[], exclude: string): Term[] {
+  const counts = new Map<string, number>();
+  for (const e of items) for (const t of e.data.tags) if (t !== exclude) counts.set(t, (counts.get(t) ?? 0) + 1);
+  return [...counts]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([slug]) => vocabularyTerms('tags').find((t) => t.slug === slug))
+    .filter((t): t is Term => !!t);
+}
+
+export const termRoute = (kind: VocabKind, slug: string) => `/${kind}/${slug}/`;
+
 export async function collectionCounts(): Promise<{ name: ArtifactCollection; label: string; route: string; description: string; count: number }[]> {
   return Promise.all(
     COLLECTIONS.map(async (c) => ({ ...c, count: (await published(c.name)).length }))

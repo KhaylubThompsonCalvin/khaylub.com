@@ -1,0 +1,16 @@
+---
+// Technology pages: one per term with at least one listed item (W14, P2-CE-09).
+import BaseLayout from '@layouts/BaseLayout.astro';
+import TermPage from '@components/TermPage.astro';
+import { termPages } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  return (await termPages('technologies')).map((term) => ({ params: { slug: term.slug }, props: { term } }));
+}
+const { term } = Astro.props;
+const noun = term.kind === 'tags' ? 'items' : 'pieces of published work';
+---
+
+<BaseLayout title={`Technology: ${term.label}`} description={`${term.count} ${noun} on this site ${term.kind === 'tags' ? 'tagged' : term.kind === 'skills' ? 'showing the skill' : 'built with'} ${term.label}. ${term.description ?? ''}`.trim()} current="library">
+  <TermPage term={term} />
+</BaseLayout>

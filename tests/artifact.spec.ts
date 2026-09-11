@@ -6,7 +6,7 @@ test.describe('artifact pages', () => {
     const text = await page.locator('main').innerText();
     expect(text).toContain('React Three Fiber');
     expect(text).not.toContain('react-three-fiber');
-    await expect(page.locator('.skills-shown').getByRole('link', { name: 'Web development' })).toHaveAttribute('href', '/work/#skill-web-development');
+    await expect(page.locator('.skills-shown').getByRole('link', { name: 'Web development' })).toHaveAttribute('href', '/skills/web-development/');
     await expect(page.locator('.tags').getByRole('link', { name: 'three.js' })).toHaveAttribute('href', '/tags/three-js/');
     expect(text).not.toMatch(/Tags: three-js/);
   });

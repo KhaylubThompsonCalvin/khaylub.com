@@ -106,7 +106,7 @@ const jsonLd = [
             Skills shown:{' '}
             {data.skills.map((s: string, i: number) => (
               <>
-                {evidenced.has(s) ? <a href={`/work/#skill-${s}`}>{labelFor('skills', s)}</a> : labelFor('skills', s)}
+                {evidenced.has(s) ? <a href={`/skills/${s}/`}>{labelFor('skills', s)}</a> : labelFor('skills', s)}
                 {i < data.skills.length - 1 ? ', ' : ''}
               </>
             ))}

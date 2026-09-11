@@ -1,7 +1,7 @@
 ---
 // Outcome, technologies, and proof links for a project or data entry, from frontmatter only.
 // Used inside featured cards (compact) and in the artifact page header.
-import { termLabels, type AnyEntry } from '@lib/catalog';
+import { evidenceFor, labelFor, termRoute, type AnyEntry } from '@lib/catalog';
 
 interface Props {
   entry: AnyEntry;
@@ -9,7 +9,9 @@ interface Props {
 }
 const { entry, compact = false } = Astro.props;
 const data = entry.data as Record<string, any>;
-const tech = termLabels('technologies', data.technologies);
+const techSlugs: string[] = data.technologies ?? [];
+const withPage = new Set((await evidenceFor('technologies')).map((t) => t.slug));
+const tech = techSlugs.map((s) => ({ slug: s, label: labelFor('technologies', s), href: withPage.has(s) ? termRoute('technologies', s) : undefined }));
 const links: { label: string; href: string }[] = [];
 if (entry.collection === 'projects') {
   if (data.links?.code) links.push({ label: 'Code', href: data.links.code });
@@ -27,7 +29,19 @@ const outcome: string | undefined = data.outcome ?? (compact && entry.collection
 
 <div class:list={['facts', { compact }]}>
   {outcome && <p class="outcome">{outcome}</p>}
-  {tech.length > 0 && <p class="tech small muted">Built with {tech.join(', ')}</p>}
+  {
+    tech.length > 0 && (
+      <p class="tech small muted">
+        Built with{' '}
+        {tech.map((t, i) => (
+          <>
+            {t.href ? <a href={t.href}>{t.label}</a> : t.label}
+            {i < tech.length - 1 ? ', ' : ''}
+          </>
+        ))}
+      </p>
+    )
+  }
   {
     links.length > 0 && (
       <p class="proof">

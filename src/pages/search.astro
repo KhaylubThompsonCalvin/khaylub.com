@@ -2,9 +2,8 @@
 // Search page. The Pagefind index and its on-demand UI arrive with the collection engine at a
 // later phase; at Phase 9 this page is the no-JavaScript fallback that stays in place forever.
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { COLLECTIONS } from '@lib/catalog';
-import { vocabularyTerms } from '@lib/catalog';
-const tags = vocabularyTerms('tags');
+import { COLLECTIONS, termPages } from '@lib/catalog';
+const tags = await termPages('tags');
 ---
 
 <BaseLayout title="Search" description="Find anything on the site by collection, tag, or date." current="search">
