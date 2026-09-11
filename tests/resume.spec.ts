@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
 test.describe('résumé', () => {
   test('the PDF is served at the unchanged path', async ({ request }) => {
@@ -17,5 +18,15 @@ test.describe('résumé', () => {
     }
     await expect(page.getByRole('link', { name: 'Download the PDF' })).toHaveAttribute('href', '/resume/Khaylub-Thompson-Calvin-Resume.pdf');
     expect(text).not.toMatch(/\(\d{3}\) \d{3}-\d{4}/);
+  });
+
+  test('every PDF link on the employer pages uses the canonical path from resume.md', async ({ page }) => {
+    const canonical = readFileSync('content/profile/resume.md', 'utf8').match(/^pdf:\s*(\S+)/m)![1];
+    for (const path of ['/', '/work/', '/resume/', '/contact/']) {
+      await page.goto(path);
+      const hrefs = await page.locator('a[href$=".pdf"]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+      expect(hrefs.length, path).toBeGreaterThan(0);
+      for (const h of hrefs) expect(h, path).toBe(canonical);
+    }
   });
 });

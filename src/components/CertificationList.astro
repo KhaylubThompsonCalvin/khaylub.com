@@ -1,0 +1,10 @@
+---
+// Certifications and training from content/profile/certifications.yaml. Rendered on Work and About.
+import { certifications } from '@lib/profile';
+const certs = certifications();
+---
+
+<ul class="certs">
+  {certs.items.map((c) => <li>{c.name}{c.issuer ? ` (${c.issuer}${c.years ? `, ${c.years}` : ''})` : ''}</li>)}
+</ul>
+{certs.planned.length > 0 && <p class="muted">Planned: {certs.planned.join(' and ')}</p>}

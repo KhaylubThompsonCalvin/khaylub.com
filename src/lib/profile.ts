@@ -10,18 +10,22 @@ function readYaml(rel: string): unknown {
   return load(readFileSync(contentPath(rel), 'utf8'));
 }
 
-function parse<T extends z.ZodTypeAny>(rel: string, schema: T): z.infer<T> {
-  const result = schema.safeParse(readYaml(rel));
+function parseValue<T extends z.ZodTypeAny>(value: unknown, schema: T, label: string): z.infer<T> {
+  const result = schema.safeParse(value);
   if (!result.success) {
     const issues = result.error.issues
       .map((i) => `  ${i.path.join('.') || '(root)'}: ${i.message}`)
       .join('\n');
-    throw new Error(`content/${rel} failed validation:\n${issues}`);
+    throw new Error(`content/${label} failed validation:\n${issues}`);
   }
   return result.data;
 }
 
-const yearMonth = z.string().regex(/^\d{4}-\d{2}$/);
+function parse<T extends z.ZodTypeAny>(rel: string, schema: T): z.infer<T> {
+  return parseValue(readYaml(rel), schema, rel);
+}
+
+const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'expected YYYY-MM with a month from 01 to 12');
 
 export const identitySchema = z
   .object({
@@ -147,6 +151,30 @@ export const education = () => parse('profile/education.yaml', educationSchema);
 export const certifications = () => parse('profile/certifications.yaml', certificationsSchema);
 export const timelineEvents = () => parse('timeline/events.yaml', timelineSchema).events;
 export const redirects = () => parse('redirects.yaml', redirectsSchema).redirects;
+
+/** The résumé frontmatter (revision, date, PDF path). The one place the PDF path is written. */
+export function resumeMeta(): { revision: string; as_of: Date; pdf: string } {
+  const text = readFileSync(contentPath('profile', 'resume.md'), 'utf8');
+  const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
+  return parseValue(
+    load(block),
+    z.object({ revision: z.string(), as_of: z.coerce.date(), pdf: z.string().startsWith('/') }).strict(),
+    'profile/resume.md (frontmatter)'
+  );
+}
+
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** "2023-12" becomes "December 2023"; "2016" and "present" are returned as written. */
+export function dateLabel(value: string): string {
+  const m = value.match(/^(\d{4})-(\d{2})$/);
+  return m ? `${monthNames[Number(m[2]) - 1]} ${m[1]}` : value;
+}
+
+export const periodLabel = (start: string, end: string) => `${dateLabel(start)} to ${dateLabel(end)}`;
+
+/** "Hillsboro, OR" gives "OR"; undefined when the location has no region part. */
+export const regionOf = (location: string) => location.split(',')[1]?.trim() || undefined;
 
 /** All Top 8 revision files, newest first. */
 export function top8Revisions() {

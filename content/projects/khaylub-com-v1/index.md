@@ -17,7 +17,6 @@ links:
   code: https://github.com/KhaylubThompsonCalvin/khaylub-portfolio
   live: /climb/
   result: /notes/the-16-mb-front-door/
-stack: [react-three-fiber, three-js, vite, blender, lenis, zustand]
 outcome: Launched 2026-06-24, three months ahead of its target date; preserved at tag v1.0.0-3d-experiment.
 related: [preserving-v1, the-16-mb-front-door]
 ---

@@ -1,0 +1,7 @@
+---
+// The Now lines from content/profile/now.yaml as a list. The dated heading belongs to the page.
+import { now } from '@lib/profile';
+const n = now();
+---
+
+<ul class="now-lines">{n.lines.map((l) => <li>{l}</li>)}</ul>

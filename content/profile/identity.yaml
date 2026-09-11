@@ -7,8 +7,9 @@ location: Hillsboro, OR
 email: khaylubthompsoncalvin@gmail.com
 github: https://github.com/KhaylubThompsonCalvin
 linkedin: https://www.linkedin.com/in/khaylub-thompson-calvin-40543b294/
-# Expected reply time shown on the contact page. Left empty until the owner sets it; nothing renders when empty.
-response_time: ''
+# Expected reply time shown on the contact page. Nothing renders when empty.
+# Placeholder authorized by the owner in the Phase 10 prompt (2026-09-10); the owner may replace it.
+response_time: Usually replies within 1 to 2 business days.
 # Optional photo for the identity card (path under public/). Empty means no photo is rendered.
 photo: ''
 photo_alt: ''

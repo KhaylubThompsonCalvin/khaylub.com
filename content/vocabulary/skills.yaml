@@ -1,18 +1,18 @@
 # Skills are abilities shown by published work. Evidence counts on the Work page come from
-# artifacts that list a skill. "AI" is never a skill term (schemas.ts rejects it).
+# artifacts that list a skill; `area` groups the Work page. "AI" is never a skill term (schemas.ts rejects it).
 terms:
-  - { slug: data-analysis, label: Data analysis, description: Asking a question of data and answering it with evidence. }
-  - { slug: data-cleaning, label: Data cleaning, description: Correcting and preparing raw data before analysis. }
-  - { slug: regression-modeling, label: Regression modeling, description: Fitting, evaluating, and explaining linear models. }
-  - { slug: visualization, label: Visualization, description: Choosing and building the right chart. }
-  - { slug: sql-querying, label: SQL querying, description: Joins, aggregates, and schema reading. }
-  - { slug: reproducible-research, label: Reproducible research, description: Work that re-runs from a clean clone. }
-  - { slug: web-development, label: Web development, description: Building and shipping web sites. }
-  - { slug: 3d-pipeline, label: 3D pipeline, description: Modeling, rigging, export, and web delivery. }
-  - { slug: performance-analysis, label: Performance analysis, description: Measuring payload and load behavior. }
-  - { slug: version-control, label: Version control, description: Branches, tags, releases, protection. }
-  - { slug: documentation, label: Documentation, description: Writing procedures and records others can follow. }
-  - { slug: electronics-repair, label: Electronics repair, description: Diagnosing and repairing assemblies to specification. }
-  - { slug: calibration, label: Calibration and testing, description: Precision calibration and safety testing. }
-  - { slug: training, label: Training, description: Teaching procedures to new employees. }
-  - { slug: security-hardening, label: Security hardening, description: Headers, policies, and disclosure practice. }
+  - { slug: data-analysis, area: Data, label: Data analysis, description: Asking a question of data and answering it with evidence. }
+  - { slug: data-cleaning, area: Data, label: Data cleaning, description: Correcting and preparing raw data before analysis. }
+  - { slug: regression-modeling, area: Data, label: Regression modeling, description: Fitting, evaluating, and explaining linear models. }
+  - { slug: visualization, area: Data, label: Visualization, description: Choosing and building the right chart. }
+  - { slug: sql-querying, area: Data, label: SQL querying, description: Joins, aggregates, and schema reading. }
+  - { slug: reproducible-research, area: Data, label: Reproducible research, description: Work that re-runs from a clean clone. }
+  - { slug: web-development, area: Web, label: Web development, description: Building and shipping web sites. }
+  - { slug: 3d-pipeline, area: Web, label: 3D pipeline, description: Modeling, rigging, export, and web delivery. }
+  - { slug: performance-analysis, area: Web, label: Performance analysis, description: Measuring payload and load behavior. }
+  - { slug: security-hardening, area: Web, label: Security hardening, description: Headers, policies, and disclosure practice. }
+  - { slug: version-control, area: Practice, label: Version control, description: Branches, tags, releases, protection. }
+  - { slug: documentation, area: Practice, label: Documentation, description: Writing procedures and records others can follow. }
+  - { slug: training, area: Practice, label: Training, description: Teaching procedures to new employees. }
+  - { slug: electronics-repair, area: Hardware, label: Electronics repair, description: Diagnosing and repairing assemblies to specification. }
+  - { slug: calibration, area: Hardware, label: Calibration and testing, description: Precision calibration and safety testing. }

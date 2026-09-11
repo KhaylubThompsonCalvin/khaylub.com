@@ -1,109 +1,83 @@
 ---
+// Work: the fast path for hiring managers. Every fact on this page is read from content/:
+// featured projects and evidence from the catalog; education, certifications, availability,
+// identity, and the résumé metadata from the profile files. Nothing is typed here twice.
 import BaseLayout from '@layouts/BaseLayout.astro';
 import ArtifactCard from '@components/ArtifactCard.astro';
-import { featured, skillsWithEvidence, routeFor } from '@lib/catalog';
-import { education, certifications, availability, identity, monthLabel } from '@lib/profile';
+import EvidenceList from '@components/EvidenceList.astro';
+import EducationList from '@components/EducationList.astro';
+import CertificationList from '@components/CertificationList.astro';
+import { featured, skillGroups, evidenceFor } from '@lib/catalog';
+import { availability, identity, monthLabel, resumeMeta } from '@lib/profile';
 
 const feat = await featured();
-const skills = await skillsWithEvidence();
-const edu = education();
-const certs = certifications();
+const groups = await skillGroups();
+const tech = await evidenceFor('technologies');
 const avail = availability();
 const id = identity();
+const resume = resumeMeta();
+const skillCount = groups.reduce((n, g) => n + g.skills.length, 0);
+const evidenceTotal = new Set(groups.flatMap((g) => g.skills.flatMap((s) => s.items.map((i) => i.data.slug)))).size;
 ---
 
 <BaseLayout
   title="Work"
-  description="Skills with evidence, three featured projects, education, and certifications. The fast path for hiring managers."
+  description={`${feat.length} featured projects with code and results, ${skillCount} skills with evidence, education, and certifications of ${id.name}. The fast path for hiring managers.`}
   current="work"
 >
   <div class="measure">
     <h1>Work</h1>
     <p class="availability">{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small></p>
     <p>
-      Three projects with code and results, the skills they show, and where I studied. The
-      <a href="/resume/">résumé</a> has the same facts in one page.
+      {feat.length} projects with code and results, the skills and technologies they show, and where I
+      studied. The <a href="/resume/">résumé</a> has the same facts in one page.
     </p>
   </div>
 
   <section class="section" aria-labelledby="featured-heading">
     <h2 id="featured-heading">Featured projects</h2>
     <ul class="card-grid">
-      {feat.map((e) => <li><ArtifactCard entry={e} /></li>)}
+      {feat.map((e) => <li><ArtifactCard entry={e} detail /></li>)}
     </ul>
   </section>
 
-  <section class="section" aria-labelledby="skills" id="skills">
+  <section class="section" id="skills" aria-labelledby="skills-heading">
     <h2 id="skills-heading">Skills, with evidence</h2>
-    <p class="muted measure">Each count is the number of published pieces of work on this site that show the skill.</p>
-    <ul class="skills">
-      {
-        skills.map((s) => (
-          <li>
-            <span class="skill-label">{s.label}</span>
-            <span class="badge">{s.count} {s.count === 1 ? 'piece' : 'pieces'} of evidence</span>
-            <span class="small muted">
-              {s.items.map((it, i) => (
-                <>
-                  <a href={routeFor(it)}>{it.data.title}</a>
-                  {i < s.items.length - 1 ? ', ' : ''}
-                </>
-              ))}
-            </span>
-          </li>
-        ))
-      }
-    </ul>
+    <p class="muted measure">
+      Each count is the number of published pieces of work on this site that show the skill, across
+      {evidenceTotal} {evidenceTotal === 1 ? 'item' : 'items'}. Every item is linked; there are no self-ratings.
+    </p>
+    {
+      groups.map((g) => (
+        <div class="skill-group">
+          <h3>{g.area}</h3>
+          <EvidenceList kind="skills" items={g.skills} idPrefix="skill" />
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="section" id="technologies" aria-labelledby="technologies-heading">
+    <h2 id="technologies-heading">Technologies, across projects</h2>
+    <p class="muted measure">Tools and libraries named by the published work, with the items that use each one.</p>
+    <EvidenceList kind="technologies" items={tech} idPrefix="technology" />
   </section>
 
   <section class="section measure" aria-labelledby="education-heading">
     <h2 id="education-heading">Education</h2>
-    <dl class="edu">
-      {
-        edu.entries.map((e) => (
-          <div>
-            <dt>
-              {e.program}, {e.institution}
-            </dt>
-            <dd>
-              {e.location} · {e.start} to {e.end}
-              {e.note ? `, ${e.note.toLowerCase()}` : ''}
-              {e.courses.length > 0 && (
-                <ul>
-                  {e.courses.map((c) => (
-                    <li>
-                      {c.name}: completed {c.completed}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {e.highlights.length > 0 && (
-                <ul>
-                  {e.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </dd>
-          </div>
-        ))
-      }
-    </dl>
+    <EducationList />
   </section>
 
   <section class="section measure" aria-labelledby="certs-heading">
     <h2 id="certs-heading">Certifications and training</h2>
-    <ul>
-      {certs.items.map((c) => <li>{c.name}{c.issuer ? ` (${c.issuer}${c.years ? `, ${c.years}` : ''})` : ''}</li>)}
-    </ul>
-    {certs.planned.length > 0 && <p class="muted">Planned: {certs.planned.join(' and ')}</p>}
+    <CertificationList />
   </section>
 
   <section class="section" aria-labelledby="next-heading">
     <h2 id="next-heading">Résumé and contact</h2>
     <p class="actions">
       <a class="btn btn-primary" href="/resume/">Read the résumé</a>
-      <a class="btn" href="/resume/Khaylub-Thompson-Calvin-Resume.pdf">Download the PDF</a>
+      <a class="btn" href={resume.pdf}>Download the PDF</a>
       <a class="btn" href={`mailto:${id.email}`}>Email me</a>
     </p>
   </section>
@@ -113,29 +87,11 @@ const id = identity();
   .availability {
     font-weight: 600;
   }
-  .skills {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: var(--space-1);
+  .skill-group {
+    margin-bottom: var(--space-3);
   }
-  .skills li {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-1) var(--space-2);
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .skill-label {
-    font-weight: 600;
-    min-width: 12rem;
-  }
-  .edu dt {
-    font-weight: 600;
-  }
-  .edu dd {
-    margin: 0 0 var(--space-2);
+  .skill-group h3 {
+    margin-bottom: var(--space-1);
   }
   .actions {
     display: flex;

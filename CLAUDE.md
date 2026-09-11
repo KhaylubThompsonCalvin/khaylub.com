@@ -136,5 +136,7 @@ available, selected, invoked, for which task, with what evidence), and a state-b
 ## Current phase pointer
 
 Phase 9 (V2 skeleton) was accepted on 2026-09-10 with `main` green. Phase 10 (Employer
-experience: Home, Work, About, Now, Resume, Contact against P2-FE-01 to P2-FE-16) is next and
-opens only on the owner's instruction, on branch `feat/phase-10-employer-experience`.
+experience: Home, Work, About, Now, Resume, Contact against P2-FE-01 to P2-FE-16) was built on
+2026-09-11 on branch `feat/phase-10-employer-experience` (vault document 33 is its plan) and
+awaits the owner's exit-gate PASS. Phase 11 (Collection engine) opens only on the owner's
+instruction.

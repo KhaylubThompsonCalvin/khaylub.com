@@ -1,12 +1,21 @@
 ---
+// About: the owner's bio and belief (verbatim copy), then the dated Now list, education,
+// certifications, interests, and links, all read from content/profile/.
 import BaseLayout from '@layouts/BaseLayout.astro';
+import NowLines from '@components/NowLines.astro';
+import EducationList from '@components/EducationList.astro';
+import CertificationList from '@components/CertificationList.astro';
 import { identity, now, monthLabel, interests } from '@lib/profile';
 const id = identity();
 const n = now();
 const groups = interests().groups.filter((g) => g.items.length > 0);
 ---
 
-<BaseLayout title="About" description="Who Khaylub Thompson-Calvin is, what he believes about building, and where to find him elsewhere." current="about">
+<BaseLayout
+  title="About"
+  description={`Who ${id.name} is, how he works, what he is doing now, his education and training, and where to find him elsewhere.`}
+  current="about"
+>
   <article class="measure-reading">
     <h1>About</h1>
     <p>
@@ -24,8 +33,17 @@ const groups = interests().groups.filter((g) => g.items.length > 0);
     </p>
 
     <h2 class="section-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h2>
-    <ul>{n.lines.map((l) => <li>{l}</li>)}</ul>
+    <NowLines />
     <p><a href="/now/">The Now page</a> keeps the dated version.</p>
+
+    <h2>Education</h2>
+    <EducationList />
+
+    <h2>Certifications and training</h2>
+    <CertificationList />
+    <p class="small muted">
+      The <a href="/work/">Work page</a> shows the skills these support, each with the public work that proves it.
+    </p>
 
     {
       groups.length > 0 && (

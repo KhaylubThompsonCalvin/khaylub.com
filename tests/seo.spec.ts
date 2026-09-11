@@ -18,6 +18,22 @@ test.describe('SEO and metadata', () => {
     });
   }
 
+  test('the Person record is built from profile data', async ({ page }) => {
+    await page.goto('/');
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const person = blocks
+      .flatMap((b) => {
+        const p = JSON.parse(b);
+        return Array.isArray(p) ? p : [p];
+      })
+      .find((x) => x['@type'] === 'Person');
+    expect(person).toBeTruthy();
+    expect(person.address.addressRegion).toBe('OR');
+    expect(person.alumniOf.map((a: { name: string }) => a.name)).toContain('Portland Community College');
+    expect(person.knowsAbout).toContain('Data analysis');
+    expect(person.knowsAbout.join(' ')).not.toMatch(/\bAI\b/);
+  });
+
   test('the sitemap lists every built route and nothing else', async ({ request }) => {
     const xml = await (await request.get('/sitemap-0.xml')).text();
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).sort();

@@ -1,11 +1,12 @@
-// JSON-LD builders. Generated from profile data and frontmatter, never hand-written per page.
-import { identity } from './profile';
-import type { AnyEntry } from './catalog';
+// JSON-LD builders. Generated from profile data, the vocabularies, and frontmatter; never hand-written per page.
+import { identity, education, regionOf } from './profile';
+import { evidenceFor, termLabels, type AnyEntry } from './catalog';
 
 const site = 'https://khaylub.com';
 
-export function personAndWebsite() {
+export async function personAndWebsite() {
   const id = identity();
+  const skills = await evidenceFor('skills');
   return [
     {
       '@context': 'https://schema.org',
@@ -15,7 +16,10 @@ export function personAndWebsite() {
       jobTitle: id.role_line,
       email: `mailto:${id.email}`,
       sameAs: [id.github, id.linkedin],
-      address: { '@type': 'PostalAddress', addressLocality: id.location.split(',')[0]?.trim(), addressRegion: 'OR' },
+      address: { '@type': 'PostalAddress', addressLocality: id.location.split(',')[0]?.trim(), addressRegion: regionOf(id.location) },
+      alumniOf: education().entries.map((e) => ({ '@type': 'EducationalOrganization', name: e.institution })),
+      // Only skills with published, employer-visible evidence on this site; never a self-rating.
+      knowsAbout: skills.map((s) => s.label),
     },
     {
       '@context': 'https://schema.org',
@@ -50,7 +54,11 @@ export function creativeWork(entry: AnyEntry, path: string) {
     url: `${site}${path}`,
     datePublished: data.date.toISOString().slice(0, 10),
     author: { '@type': 'Person', name: id.name },
-    keywords: (data.tags ?? []).join(', '),
+    keywords: [
+      ...termLabels('tags', data.tags),
+      ...termLabels('skills', data.skills),
+      ...termLabels('technologies', data.technologies),
+    ].join(', '),
   };
   if (data.updated) record.dateModified = data.updated.toISOString().slice(0, 10);
   if (entry.collection === 'projects' && data.links?.code) record.codeRepository = data.links.code;

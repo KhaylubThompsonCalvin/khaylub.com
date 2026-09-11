@@ -13,7 +13,6 @@ technologies: [python]
 employer_visible: true
 featured: false
 source: Owner's project records; no public repository
-stack: [python]
 ai_assisted: true
 outcome: In private beta; not publicly available.
 ---

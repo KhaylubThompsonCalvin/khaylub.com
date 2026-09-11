@@ -23,6 +23,7 @@ const Heading = headingLevel;
     {rank && <span class="visually-hidden">Rank {rank}. </span>}<a href={href}>{title}</a>
   </Heading>
   {summary && <p class="summary">{summary}</p>}
+  <slot />
   {
     (badge || meta.length > 0) && (
       <div class="meta">
