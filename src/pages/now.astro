@@ -1,13 +1,15 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { now, monthLabel } from '@lib/profile';
+import NowLines from '@components/NowLines.astro';
+import { now, monthLabel, identity } from '@lib/profile';
 const n = now();
+const id = identity();
 ---
 
-<BaseLayout title="Now" description="What Khaylub Thompson-Calvin is focused on right now, with the date it was written." current="now">
+<BaseLayout title="Now" description={`What ${id.name} is focused on right now, with the date it was written.`} current="now">
   <article class="measure-reading">
     <h1 class="section-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h1>
-    <ul>{n.lines.map((l) => <li>{l}</li>)}</ul>
+    <NowLines />
     <h2>About this page</h2>
     <p>
       A dated status page, updated by hand. If the date above is more than a few months old, the

@@ -1,24 +1,27 @@
 ---
+// Contact: email as visible text, the profile links, and the résumé, all from content/profile/.
+// No form and no backend (decision recorded in the Phase 2 requirements): mailto only.
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { identity, availability, monthLabel } from '@lib/profile';
+import { identity, availability, monthLabel, resumeMeta } from '@lib/profile';
 const id = identity();
 const avail = availability();
+const resume = resumeMeta();
 ---
 
-<BaseLayout title="Contact" description="How to reach Khaylub Thompson-Calvin: email, GitHub, and LinkedIn." current="contact">
+<BaseLayout title="Contact" description={`How to reach ${id.name}: email, GitHub, and LinkedIn.`} current="contact">
   <article class="measure-reading">
     <h1>Contact</h1>
     <p class="availability">{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small></p>
     <h2>Email</h2>
     <p><a href={`mailto:${id.email}`}>{id.email}</a></p>
-    {id.response_time && <p class="muted">Expected reply: {id.response_time}.</p>}
+    {id.response_time && <p class="muted">{id.response_time}</p>}
     <h2>Elsewhere</h2>
     <ul>
       <li><a href={id.github} rel="noopener noreferrer">GitHub</a></li>
       <li><a href={id.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
     </ul>
     <h2>Résumé</h2>
-    <p><a href="/resume/">Read it here</a> or <a href="/resume/Khaylub-Thompson-Calvin-Resume.pdf">download the PDF</a>.</p>
+    <p><a href="/resume/">Read it here</a> or <a href={resume.pdf}>download the PDF</a>.</p>
   </article>
 </BaseLayout>
 
