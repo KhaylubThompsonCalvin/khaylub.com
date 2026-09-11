@@ -39,7 +39,7 @@ test.describe('content rules', () => {
 
   test('skills on Work never include AI', async ({ page }) => {
     await page.goto('/work/');
-    const labels = await page.locator('.skill-label').allInnerTexts();
+    const labels = await page.locator('[data-evidence="skills"] .term-label').allInnerTexts();
     expect(labels.length).toBeGreaterThan(3);
     expect(labels.some((l) => /\bAI\b|artificial intelligence|prompt/i.test(l))).toBe(false);
   });

@@ -1,25 +1,24 @@
 ---
 // Maps a catalog entry onto the Card pattern.
 import Card from './Card.astro';
+import ProjectFacts from './ProjectFacts.astro';
 import { badgeFor, routeFor, type AnyEntry } from '@lib/catalog';
 
 interface Props {
   entry: AnyEntry;
   rank?: number;
   showCollection?: boolean;
+  /** Featured cards on Work: outcome, technologies, and proof links from the frontmatter. */
+  detail?: boolean;
 }
-const { entry, rank, showCollection = false } = Astro.props;
+const { entry, rank, showCollection = false, detail = false } = Astro.props;
 const badge = badgeFor(entry);
 const date = entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const meta = [date];
-if (showCollection && entry.collection !== 'projects' && entry.collection !== 'data') meta.unshift(badge.text);
+const plain = showCollection && entry.collection !== 'projects' && entry.collection !== 'data';
+if (plain) meta.unshift(badge.text);
 ---
 
-<Card
-  href={routeFor(entry)}
-  title={entry.data.title}
-  summary={entry.data.summary}
-  badge={showCollection && entry.collection !== 'projects' && entry.collection !== 'data' ? undefined : badge}
-  meta={meta}
-  rank={rank}
-/>
+<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank}>
+  {detail && <ProjectFacts entry={entry} compact />}
+</Card>

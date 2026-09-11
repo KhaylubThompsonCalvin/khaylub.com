@@ -1,0 +1,52 @@
+---
+// Terms (skills or technologies) with the public artifacts that prove them. The count is the
+// number of linked items; nothing here is a self-rating.
+import { routeFor, type Evidence } from '@lib/catalog';
+
+interface Props {
+  kind: 'skills' | 'technologies';
+  items: Evidence[];
+  idPrefix: string;
+}
+const { kind, items, idPrefix } = Astro.props;
+---
+
+<ul class="evidence" data-evidence={kind}>
+  {
+    items.map((t) => (
+      <li data-term={t.slug} data-count={t.count} id={`${idPrefix}-${t.slug}`}>
+        <span class="term-label">{t.label}</span>
+        <span class="badge">{t.count} {t.count === 1 ? 'piece' : 'pieces'} of evidence</span>
+        <span class="term-items small muted">
+          {t.items.map((it, i) => (
+            <>
+              <a href={routeFor(it)}>{it.data.title}</a>
+              {i < t.items.length - 1 ? ', ' : ''}
+            </>
+          ))}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .evidence {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-1);
+  }
+  .evidence li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .term-label {
+    font-weight: 600;
+    min-width: 12rem;
+  }
+</style>

@@ -1,7 +1,8 @@
 ---
-import { identity, blogroll } from '@lib/profile';
+import { identity, blogroll, resumeMeta } from '@lib/profile';
 const id = identity();
 const roll = blogroll();
+const resume = resumeMeta();
 const year = new Date().getUTCFullYear();
 ---
 
@@ -11,7 +12,7 @@ const year = new Date().getUTCFullYear();
       <li><a href={`mailto:${id.email}`}>Email</a></li>
       <li><a href={id.github} rel="noopener noreferrer">GitHub</a></li>
       <li><a href={id.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
-      <li><a href="/resume/Khaylub-Thompson-Calvin-Resume.pdf">Résumé (PDF)</a></li>
+      <li><a href={resume.pdf}>Résumé (PDF)</a></li>
       <li><a href="/climb/">The climb</a></li>
       <li><a href="/colophon/">Colophon and accessibility</a></li>
       <li><a href="https://v1.khaylub.com" rel="noopener noreferrer">V1, the 3D experiment (2026)</a></li>

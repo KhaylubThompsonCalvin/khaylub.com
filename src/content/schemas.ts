@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { load } from 'js-yaml';
 
-type Vocab = { terms: { slug: string; label: string; description?: string }[] };
+type Vocab = { terms: { slug: string; label: string; description?: string; area?: string }[] };
 
 // Content paths resolve from the project root, not from the compiled chunk's location, so the
 // same code works in dev, in `astro sync`, and inside the prerender bundle.

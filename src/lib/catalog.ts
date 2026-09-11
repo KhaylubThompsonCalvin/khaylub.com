@@ -2,6 +2,8 @@
 // Production renders only published and archived items; preview builds also render drafts and
 // items under review (each with a banner). Nothing else exists to the build.
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { readFileSync } from 'node:fs';
+import { load } from 'js-yaml';
 import { isPreview, currentTop8 } from './profile';
 import { vocabulary, contentPath } from '../content/schemas';
 
@@ -84,29 +86,56 @@ export async function featured(): Promise<AnyEntry[]> {
   return FEATURED_ORDER.map((s) => bySlug.get(s)).filter((e): e is AnyEntry => !!e);
 }
 
-export type SkillEvidence = { slug: string; label: string; description?: string; count: number; items: AnyEntry[] };
+export type VocabKind = 'tags' | 'skills' | 'technologies';
+export type Term = { slug: string; label: string; description?: string; area?: string };
 
-/** Skills with evidence counts from published, employer-visible artifacts. Zero-evidence skills are omitted. */
-export async function skillsWithEvidence(): Promise<SkillEvidence[]> {
-  const all = (await allVisible()).filter((e) => e.data.employer_visible && e.data.status === 'published');
-  const terms = vocabularyTerms('skills');
-  return terms
+const termCache = new Map<VocabKind, Term[]>();
+
+/** Vocabulary terms with labels. schemas.ts validates the same files; this re-reads them for display. */
+export function vocabularyTerms(kind: VocabKind): Term[] {
+  let terms = termCache.get(kind);
+  if (!terms) {
+    vocabulary(kind);
+    terms = (load(readFileSync(contentPath('vocabulary', `${kind}.yaml`), 'utf8')) as { terms: Term[] }).terms;
+    termCache.set(kind, terms);
+  }
+  return terms;
+}
+
+export function labelFor(kind: VocabKind, slug: string): string {
+  return vocabularyTerms(kind).find((t) => t.slug === slug)?.label ?? slug;
+}
+
+export function termLabels(kind: VocabKind, slugs: string[] | undefined): string[] {
+  return (slugs ?? []).map((s) => labelFor(kind, s));
+}
+
+export type Evidence = Term & { count: number; items: AnyEntry[] };
+
+/** An artifact counts as evidence when it is published and employer-visible. */
+async function evidencePool(): Promise<AnyEntry[]> {
+  return (await allVisible()).filter((e) => e.data.employer_visible && e.data.status === 'published');
+}
+
+/** Terms with the public artifacts that prove them. Terms with no evidence are omitted; nothing is rated. */
+export async function evidenceFor(kind: 'skills' | 'technologies'): Promise<Evidence[]> {
+  const pool = await evidencePool();
+  return vocabularyTerms(kind)
     .map((t) => {
-      const items = all.filter((e) => (e.data.skills ?? []).includes(t.slug));
-      return { ...t, count: items.length, items: items.slice(0, 3) };
+      const items = pool.filter((e) => ((e.data as Record<string, unknown>)[kind] as string[] | undefined)?.includes(t.slug));
+      return { ...t, count: items.length, items };
     })
     .filter((t) => t.count > 0)
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
-import { readFileSync } from 'node:fs';
-import { load } from 'js-yaml';
-
-export function vocabularyTerms(name: 'tags' | 'skills' | 'technologies'): { slug: string; label: string; description?: string }[] {
-  // Re-read for labels; schemas.ts validates the same files.
-  vocabulary(name);
-  const file = readFileSync(contentPath('vocabulary', `${name}.yaml`), 'utf8');
-  return (load(file) as { terms: { slug: string; label: string; description?: string }[] }).terms;
+/** Skills with evidence grouped by the area named in skills.yaml, in the file's order; unlabeled areas last. */
+export async function skillGroups(): Promise<{ area: string; skills: Evidence[] }[]> {
+  const order = [...new Set(vocabularyTerms('skills').map((t) => t.area ?? 'Other'))];
+  const skills = await evidenceFor('skills');
+  return order
+    .map((area) => ({ area, skills: skills.filter((s) => (s.area ?? 'Other') === area) }))
+    .filter((g) => g.skills.length > 0);
 }
 
 /** Current Top 8 resolved to visible entries. Unpublished slots are skipped and later items move up. */

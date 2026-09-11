@@ -1,0 +1,70 @@
+---
+// Outcome, technologies, and proof links for a project or data entry, from frontmatter only.
+// Used inside featured cards (compact) and in the artifact page header.
+import { termLabels, type AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+  compact?: boolean;
+}
+const { entry, compact = false } = Astro.props;
+const data = entry.data as Record<string, any>;
+const tech = termLabels('technologies', data.technologies);
+const links: { label: string; href: string }[] = [];
+if (entry.collection === 'projects') {
+  if (data.links?.code) links.push({ label: 'Code', href: data.links.code });
+  if (data.links?.live) links.push({ label: 'Live', href: data.links.live });
+  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
+}
+if (entry.collection === 'data') {
+  if (data.repository) links.push({ label: 'Repository', href: data.repository });
+  if (data.links?.result) links.push({ label: 'Result', href: data.links.result });
+  if (data.story_url) links.push({ label: 'Story', href: data.story_url });
+}
+// On a card a data entry's result stands in for the outcome; on its own page the facts list carries it.
+const outcome: string | undefined = data.outcome ?? (compact && entry.collection === 'data' ? data.result : undefined);
+---
+
+<div class:list={['facts', { compact }]}>
+  {outcome && <p class="outcome">{outcome}</p>}
+  {tech.length > 0 && <p class="tech small muted">Built with {tech.join(', ')}</p>}
+  {
+    links.length > 0 && (
+      <p class="proof">
+        {links.map((l) => (
+          <a class:list={['btn', { 'btn-small': compact }]} href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+            {l.label}
+          </a>
+        ))}
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .facts {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .outcome {
+    font-weight: 600;
+    margin: 0;
+  }
+  .tech {
+    margin: 0;
+  }
+  /* Proof links stay clickable above the card's full-surface title link (its ::after overlay). */
+  .proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .btn-small {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+</style>

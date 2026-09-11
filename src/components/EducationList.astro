@@ -1,0 +1,46 @@
+---
+// Education from content/profile/education.yaml. Rendered on Work and About; edited in one place.
+import { education, periodLabel } from '@lib/profile';
+const edu = education();
+---
+
+<dl class="edu">
+  {
+    edu.entries.map((e) => (
+      <div>
+        <dt>
+          {e.program}, {e.institution}
+        </dt>
+        <dd>
+          {e.location} · {periodLabel(e.start, e.end)}
+          {e.note ? `, ${e.note.toLowerCase()}` : ''}
+          {e.courses.length > 0 && (
+            <ul>
+              {e.courses.map((c) => (
+                <li>
+                  {c.name}: completed {c.completed}
+                </li>
+              ))}
+            </ul>
+          )}
+          {e.highlights.length > 0 && (
+            <ul>
+              {e.highlights.map((h) => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          )}
+        </dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .edu dt {
+    font-weight: 600;
+  }
+  .edu dd {
+    margin: 0 0 var(--space-2);
+  }
+</style>
