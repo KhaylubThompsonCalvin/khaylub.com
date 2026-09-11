@@ -4,7 +4,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { readFileSync } from 'node:fs';
 import { load } from 'js-yaml';
-import { isPreview, currentTop8 } from './profile';
+import { isPreview, currentTop8, timelineEvents, top8Revisions } from './profile';
 import { vocabulary, contentPath } from '../content/schemas';
 
 export type ArtifactCollection =
@@ -133,16 +133,19 @@ export async function skillGroups(): Promise<{ area: string; skills: Evidence[] 
     .filter((g) => g.skills.length > 0);
 }
 
-/** Current Top 8 resolved to visible entries. Unpublished slots are skipped and later items move up. */
-export async function top8Entries(): Promise<{ asOf: string; entries: { entry: AnyEntry; reason: string }[] }> {
-  const rev = currentTop8();
+type Top8Revision = ReturnType<typeof currentTop8>;
+
+/** A Top 8 revision (the current one by default) resolved to visible entries. Unpublished slots are
+ *  skipped and later items move up; `skipped` counts them so pages can say so. */
+export async function top8Entries(revision?: Top8Revision): Promise<{ asOf: string; entries: { entry: AnyEntry; reason: string }[]; skipped: number }> {
+  const rev = revision ?? currentTop8();
   const all = await allVisible();
   const bySlug = new Map(all.filter((e) => e.data.status === 'published').map((e) => [e.data.slug, e]));
   const entries = rev.items
     .map((i) => ({ entry: bySlug.get(i.slug), reason: i.reason }))
     .filter((x): x is { entry: AnyEntry; reason: string } => !!x.entry)
     .slice(0, 8);
-  return { asOf: rev.as_of, entries };
+  return { asOf: rev.as_of, entries, skipped: rev.items.length - entries.length };
 }
 
 /* ---------- Collection browsing (Phase 11): sorts and filters as pre-rendered pages ---------- */
@@ -237,6 +240,36 @@ export function relatedTags(items: AnyEntry[], exclude: string): Term[] {
 }
 
 export const termRoute = (kind: VocabKind, slug: string) => `/${kind}/${slug}/`;
+
+/* ---------- Timeline (W11): artifact dates, authored events, Top 8 revisions, grouped for filtering ---------- */
+
+export type TimelineGroup = 'education' | 'projects' | 'data' | 'notes' | 'creative' | 'site';
+export const TIMELINE_GROUPS: { slug: TimelineGroup; label: string }[] = [
+  { slug: 'education', label: 'Education' },
+  { slug: 'projects', label: 'Projects' },
+  { slug: 'data', label: 'Data' },
+  { slug: 'notes', label: 'Field Notes' },
+  { slug: 'creative', label: 'Creative' },
+  { slug: 'site', label: 'Site history' },
+];
+export type TimelineRow = { date: Date; title: string; url?: string; kind: string; group: TimelineGroup };
+
+const CREATIVE: ArtifactCollection[] = ['writing', 'journal', 'music', 'video', 'gallery', 'experiments'];
+
+function groupForCollection(name: ArtifactCollection): TimelineGroup {
+  if (name === 'projects' || name === 'data' || name === 'notes') return name;
+  return CREATIVE.includes(name) ? 'creative' : 'site';
+}
+
+/** Every dated row, newest first: authored events, published artifacts, Top 8 revisions. */
+export async function timelineRows(): Promise<TimelineRow[]> {
+  const authored: TimelineRow[] = timelineEvents().map((e) => ({ date: e.date, title: e.title, url: e.url, kind: e.kind, group: e.kind === 'course-completed' ? 'education' : 'site' }));
+  const artifacts: TimelineRow[] = (await allVisible())
+    .filter((e) => e.data.status === 'published')
+    .map((e) => ({ date: e.data.date, title: `${e.data.title} (${collectionLabel(e.collection)})`, url: routeFor(e), kind: 'publication', group: groupForCollection(e.collection) }));
+  const top8: TimelineRow[] = top8Revisions().map((r) => ({ date: new Date(`${r.as_of}-01T00:00:00Z`), title: `Top 8 revised (${r.as_of})`, url: `/top8/${r.as_of}/`, kind: 'top8-revision', group: 'site' }));
+  return [...authored, ...artifacts, ...top8].sort((a, b) => b.date.getTime() - a.date.getTime());
+}
 
 export async function collectionCounts(): Promise<{ name: ArtifactCollection; label: string; route: string; description: string; count: number }[]> {
   return Promise.all(

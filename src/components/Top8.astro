@@ -1,8 +1,14 @@
 ---
 import { top8Entries } from '@lib/catalog';
+import type { top8Revisions } from '@lib/profile';
 import ArtifactCard from './ArtifactCard.astro';
 
-const { asOf, entries } = await top8Entries();
+interface Props {
+  /** An archived revision; the newest revision when omitted. */
+  revision?: ReturnType<typeof top8Revisions>[number];
+}
+const { revision } = Astro.props;
+const { asOf, entries, skipped } = await top8Entries(revision);
 const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
 
@@ -22,7 +28,7 @@ const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { mon
     )
   }
   <p class="small muted">
-    Eight things I am proud of right now, ranked and dated. <a href="/top8/">Previous sets</a>.
+    Eight things I am proud of right now, ranked and dated. <a href="/top8/">Previous sets</a>.{skipped > 0 ? ` ${skipped} ${skipped === 1 ? 'slot is' : 'slots are'} not published yet and will appear when they are.` : ''}
   </p>
 </section>
 

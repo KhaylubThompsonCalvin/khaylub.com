@@ -1,0 +1,23 @@
+---
+// The timeline narrowed to one group (W11 filter chips). Only groups with rows get a page.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import TimelineList from '@components/TimelineList.astro';
+import { TIMELINE_GROUPS, timelineRows } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const all = await timelineRows();
+  return TIMELINE_GROUPS.filter((g) => all.some((r) => r.group === g.slug)).map((g) => ({
+    params: { group: g.slug },
+    props: { all, rows: all.filter((r) => r.group === g.slug), group: g },
+  }));
+}
+const { all, rows, group } = Astro.props;
+---
+
+<BaseLayout title={`Timeline: ${group.label}`} description={`${group.label} entries on the timeline, newest first.`} current="timeline">
+  <div class="measure-reading">
+    <h1>Timeline: {group.label}</h1>
+    <p class="muted">{rows.length} {rows.length === 1 ? 'entry' : 'entries'}. <a href="/timeline/">Everything</a>.</p>
+    <TimelineList rows={rows} all={all} group={group.slug} />
+  </div>
+</BaseLayout>

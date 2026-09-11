@@ -13,6 +13,6 @@ const revisions = top8Revisions();
   <Top8 />
   <section class="section measure-reading" aria-labelledby="revisions-heading">
     <h2 id="revisions-heading">Revisions</h2>
-    <ul>{revisions.map((r) => <li>{r.as_of}</li>)}</ul>
+    <ul>{revisions.map((r) => <li><a href={`/top8/${r.as_of}/`}>{r.as_of}</a></li>)}</ul>
   </section>
 </BaseLayout>
