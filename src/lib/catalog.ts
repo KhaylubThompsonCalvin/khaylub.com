@@ -89,17 +89,11 @@ export async function featured(): Promise<AnyEntry[]> {
 export type VocabKind = 'tags' | 'skills' | 'technologies';
 export type Term = { slug: string; label: string; description?: string; area?: string };
 
-const termCache = new Map<VocabKind, Term[]>();
-
-/** Vocabulary terms with labels. schemas.ts validates the same files; this re-reads them for display. */
+/** Vocabulary terms with labels. schemas.ts validates the same files; this re-reads them for display
+ *  on every call so `astro dev` picks up a label edit without a restart. */
 export function vocabularyTerms(kind: VocabKind): Term[] {
-  let terms = termCache.get(kind);
-  if (!terms) {
-    vocabulary(kind);
-    terms = (load(readFileSync(contentPath('vocabulary', `${kind}.yaml`), 'utf8')) as { terms: Term[] }).terms;
-    termCache.set(kind, terms);
-  }
-  return terms;
+  vocabulary(kind);
+  return (load(readFileSync(contentPath('vocabulary', `${kind}.yaml`), 'utf8')) as { terms: Term[] }).terms;
 }
 
 export function labelFor(kind: VocabKind, slug: string): string {
@@ -129,9 +123,10 @@ export async function evidenceFor(kind: 'skills' | 'technologies'): Promise<Evid
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
-/** Skills with evidence grouped by the area named in skills.yaml, in the file's order; unlabeled areas last. */
+/** Skills with evidence grouped by the area named in skills.yaml, in the file's order; terms without an area last. */
 export async function skillGroups(): Promise<{ area: string; skills: Evidence[] }[]> {
-  const order = [...new Set(vocabularyTerms('skills').map((t) => t.area ?? 'Other'))];
+  const named = [...new Set(vocabularyTerms('skills').map((t) => t.area).filter((a): a is string => !!a))];
+  const order = [...named, 'Other'];
   const skills = await evidenceFor('skills');
   return order
     .map((area) => ({ area, skills: skills.filter((s) => (s.area ?? 'Other') === area) }))

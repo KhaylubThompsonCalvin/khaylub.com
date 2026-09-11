@@ -25,7 +25,7 @@ function parse<T extends z.ZodTypeAny>(rel: string, schema: T): z.infer<T> {
   return parseValue(readYaml(rel), schema, rel);
 }
 
-const yearMonth = z.string().regex(/^\d{4}-\d{2}$/);
+const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'expected YYYY-MM with a month from 01 to 12');
 
 export const identitySchema = z
   .object({

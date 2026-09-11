@@ -5,7 +5,7 @@ import { render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Badge from '@components/Badge.astro';
 import ProjectFacts from '@components/ProjectFacts.astro';
-import { COLLECTIONS, allVisible, badgeFor, collectionLabel, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
+import { COLLECTIONS, allVisible, badgeFor, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
 export async function getStaticPaths() {
@@ -23,6 +23,9 @@ const badge = badgeFor(entry);
 const path = routeFor(entry);
 const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
 const isData = entry.collection === 'data';
+// Only skills with a public evidence row on Work get a link; a skill shown solely by this item
+// while it is archived, employer-hidden, or a preview draft is named without an anchor.
+const evidenced = new Set((await evidenceFor('skills')).map((s) => s.slug));
 const related: AnyEntry[] = data.related
   ? (await allVisible()).filter((e) => data.related.includes(e.data.slug))
   : [];
@@ -103,7 +106,7 @@ const jsonLd = [
             Skills shown:{' '}
             {data.skills.map((s: string, i: number) => (
               <>
-                <a href={`/work/#skill-${s}`}>{labelFor('skills', s)}</a>
+                {evidenced.has(s) ? <a href={`/work/#skill-${s}`}>{labelFor('skills', s)}</a> : labelFor('skills', s)}
                 {i < data.skills.length - 1 ? ', ' : ''}
               </>
             ))}
