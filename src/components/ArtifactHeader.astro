@@ -19,7 +19,7 @@ const isData = entry.collection === 'data';
   <h1>{data.title}</h1>
   <p class="meta">
     <Badge text={badge.text} tone={badge.tone} />
-    <span class="muted">{collectionLabel(entry.collection)} · {date}{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
+    <span class="muted">{collectionLabel(entry.collection)} · <time datetime={date} data-pagefind-meta="date">{date}</time>{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
   </p>
   {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
   <ProjectFacts entry={entry} />

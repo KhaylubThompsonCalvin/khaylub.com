@@ -68,6 +68,9 @@ test.describe('search', () => {
     expect(requests.some((u) => /\/pagefind\/pagefind\.js/.test(u))).toBe(true);
     expect(requests.filter((u) => !u.startsWith('http://localhost:'))).toEqual([]);
     await expect(status).toContainText(/\d+ results? for regression/);
+    const first = page.locator('#search-results li').first();
+    await expect(first.locator('.badge')).toHaveText(/^(Projects|Data|Field Notes)$/);
+    await expect(first.locator('.result-head .small')).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   test('the fallback links remain and the 404 page points to search', async ({ page, request }) => {

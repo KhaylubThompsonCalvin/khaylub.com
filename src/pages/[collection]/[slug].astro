@@ -38,7 +38,7 @@ const jsonLd = [creativeWork(entry, path), breadcrumbs(trail)];
 ---
 
 <BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
-  <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}, date:${date}`}>
+  <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}`}>
     <div data-pagefind-ignore>
       <Breadcrumb trail={trail} />
     </div>
