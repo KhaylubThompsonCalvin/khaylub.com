@@ -31,3 +31,5 @@ function setup(): void {
 }
 
 setup();
+
+export {};

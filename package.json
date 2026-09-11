@@ -9,8 +9,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "build:preview": "cross-env PUBLIC_SITE_ENV=preview astro build",
+    "build": "astro build && pagefind --site dist",
+    "build:preview": "cross-env PUBLIC_SITE_ENV=preview astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
     "validate": "node scripts/validate.mjs",
@@ -39,6 +39,7 @@
     "cross-env": "^7.0.3",
     "gray-matter": "^4.0.3",
     "html-validate": "^9.0.0",
+    "pagefind": "^1.5.2",
     "pdf-parse": "^1.1.1",
     "prettier": "^3.6.0",
     "prettier-plugin-astro": "^0.14.1",

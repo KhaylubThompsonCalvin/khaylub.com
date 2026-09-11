@@ -41,8 +41,8 @@ const jsonLd = [
 ---
 
 <BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd}>
-  <article class="artifact">
-    <nav aria-label="Breadcrumb" class="breadcrumb small">
+  <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}, date:${date}`}>
+    <nav aria-label="Breadcrumb" class="breadcrumb small" data-pagefind-ignore>
       <ol>
         <li><a href="/">Home</a></li>
         <li><a href={meta.route}>{meta.label}</a></li>
@@ -84,7 +84,7 @@ const jsonLd = [
       <Content />
     </div>
 
-    <footer class="artifact-footer measure-reading">
+    <footer class="artifact-footer measure-reading" data-pagefind-ignore>
       <p class="small muted">Source: {data.source}</p>
       {
         related.length > 0 && (

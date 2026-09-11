@@ -1,20 +1,88 @@
 ---
-// Search page. The Pagefind index and its on-demand UI arrive with the collection engine at a
-// later phase; at Phase 9 this page is the no-JavaScript fallback that stays in place forever.
+// Search (W13). A labelled search box drives the Pagefind index built after the build; results
+// render in a list with the count announced in a live region. The links below are the
+// no-JavaScript fallback and stay in place forever.
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { COLLECTIONS, termPages } from '@lib/catalog';
 const tags = await termPages('tags');
 ---
 
-<BaseLayout title="Search" description="Find anything on the site by collection, tag, or date." current="search">
+<BaseLayout title="Search" description="Search every published item on the site by title, summary, tag, or text, or browse by collection, tag, and date." current="search">
   <div class="measure-reading">
     <h1>Search</h1>
-    <p class="muted">Full-text search is added with the library engine. Until then, browse by collection, tag, or date.</p>
-    <h2>Collections</h2>
+    <form id="search-form" role="search" action="/search/" method="get">
+      <label for="search-input">Search the library</label>
+      <div class="search-row">
+        <input id="search-input" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="regression, Blender, preservation" />
+        <button class="btn" type="submit">Search</button>
+      </div>
+      <p id="search-status" class="small muted" aria-live="polite" role="status"></p>
+    </form>
+    <ol id="search-results" class="search-results"></ol>
+
+    <h2>Browse instead</h2>
+    <p class="muted">Every published item is also reachable without search or JavaScript.</p>
+    <h3>Collections</h3>
     <ul>{COLLECTIONS.map((c) => <li><a href={c.route}>{c.label}</a></li>)}</ul>
-    <h2>Tags</h2>
+    <h3>Tags</h3>
     <p>{tags.map((t, i) => <><a href={`/tags/${t.slug}/`}>{t.label}</a>{i < tags.length - 1 ? ' · ' : ''}</>)}</p>
-    <h2>By date</h2>
+    <h3>By date</h3>
     <p><a href="/timeline/">The timeline</a> lists everything in order.</p>
   </div>
 </BaseLayout>
+
+<script src="../scripts/search.ts"></script>
+
+<style>
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+  }
+  .search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  input[type='search'] {
+    flex: 1 1 16rem;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+  #search-status {
+    min-height: 1.5rem;
+    margin: var(--space-1) 0 0;
+  }
+  .search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-4);
+  }
+  .search-results li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .search-results :global(.result-head) {
+    margin: 0 0 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+  }
+  .search-results :global(.result-excerpt) {
+    margin: 0;
+  }
+  .search-results :global(mark) {
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+  }
+</style>
