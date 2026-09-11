@@ -1,11 +1,14 @@
 ---
-// One artifact template for every collection. Projects and data pages add their proof links
-// and named sections; everything else renders the body under the header block.
+// One artifact template for every collection (doc 31: ArticleLayout). Breadcrumb, the shared
+// header (badge, dates, facts, proof links), a contents nav on long pages, the body, and a footer
+// with the source, curated related items, and the skill and tag labels. Backlinks, the related
+// rail, and series navigation arrive in Phase 14.
 import { render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Badge from '@components/Badge.astro';
-import ProjectFacts from '@components/ProjectFacts.astro';
-import { COLLECTIONS, allVisible, badgeFor, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import ArtifactHeader from '@components/ArtifactHeader.astro';
+import TableOfContents from '@components/TableOfContents.astro';
+import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
 export async function getStaticPaths() {
@@ -17,38 +20,28 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props as { entry: AnyEntry };
-const { Content } = await render(entry as any);
+const { Content, headings } = await render(entry as any);
 const data = entry.data as any;
-const badge = badgeFor(entry);
 const path = routeFor(entry);
 const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
-const isData = entry.collection === 'data';
-// Only skills with a public evidence row on Work get a link; a skill shown solely by this item
-// while it is archived, employer-hidden, or a preview draft is named without an anchor.
+// Only skills with a public evidence row get a link; a skill shown solely by this item while it is
+// archived, employer-hidden, or a preview draft is named without one.
 const evidenced = new Set((await evidenceFor('skills')).map((s) => s.slug));
-const related: AnyEntry[] = data.related
-  ? (await allVisible()).filter((e) => data.related.includes(e.data.slug))
-  : [];
+const related: AnyEntry[] = data.related ? (await allVisible()).filter((e) => data.related.includes(e.data.slug)) : [];
 const date = data.date.toISOString().slice(0, 10);
-const jsonLd = [
-  creativeWork(entry, path),
-  breadcrumbs([
-    { name: 'Home', path: '/' },
-    { name: meta.label, path: meta.route },
-    { name: data.title, path },
-  ]),
+const trail = [
+  { name: 'Home', path: '/' },
+  { name: meta.label, path: meta.route },
+  { name: data.title, path },
 ];
+const jsonLd = [creativeWork(entry, path), breadcrumbs(trail)];
 ---
 
-<BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd}>
+<BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
   <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}, date:${date}`}>
-    <nav aria-label="Breadcrumb" class="breadcrumb small" data-pagefind-ignore>
-      <ol>
-        <li><a href="/">Home</a></li>
-        <li><a href={meta.route}>{meta.label}</a></li>
-        <li aria-current="page">{data.title}</li>
-      </ol>
-    </nav>
+    <div data-pagefind-ignore>
+      <Breadcrumb trail={trail} />
+    </div>
 
     {
       data.status !== 'published' && (
@@ -58,30 +51,15 @@ const jsonLd = [
       )
     }
 
-    <header class="artifact-header measure-reading">
-      <h1>{data.title}</h1>
-      <p class="meta">
-        <Badge text={badge.text} tone={badge.tone} />
-        <span class="muted">{collectionLabel(entry.collection)} · {date}{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
-      </p>
-      {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
-      <ProjectFacts entry={entry} />
-      {
-        isData && (
-          <dl class="facts">
-            <dt>Question</dt>
-            <dd>{data.question}</dd>
-            <dt>Data</dt>
-            <dd>{data.dataset.name}. Source: {data.dataset.source}. License: {data.dataset.license}.</dd>
-            <dt>Result</dt>
-            <dd>{data.result}</dd>
-          </dl>
-        )
-      }
-    </header>
+    <ArtifactHeader entry={entry} />
 
-    <div class="body measure-reading">
-      <Content />
+    <div class="layout">
+      <div class="body measure-reading">
+        <Content />
+      </div>
+      <aside class="side" data-pagefind-ignore>
+        <TableOfContents headings={headings} />
+      </aside>
     </div>
 
     <footer class="artifact-footer measure-reading" data-pagefind-ignore>
@@ -131,39 +109,28 @@ const jsonLd = [
 </BaseLayout>
 
 <style>
-  .breadcrumb ol {
+  /* Body column with the contents nav beside it from 1024 px (W5); stacked below, nav first in
+     reading order would push the text down, so the aside follows the body on small screens. */
+  .layout {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 var(--space-2);
+    flex-direction: column-reverse;
+    gap: var(--space-3);
   }
-  .breadcrumb li + li::before {
-    content: '›';
-    margin-right: 0.5rem;
-    color: var(--muted);
+  @media (min-width: 1024px) {
+    .layout {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .body {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .side {
+      flex: 0 0 16rem;
+    }
   }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-1) var(--space-2);
-  }
-  .outcome {
-    font-weight: 600;
-  }
-  .proof {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-2);
-  }
-  .facts dt {
-    font-weight: 600;
-    margin-top: var(--space-1);
-  }
-  .facts dd {
-    margin: 0;
+  .side:empty {
+    display: none;
   }
   .body :global(h2) {
     margin-top: var(--space-4);
