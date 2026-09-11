@@ -1,0 +1,87 @@
+---
+// The listing template every collection route uses (doc 31: IndexLayout plus CardGrid).
+// Breadcrumb, heading, intro, count, filters as links, sort links, the card grid, the feed link.
+import Breadcrumb from './Breadcrumb.astro';
+import FilterBar from './FilterBar.astro';
+import ArtifactCard from './ArtifactCard.astro';
+import { SORT_ORDERS, filterOptions, sortEntries, type AnyEntry, type ArtifactCollection, type SortOrder } from '@lib/catalog';
+
+interface Props {
+  meta: { name: ArtifactCollection; label: string; route: string; description: string };
+  /** Every visible entry of the collection (filters are counted from this set). */
+  all: AnyEntry[];
+  /** The entries this page shows (a subset of `all` when filtered). */
+  entries: AnyEntry[];
+  sort?: SortOrder;
+  filter?: { kind: 'tag' | 'type' | 'series'; slug: string; label: string };
+}
+const { meta, all, entries, sort = 'newest', filter } = Astro.props;
+const shown = sortEntries(entries, sort);
+const options = filterOptions(meta.name, all);
+const trail = [{ name: 'Home', path: '/' }, { name: 'Library', path: '/library/' }, { name: meta.label, path: meta.route }];
+if (filter) trail.push({ name: filter.label, path: Astro.url.pathname });
+const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${meta.route}sort/${order}/`);
+---
+
+<Breadcrumb trail={trail} />
+<div class="measure">
+  <h1>{filter ? `${meta.label}: ${filter.label}` : meta.label}</h1>
+  <p>{meta.description}</p>
+</div>
+
+<section class="section" aria-labelledby="list-heading">
+  <h2 id="list-heading">
+    {shown.length} {shown.length === 1 ? 'item' : 'items'}{filter ? ` with ${filter.kind === 'type' ? 'status' : filter.kind} ${filter.label}` : ''}
+  </h2>
+
+  <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} />
+  <FilterBar label="Filter by tag" allHref={meta.route} options={options.tags} active={filter?.kind === 'tag' ? filter.slug : undefined} filtered={!!filter} />
+  <FilterBar label="Filter by series" allHref={meta.route} options={options.series} active={filter?.kind === 'series' ? filter.slug : undefined} filtered={!!filter} />
+
+  {
+    !filter && shown.length > 1 && (
+      <p class="sort-links small">
+        Sort:{' '}
+        {SORT_ORDERS.map((s, i) => (
+          <>
+            <a href={sortHref(s.order)} aria-current={s.order === sort ? 'page' : undefined}>
+              {s.label}
+            </a>
+            {i < SORT_ORDERS.length - 1 ? ' · ' : ''}
+          </>
+        ))}
+      </p>
+    )
+  }
+
+  {
+    shown.length > 0 ? (
+      <ul class="card-grid">
+        {shown.map((e) => (
+          <li>
+            <ArtifactCard entry={e} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="muted">Nothing published in this collection yet.</p>
+    )
+  }
+  <p class="small muted feed-link">
+    <a href={`${meta.route}feed.xml`}>RSS feed for {meta.label}</a>
+  </p>
+</section>
+
+<style>
+  .sort-links a[aria-current='page'] {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .sort-links a {
+    display: inline-block;
+    padding: 0.5rem 0;
+  }
+  .feed-link {
+    margin-top: var(--space-2);
+  }
+</style>

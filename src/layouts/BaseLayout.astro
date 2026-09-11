@@ -17,9 +17,11 @@ interface Props {
   fullBleed?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogImage?: string;
+  /** A per-collection feed advertised in addition to the site feeds. */
+  feed?: { href: string; title: string };
 }
 
-const { title, description, current, fullBleed = false, jsonLd, ogImage } = Astro.props;
+const { title, description, current, fullBleed = false, jsonLd, ogImage, feed } = Astro.props;
 const id = identity();
 const site = 'https://khaylub.com';
 const path = Astro.url.pathname;
@@ -60,6 +62,9 @@ const structured = jsonLd ?? {
     <meta name="twitter:image" content={image} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${id.site_name} feed`} href="/feed.xml" />
+    <link rel="alternate" type="application/feed+json" title={`${id.site_name} feed (JSON)`} href="/feed.json" />
+    {feed && <link rel="alternate" type="application/rss+xml" title={feed.title} href={feed.href} />}
     <script type="application/ld+json" set:html={JSON.stringify(structured)} />
   </head>
   <body>

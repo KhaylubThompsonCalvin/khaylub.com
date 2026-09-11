@@ -1,0 +1,21 @@
+---
+// Field Notes narrowed to one series (P2-FE-13). Series navigation inside a note is Phase 14.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import CollectionIndex from '@components/CollectionIndex.astro';
+import { COLLECTIONS, filterOptions, published } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const meta = COLLECTIONS.find((c) => c.name === 'notes')!;
+  const all = await published('notes');
+  return filterOptions('notes', all).series.map((s) => ({
+    params: { series: s.slug },
+    props: { meta, all, entries: all.filter((e) => (e.data as Record<string, any>).series === s.slug), label: s.label, slug: s.slug },
+  }));
+}
+
+const { meta, all, entries, label, slug } = Astro.props;
+---
+
+<BaseLayout title={`Field Notes series: ${label}`} description={`The Field Notes in the series ${label}, newest first.`} current="notes">
+  <CollectionIndex meta={meta} all={all} entries={entries} filter={{ kind: 'series', slug, label }} />
+</BaseLayout>

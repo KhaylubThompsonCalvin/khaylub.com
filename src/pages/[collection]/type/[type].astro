@@ -1,0 +1,23 @@
+---
+// A collection index narrowed to one type (project status for projects, the schema type elsewhere).
+import BaseLayout from '@layouts/BaseLayout.astro';
+import CollectionIndex from '@components/CollectionIndex.astro';
+import { COLLECTIONS, filterOptions, published, typeOf } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const c of COLLECTIONS) {
+    const all = await published(c.name);
+    for (const t of filterOptions(c.name, all).types) {
+      paths.push({ params: { collection: c.name, type: t.slug }, props: { meta: c, all, entries: all.filter((e) => typeOf(e) === t.slug), label: t.label, slug: t.slug } });
+    }
+  }
+  return paths;
+}
+
+const { meta, all, entries, label, slug } = Astro.props;
+---
+
+<BaseLayout title={`${meta.label}: ${label}`} description={`${meta.label} on this site with the status or type ${label}, newest first.`} current={meta.name}>
+  <CollectionIndex meta={meta} all={all} entries={entries} filter={{ kind: 'type', slug, label }} />
+</BaseLayout>

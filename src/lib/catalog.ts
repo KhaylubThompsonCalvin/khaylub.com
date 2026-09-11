@@ -145,6 +145,56 @@ export async function top8Entries(): Promise<{ asOf: string; entries: { entry: A
   return { asOf: rev.as_of, entries };
 }
 
+/* ---------- Collection browsing (Phase 11): sorts and filters as pre-rendered pages ---------- */
+
+export type SortOrder = 'newest' | 'oldest' | 'title';
+export const SORT_ORDERS: { order: SortOrder; label: string }[] = [
+  { order: 'newest', label: 'Newest' },
+  { order: 'oldest', label: 'Oldest' },
+  { order: 'title', label: 'Title' },
+];
+
+export function sortEntries(entries: AnyEntry[], order: SortOrder): AnyEntry[] {
+  const copy = [...entries];
+  if (order === 'oldest') return copy.sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  if (order === 'title') return copy.sort((a, b) => a.data.title.localeCompare(b.data.title));
+  return copy.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  'case-study': 'Case study', concept: 'Concept', exhibit: 'Exhibit',
+  analysis: 'Analysis', notebook: 'Notebook', dataset: 'Dataset', story: 'Story',
+  'field-note': 'Field note', retrospective: 'Retrospective', 'how-to': 'How-to',
+  essay: 'Essay', poem: 'Poem', fiction: 'Fiction', 'book-note': 'Book note', entry: 'Entry',
+  track: 'Track', film: 'Film', recording: 'Recording', 'concept-film': 'Concept film',
+  still: 'Still', set: 'Set', render: 'Render', prototype: 'Prototype',
+  live: 'Live', 'private-beta': 'Private beta', archived: 'Archived',
+};
+
+/** The filterable "type" of an entry: project status for projects, the schema `type` elsewhere. */
+export function typeOf(entry: AnyEntry): string {
+  const d = entry.data as Record<string, any>;
+  return entry.collection === 'projects' ? d.project_status : d.type;
+}
+export const typeLabel = (slug: string) => TYPE_LABELS[slug] ?? slug;
+
+export type FilterOption = { slug: string; label: string; count: number; href: string };
+export type FilterOptions = { types: FilterOption[]; tags: FilterOption[]; series: FilterOption[] };
+
+/** Filter links for a collection index, counted from its visible entries. Only values that occur become links. */
+export function filterOptions(name: ArtifactCollection, entries: AnyEntry[]): FilterOptions {
+  const count = (values: (string | undefined)[]) => {
+    const m = new Map<string, number>();
+    for (const v of values) if (v) m.set(v, (m.get(v) ?? 0) + 1);
+    return m;
+  };
+  const types = [...count(entries.map(typeOf))].map(([slug, n]) => ({ slug, label: typeLabel(slug), count: n, href: `/${name}/type/${slug}/` }));
+  const tags = [...count(entries.flatMap((e) => e.data.tags))].map(([slug, n]) => ({ slug, label: labelFor('tags', slug), count: n, href: `/${name}/tag/${slug}/` }));
+  const series = [...count(entries.map((e) => (e.data as Record<string, any>).series))].map(([slug, n]) => ({ slug, label: slug.replace(/-/g, ' '), count: n, href: `/${name}/series/${slug}/` }));
+  const byCount = (a: FilterOption, b: FilterOption) => b.count - a.count || a.label.localeCompare(b.label);
+  return { types: types.sort(byCount), tags: tags.sort(byCount), series: series.sort(byCount) };
+}
+
 export async function collectionCounts(): Promise<{ name: ArtifactCollection; label: string; route: string; description: string; count: number }[]> {
   return Promise.all(
     COLLECTIONS.map(async (c) => ({ ...c, count: (await published(c.name)).length }))
