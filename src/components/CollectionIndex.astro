@@ -31,7 +31,7 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 
 <section class="section" aria-labelledby="list-heading">
   <h2 id="list-heading">
-    {shown.length} {shown.length === 1 ? 'item' : 'items'}{filter ? ` with ${filter.kind === 'type' ? 'status' : filter.kind} ${filter.label}` : ''}
+    {shown.length} {shown.length === 1 ? 'item' : 'items'}{filter ? ` with ${filter.kind === 'type' ? (meta.name === 'projects' ? 'status' : 'type') : filter.kind} ${filter.label}` : ''}
   </h2>
 
   <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} />

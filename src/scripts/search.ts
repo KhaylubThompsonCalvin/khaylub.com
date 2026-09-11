@@ -61,10 +61,15 @@ function setup(): void {
       return;
     }
     status.textContent = 'Searching';
-    const pf = await load();
-    const { results } = await pf.search(q);
-    const items = await Promise.all(results.slice(0, 20).map((r) => r.data()));
-    if (id === latest) render(items, q);
+    try {
+      const pf = await load();
+      const { results } = await pf.search(q);
+      const items = await Promise.all(results.slice(0, 20).map((r) => r.data()));
+      if (id === latest) render(items, q);
+    } catch {
+      // The index is missing (a dev session without a build) or blocked; the browse links below still work.
+      if (id === latest) status.textContent = 'Search is unavailable right now. Browse by collection, tag, or date below.';
+    }
   };
 
   input.addEventListener('input', () => {
@@ -76,6 +81,13 @@ function setup(): void {
     window.clearTimeout(timer);
     void run();
   });
+
+  // A shared or bookmarked /search/?q=... (and the no-JavaScript form submit) runs once on load.
+  const initial = new URLSearchParams(location.search).get('q');
+  if (initial) {
+    input.value = initial;
+    void run();
+  }
 }
 
 setup();

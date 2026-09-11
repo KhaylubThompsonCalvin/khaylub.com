@@ -28,7 +28,7 @@ const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { mon
     )
   }
   <p class="small muted">
-    Eight things I am proud of right now, ranked and dated. <a href="/top8/">Previous sets</a>.{skipped > 0 ? ` ${skipped} ${skipped === 1 ? 'slot is' : 'slots are'} not published yet and will appear when they are.` : ''}
+    {revision ? 'Eight things I was proud of then, ranked and dated.' : 'Eight things I am proud of right now, ranked and dated.'} <a href="/top8/">{revision ? 'The current set' : 'Previous sets'}</a>.{skipped > 0 ? ` ${skipped} ${skipped === 1 ? 'slot is' : 'slots are'} not published yet and will appear when they are.` : ''}
   </p>
 </section>
 

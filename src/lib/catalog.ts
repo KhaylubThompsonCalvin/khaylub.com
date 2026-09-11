@@ -193,7 +193,8 @@ export function filterOptions(name: ArtifactCollection, entries: AnyEntry[]): Fi
   };
   const types = [...count(entries.map(typeOf))].map(([slug, n]) => ({ slug, label: typeLabel(slug), count: n, href: `/${name}/type/${slug}/` }));
   const tags = [...count(entries.flatMap((e) => e.data.tags))].map(([slug, n]) => ({ slug, label: labelFor('tags', slug), count: n, href: `/${name}/tag/${slug}/` }));
-  const series = [...count(entries.map((e) => (e.data as Record<string, any>).series))].map(([slug, n]) => ({ slug, label: slug.replace(/-/g, ' '), count: n, href: `/${name}/series/${slug}/` }));
+  // Series pages exist for Field Notes only (P2-FE-13); other collections get no series bar until a route exists.
+  const series = name === 'notes' ? [...count(entries.map((e) => (e.data as Record<string, any>).series))].map(([slug, n]) => ({ slug, label: slug.replace(/-/g, ' '), count: n, href: `/${name}/series/${slug}/` })) : [];
   const byCount = (a: FilterOption, b: FilterOption) => b.count - a.count || a.label.localeCompare(b.label);
   return { types: types.sort(byCount), tags: tags.sort(byCount), series: series.sort(byCount) };
 }
@@ -263,7 +264,12 @@ function groupForCollection(name: ArtifactCollection): TimelineGroup {
 
 /** Every dated row, newest first: authored events, published artifacts, Top 8 revisions. */
 export async function timelineRows(): Promise<TimelineRow[]> {
-  const authored: TimelineRow[] = timelineEvents().map((e) => ({ date: e.date, title: e.title, url: e.url, kind: e.kind, group: e.kind === 'course-completed' ? 'education' : 'site' }));
+  const groupForEvent = (kind: string, url?: string): TimelineGroup => {
+    if (kind === 'course-completed') return 'education';
+    const top = url?.split('/')[1] as ArtifactCollection | undefined;
+    return top && COLLECTIONS.some((c) => c.name === top) ? groupForCollection(top) : 'site';
+  };
+  const authored: TimelineRow[] = timelineEvents().map((e) => ({ date: e.date, title: e.title, url: e.url, kind: e.kind, group: groupForEvent(e.kind, e.url) }));
   const artifacts: TimelineRow[] = (await allVisible())
     .filter((e) => e.data.status === 'published')
     .map((e) => ({ date: e.data.date, title: `${e.data.title} (${collectionLabel(e.collection)})`, url: routeFor(e), kind: 'publication', group: groupForCollection(e.collection) }));

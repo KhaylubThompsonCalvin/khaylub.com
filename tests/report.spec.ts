@@ -17,7 +17,9 @@ function artifactStatuses(): string[] {
   return out;
 }
 
-test('the build report counts artifacts, pages, evidence, and integrity from the real content and build', () => {
+test('the build report counts artifacts, pages, evidence, and integrity from the real content and build', ({}, testInfo) => {
+  // The report writes one file at the repository root, so it runs in one project only.
+  test.skip(testInfo.project.name !== 'desktop', 'run once, in the desktop project');
   const stdout = execSync('node scripts/build-report.mjs', { encoding: 'utf8' });
   expect(stdout).toMatch(/build report: \d+ pages/);
   const report = JSON.parse(readFileSync('build-report.json', 'utf8'));

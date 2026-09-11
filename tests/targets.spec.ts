@@ -26,6 +26,15 @@ test.describe('targets and overflow', () => {
     }
   });
 
+  test('list links on the new library templates meet the 24 px floor at 390 px', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const path of ['/projects/', '/skills/data-analysis/', '/timeline/data/', '/projects/khaylub-com-v1/']) {
+      await page.goto(path);
+      const short = await page.locator('.breadcrumb a, .filter-bar a, .sort-links a, .related-tags a, .toc a').evaluateAll((els) => els.filter((e) => e.getClientRects().length && e.getBoundingClientRect().height < 24).map((e) => e.textContent?.trim()));
+      expect(short, path).toEqual([]);
+    }
+  });
+
   test('body text is at least 16 px', async ({ page }) => {
     await page.goto('/');
     const size = await page.locator('main p:not(.eyebrow):not(.small)').first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));

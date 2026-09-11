@@ -73,6 +73,13 @@ test.describe('search', () => {
     await expect(first.locator('.result-head .small')).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  test('a shared /search/?q= link runs the query on load', async ({ page }) => {
+    await page.goto('/search/?q=regression');
+    await expect(page.getByRole('searchbox', { name: 'Search the library' })).toHaveValue('regression');
+    await expect(page.locator('#search-status')).toContainText(/\d+ results? for regression/, { timeout: 10_000 });
+    expect(await page.locator('#search-results li').count()).toBeGreaterThan(0);
+  });
+
   test('the fallback links remain and the 404 page points to search', async ({ page, request }) => {
     await page.goto('/search/');
     for (const href of ['/projects/', '/tags/python/', '/timeline/']) await expect(page.locator(`main a[href="${href}"]`).first()).toBeVisible();

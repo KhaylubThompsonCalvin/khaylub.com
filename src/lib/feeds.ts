@@ -25,15 +25,15 @@ export async function rssFeed(name?: ArtifactCollection) {
   });
 }
 
-export async function jsonFeed(name?: ArtifactCollection) {
+export async function jsonFeed() {
   const id = identity();
-  const items = await feedItems(name);
+  const items = await feedItems();
   const body = {
     version: 'https://jsonfeed.org/version/1.1',
-    title: name ? `${id.site_name}: ${collectionLabel(name)}` : `${id.site_name} feed`,
+    title: `${id.site_name} feed`,
     home_page_url: `${site}/`,
-    feed_url: `${site}${name ? `/${name}` : ''}/feed.json`,
-    description: name ? `New items in ${collectionLabel(name)} on ${id.site_name}.` : `New projects, data work, and Field Notes on ${id.site_name}.`,
+    feed_url: `${site}/feed.json`,
+    description: `New projects, data work, and Field Notes on ${id.site_name}.`,
     language: 'en-US',
     authors: [{ name: id.name, url: `${site}/` }],
     items: items.map((e: AnyEntry) => ({
