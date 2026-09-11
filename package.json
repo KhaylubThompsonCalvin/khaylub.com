@@ -42,7 +42,7 @@
     "gray-matter": "^4.0.3",
     "html-validate": "^9.0.0",
     "pagefind": "^1.5.2",
-    "pdf-parse": "^1.1.1",
+    "pdf-parse": "^2.4.5",
     "prettier": "^3.6.0",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.8.0"
