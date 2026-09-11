@@ -24,3 +24,8 @@ lhci-report/
 .DS_Store
 Thumbs.db
 *.log
+
+# Claude Code: personal overrides and the local verification stamp
+.claude/settings.local.json
+.claude/verify-stamp.json
+CLAUDE.local.md
