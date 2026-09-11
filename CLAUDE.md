@@ -135,8 +135,9 @@ available, selected, invoked, for which task, with what evidence), and a state-b
 
 ## Current phase pointer
 
-Phase 10 (Employer experience) was accepted and merged on 2026-09-11 (PR #13). Phase 11 (Collection
-and library engine: filtered collection pages, tag, skill, and technology pages, timeline filter,
-Top 8 archives, Pagefind search, feeds, build report) was built on 2026-09-11 on branch
-`feat/phase-11-collection-engine` (vault document 34 is its plan) and awaits the owner's exit-gate
-PASS. Phase 12 (Project case studies) opens only on the owner's instruction.
+Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 as
+PR #15 (`main` at `b157663`, post-merge verification green). Two Phase 11 items stay open on the
+owner's side without blocking the gate: the content deliverable (20 real artifacts across 4
+collections; 7 across 3 today) and the ADR-002 Quarto proof (Quarto not installed). Phase 12
+(Project case studies) is the next gated phase and is NOT opened; it opens only on the owner's
+instruction, on a new branch from `main`.
