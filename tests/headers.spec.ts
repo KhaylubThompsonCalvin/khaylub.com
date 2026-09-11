@@ -11,7 +11,7 @@ const REQUIRED: Record<string, RegExp> = {
 };
 
 test.describe('headers from render.yaml', () => {
-  for (const path of ['/', '/work/', '/projects/khaylub-com-v1/', '/notes/preserving-v1/', '/climb/']) {
+  for (const path of ['/', '/work/', '/projects/khaylub-com-v1/', '/notes/preserving-v1/', '/climb/', '/search/']) {
     test(`security headers on ${path}`, async ({ request }) => {
       const res = await request.get(path);
       expect(res.status()).toBe(200);
@@ -19,7 +19,11 @@ test.describe('headers from render.yaml', () => {
       for (const [name, re] of Object.entries(REQUIRED)) expect(h[name], name).toMatch(re);
       expect(h['content-security-policy-report-only']).not.toMatch(/unsafe-inline|(?<!wasm-)unsafe-eval/);
       if (path === '/' || path === '/climb/') expect(h['content-security-policy-report-only']).toMatch(/blob:.*wasm-unsafe-eval|wasm-unsafe-eval.*blob:/s);
-      else expect(h['content-security-policy-report-only']).not.toMatch(/blob:|wasm-unsafe-eval/);
+      else if (path === '/search/') {
+        // Pagefind decodes its index with WebAssembly; no blob: URLs are needed here.
+        expect(h['content-security-policy-report-only']).toMatch(/wasm-unsafe-eval/);
+        expect(h['content-security-policy-report-only']).not.toMatch(/blob:/);
+      } else expect(h['content-security-policy-report-only']).not.toMatch(/blob:|wasm-unsafe-eval/);
     });
   }
 

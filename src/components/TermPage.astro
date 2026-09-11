@@ -1,0 +1,73 @@
+---
+// One template for tag, skill, and technology pages (W14). The count is the number of listed
+// items; skill and technology pages also show the first and latest evidence dates. No ratings.
+import Breadcrumb from './Breadcrumb.astro';
+import ArtifactCard from './ArtifactCard.astro';
+import { termRoute, type TermPageData } from '@lib/catalog';
+
+interface Props {
+  term: TermPageData;
+}
+const { term } = Astro.props;
+const kindLabel = { tags: 'Tag', skills: 'Skill', technologies: 'Technology' }[term.kind];
+const noun = term.kind === 'tags' ? (term.count === 1 ? 'item' : 'items') : term.count === 1 ? 'piece of evidence' : 'pieces of evidence';
+const iso = (d?: Date) => d?.toISOString().slice(0, 10) ?? '';
+const trail = [{ name: 'Home', path: '/' }, { name: 'Library', path: '/library/' }, { name: term.label, path: termRoute(term.kind, term.slug) }];
+---
+
+<Breadcrumb trail={trail} />
+<div class="measure">
+  <p class="eyebrow">{kindLabel}</p>
+  <h1>{term.label}</h1>
+  {term.description && <p class="muted">{term.description}</p>}
+  <p class="term-summary">
+    <span class="badge">{term.count} {noun}</span>
+    {
+      term.kind !== 'tags' && term.first && term.latest && (
+        <span class="term-dates small muted">
+          {' '}
+          first <time datetime={iso(term.first)}>{iso(term.first)}</time>, latest <time datetime={iso(term.latest)}>{iso(term.latest)}</time>
+        </span>
+      )
+    }
+  </p>
+  {
+    term.relatedTags.length > 0 && (
+      <p class="related-tags small muted">
+        Related tags:{' '}
+        {term.relatedTags.map((t, i) => (
+          <>
+            <a href={termRoute('tags', t.slug)}>{t.label}</a>
+            {i < term.relatedTags.length - 1 ? ' · ' : ''}
+          </>
+        ))}
+      </p>
+    )
+  }
+</div>
+
+{
+  term.groups.map((g) => (
+    <section class="section" aria-labelledby={`group-${g.name}`}>
+      <h2 id={`group-${g.name}`} class="group-heading">
+        {g.label} ({g.items.length})
+      </h2>
+      <ul class="card-grid">
+        {g.items.map((e) => (
+          <li>
+            <ArtifactCard entry={e} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))
+}
+
+<style>
+  .term-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1);
+  }
+</style>

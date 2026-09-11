@@ -31,3 +31,7 @@ events:
     kind: milestone
     title: "Résumé revision 2.2 published"
     url: /resume/
+  - date: 2026-09-10
+    kind: publication
+    title: "Data Science Salaries story published on Tableau Public"
+    url: /data/tableau-salary-story/

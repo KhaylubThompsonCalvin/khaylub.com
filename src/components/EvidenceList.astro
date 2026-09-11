@@ -1,7 +1,7 @@
 ---
 // Terms (skills or technologies) with the public artifacts that prove them. The count is the
 // number of linked items; nothing here is a self-rating.
-import { routeFor, type Evidence } from '@lib/catalog';
+import { routeFor, termRoute, type Evidence } from '@lib/catalog';
 
 interface Props {
   kind: 'skills' | 'technologies';
@@ -15,7 +15,7 @@ const { kind, items, idPrefix } = Astro.props;
   {
     items.map((t) => (
       <li data-term={t.slug} data-count={t.count} id={`${idPrefix}-${t.slug}`}>
-        <span class="term-label">{t.label}</span>
+        <span class="term-label"><a href={termRoute(kind, t.slug)}>{t.label}</a></span>
         <span class="badge">{t.count} {t.count === 1 ? 'piece' : 'pieces'} of evidence</span>
         <span class="term-items small muted">
           {t.items.map((it, i) => (

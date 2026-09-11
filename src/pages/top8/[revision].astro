@@ -1,0 +1,20 @@
+---
+// One archived Top 8 per revision file (doc 27 sitemap). Unpublished slots are skipped, as on Home.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Top8 from '@components/Top8.astro';
+import { top8Revisions } from '@lib/profile';
+
+export function getStaticPaths() {
+  return top8Revisions().map((r) => ({ params: { revision: r.as_of }, props: { revision: r } }));
+}
+const { revision } = Astro.props;
+const label = new Date(`${revision.as_of}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+
+<BaseLayout title={`Top 8, ${label}`} description={`Khaylub's Top 8 as revised in ${label}: eight things he was proud of then, ranked and dated.`} current="library">
+  <div class="measure">
+    <h1>Top 8, {label}</h1>
+    <p>The set as it stood in {label}. <a href="/top8/">The current set and every revision</a>.</p>
+  </div>
+  <Top8 revision={revision} />
+</BaseLayout>

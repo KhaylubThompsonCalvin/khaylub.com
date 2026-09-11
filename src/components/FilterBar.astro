@@ -1,0 +1,72 @@
+---
+// Filters as plain links (W4): the unfiltered page is always the HTML default; the active value
+// carries aria-current. No script.
+import type { FilterOption } from '@lib/catalog';
+
+interface Props {
+  label: string;
+  allHref: string;
+  options: FilterOption[];
+  /** The active value in this bar, if the page is filtered by this bar's kind. */
+  active?: string;
+  /** True when the page is filtered by any bar, so only the unfiltered index marks "All". */
+  filtered?: boolean;
+}
+const { label, allHref, options, active, filtered = false } = Astro.props;
+---
+
+{
+  options.length > 0 && (
+    <nav class="filter-bar" aria-label={label}>
+      <span class="filter-label small muted">{label}</span>
+      <ul>
+        <li>
+          <a href={allHref} aria-current={filtered ? undefined : 'page'}>
+            All
+          </a>
+        </li>
+        {options.map((o) => (
+          <li>
+            <a href={o.href} aria-current={o.slug === active ? 'page' : undefined}>
+              {o.label} <span class="muted">({o.count})</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+  .filter-bar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .filter-bar a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    text-decoration: none;
+  }
+  .filter-bar a:hover {
+    border-color: var(--muted);
+  }
+  .filter-bar a[aria-current='page'] {
+    border-color: var(--ink);
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+// Contents nav for long artifact pages (W5 sidebar from 1024 px, in flow below). Rendered only
+// when the body has at least five H2 headings, the smallest case-study page today; shorter notes
+// read top to bottom without one.
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+export const TOC_MIN_HEADINGS = 5;
+const items = Astro.props.headings.filter((h) => h.depth === 2);
+---
+
+{
+  items.length >= TOC_MIN_HEADINGS && (
+    <nav class="toc" aria-label="Contents">
+      <p class="toc-title small muted">Contents</p>
+      <ol>
+        {items.map((h) => (
+          <li>
+            <a href={`#${h.slug}`}>{h.text}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    margin: 0 0 var(--space-3);
+    padding: var(--space-2);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .toc-title {
+    margin: 0 0 var(--space-1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .toc ol {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+  .toc li {
+    padding: 0.125rem 0;
+  }
+  .toc a {
+    display: inline-block;
+    padding: 0.25rem 0;
+    min-height: 24px;
+  }
+  @media (min-width: 1024px) {
+    .toc {
+      position: sticky;
+      top: calc(var(--header-height) + 1rem);
+    }
+  }
+</style>

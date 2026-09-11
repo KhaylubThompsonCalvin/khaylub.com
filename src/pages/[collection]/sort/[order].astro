@@ -1,0 +1,25 @@
+---
+// Sort variants of a collection index (oldest, title). Newest is the base index page.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import CollectionIndex from '@components/CollectionIndex.astro';
+import { COLLECTIONS, SORT_ORDERS, published } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const c of COLLECTIONS) {
+    const entries = await published(c.name);
+    if (entries.length < 2) continue;
+    for (const s of SORT_ORDERS) {
+      if (s.order === 'newest') continue;
+      paths.push({ params: { collection: c.name, order: s.order }, props: { meta: c, entries, sort: s.order, label: s.label } });
+    }
+  }
+  return paths;
+}
+
+const { meta, entries, sort, label } = Astro.props;
+---
+
+<BaseLayout title={`${meta.label}, by ${label.toLowerCase()}`} description={`${meta.label} sorted by ${label.toLowerCase()}: ${meta.description}`} current={meta.name}>
+  <CollectionIndex meta={meta} all={entries} entries={entries} sort={sort} />
+</BaseLayout>

@@ -15,4 +15,5 @@ terms:
   - { slug: reproducibility, label: Reproducibility, description: Clean-room re-runs and documented steps. }
   - { slug: data-storytelling, label: Data storytelling, description: Explaining findings for an audience. }
   - { slug: portfolio, label: Portfolio, description: About this site and its history. }
+  - { slug: tableau, label: Tableau, description: Tableau workbooks and public stories. }
   - { slug: estimating, label: Estimating, description: Turning measurements into defensible bids. }

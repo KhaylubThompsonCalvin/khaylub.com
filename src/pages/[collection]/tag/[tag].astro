@@ -1,0 +1,23 @@
+---
+// A collection index narrowed to one tag. Only tags that occur in the collection get a page.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import CollectionIndex from '@components/CollectionIndex.astro';
+import { COLLECTIONS, filterOptions, published } from '@lib/catalog';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const c of COLLECTIONS) {
+    const all = await published(c.name);
+    for (const t of filterOptions(c.name, all).tags) {
+      paths.push({ params: { collection: c.name, tag: t.slug }, props: { meta: c, all, entries: all.filter((e) => e.data.tags.includes(t.slug)), label: t.label, slug: t.slug } });
+    }
+  }
+  return paths;
+}
+
+const { meta, all, entries, label, slug } = Astro.props;
+---
+
+<BaseLayout title={`${meta.label} tagged ${label}`} description={`${meta.label} on this site tagged ${label}, newest first.`} current={meta.name}>
+  <CollectionIndex meta={meta} all={all} entries={entries} filter={{ kind: 'tag', slug, label }} />
+</BaseLayout>

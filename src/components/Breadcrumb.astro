@@ -1,0 +1,46 @@
+---
+// Breadcrumb trail. The last item is the current page (aria-current); the page emits the matching
+// BreadcrumbList JSON-LD through seo.breadcrumbs() with the same trail.
+interface Props {
+  trail: { name: string; path: string }[];
+}
+const { trail } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="breadcrumb small">
+  <ol>
+    {
+      trail.map((t, i) =>
+        i < trail.length - 1 ? (
+          <li>
+            <a href={t.path}>{t.name}</a>
+          </li>
+        ) : (
+          <li aria-current="page">{t.name}</li>
+        )
+      )
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-2);
+  }
+  .breadcrumb li + li::before {
+    content: '›';
+    margin-right: 0.5rem;
+    color: var(--muted);
+  }
+  /* Breadcrumb links are a list, not prose: keep the 24 px target floor (WCAG 2.5.8). */
+  .breadcrumb a {
+    display: inline-block;
+    padding: 0.25rem 0;
+    min-height: 24px;
+  }
+</style>
