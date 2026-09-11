@@ -35,6 +35,16 @@ test.describe('home', () => {
     await ctx.close();
   });
 
+  test('empty optional blocks are not rendered; present blocks are', async ({ page }) => {
+    await page.goto('/');
+    const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(' as of')[0].trim());
+    // Journal, On repeat, and Interests render only when their content files have entries.
+    expect(names).not.toContain('Latest from the journal');
+    expect(names).not.toContain('On repeat');
+    expect(names).toContain('Interests');
+    expect(await page.locator('main').innerText()).not.toMatch(/No entries yet/);
+  });
+
   test('Top 8 is an ordered list of linked cards', async ({ page }) => {
     await page.goto('/');
     const items = page.locator('ol.top8 > li');

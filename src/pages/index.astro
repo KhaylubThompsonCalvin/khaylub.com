@@ -3,20 +3,22 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import IdentityCard from '@components/IdentityCard.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
-import { interests, onRepeat } from '@lib/profile';
+import { identity, interests, onRepeat } from '@lib/profile';
 import { published } from '@lib/catalog';
 import { personAndWebsite } from '@lib/seo';
 
+const id = identity();
 const groups = interests().groups.filter((g) => g.items.length > 0);
 const repeat = onRepeat();
 const journal = (await published('journal')).slice(0, 5);
+const jsonLd = await personAndWebsite();
 ---
 
 <BaseLayout
   title="Home"
-  description="Khaylub Thompson-Calvin: Computer Information Systems student and builder. Projects, data work, Field Notes, and a library, with the original 3D climb one click away."
+  description={`${id.name}: ${id.role_line.split(' · ')[0]} and builder. Projects, data work, Field Notes, and a library, with the original 3D climb one click away.`}
   current="home"
-  jsonLd={personAndWebsite()}
+  jsonLd={jsonLd}
 >
   <IdentityCard />
   <NowLine />
@@ -45,10 +47,10 @@ const journal = (await published('journal')).slice(0, 5);
     )
   }
 
-  <section class="section" aria-labelledby="journal-heading">
-    <h2 id="journal-heading">Latest from the journal</h2>
-    {
-      journal.length > 0 ? (
+  {
+    journal.length > 0 && (
+      <section class="section" aria-labelledby="journal-heading">
+        <h2 id="journal-heading">Latest from the journal</h2>
         <ul>
           {journal.map((e) => (
             <li>
@@ -57,11 +59,9 @@ const journal = (await published('journal')).slice(0, 5);
             </li>
           ))}
         </ul>
-      ) : (
-        <p class="muted">No entries yet. The journal opens with the library.</p>
-      )
-    }
-  </section>
+      </section>
+    )
+  }
 
   {
     repeat.title && (
