@@ -271,6 +271,16 @@ export async function timelineRows(): Promise<TimelineRow[]> {
   return [...authored, ...artifacts, ...top8].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
+/* ---------- Feeds (P2-CE-14): published only, newest first, twenty items, summaries ---------- */
+
+export const FEED_LIMIT = 20;
+
+/** Items for the site feed or one collection's feed. Archived items stay out of feeds (doc 28). */
+export async function feedItems(name?: ArtifactCollection): Promise<AnyEntry[]> {
+  const pool = name ? await published(name) : await allVisible();
+  return sortEntries(pool.filter((e) => e.data.status === 'published'), 'newest').slice(0, FEED_LIMIT);
+}
+
 export async function collectionCounts(): Promise<{ name: ArtifactCollection; label: string; route: string; description: string; count: number }[]> {
   return Promise.all(
     COLLECTIONS.map(async (c) => ({ ...c, count: (await published(c.name)).length }))
