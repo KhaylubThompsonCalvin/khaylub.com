@@ -103,10 +103,11 @@ had begun to fade, so the last words dissolved mid-sentence. Both were fixed the
 live (vault checkpoint of 2026-06-27).
 
 The structural one: the site asked every visitor to pay for the whole experience before reading a
-word. Measured on 2026-09-09 with Playwright and Lighthouse 12.8, the cold load requested about
-15.9 MB on the wire at every viewport before the "Tap to explore" prompt, most of it two video
-plates, and Lighthouse scored performance 69 on mobile (total blocking time 1,265 ms) and 79 on
-desktop (V1 audit section 15). Projects lived inside dialogs with no addresses of their own, so
+word. Measured on 2026-09-09 with Playwright and Lighthouse 12.8 at a 1440 by 900 desktop size, the
+cold load requested thirteen files and 14.5 MB before the "Tap to explore" prompt, most of it two
+video plates, and Lighthouse scored performance 69 on mobile (total blocking time 1,265 ms) and 79
+on desktop (the measurement is written up in [The 16 MB front door](/notes/the-16-mb-front-door/);
+Lighthouse figures from the V1 audit section 15). Projects lived inside dialogs with no addresses of their own, so
 nothing was linkable or crawlable, and there was no skip link and almost no heading structure.
 None of that was a bug. It was the architecture I chose.
 

@@ -95,6 +95,11 @@ const rules = <T extends z.ZodTypeAny>(schema: T) =>
     .refine((d: any) => !d.cover || !!d.provenance, {
       message: 'a cover image requires a provenance record',
       path: ['provenance'],
+    })
+    // Content model section 5: every featured case study opens with its summary card.
+    .refine((d: any) => !d.featured || (!!d.problem && !!d.role), {
+      message: 'a featured case study needs problem and role for its summary card',
+      path: ['problem'],
     });
 
 export const PROJECT_STATUS = ['live', 'prototype', 'private-beta', 'concept', 'archived'] as const;

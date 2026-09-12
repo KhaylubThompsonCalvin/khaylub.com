@@ -27,12 +27,15 @@ test.describe('case studies (Phase 12)', () => {
     await expect(page.locator('.body pre code').filter({ hasText: /SELECT/ })).toHaveCount(1);
   });
 
-  test('the summary card renders problem and role from frontmatter, and only when present', async ({ page }) => {
-    const v1 = front('content/projects/khaylub-com-v1/index.md');
-    expect(v1.problem && v1.role, 'the featured project declares problem and role').toBeTruthy();
-    await page.goto('/projects/khaylub-com-v1/');
-    await expect(page.locator('.artifact-header .problem')).toContainText(v1.problem!);
-    await expect(page.locator('.artifact-header .role')).toContainText(v1.role!);
+  test('the summary card renders problem and role from frontmatter on every featured page, and only when present', async ({ page }) => {
+    const files: Record<string, string> = { '/projects/khaylub-com-v1/': 'content/projects/khaylub-com-v1/index.md', '/data/fuel-economy-regression/': 'content/data/fuel-economy-regression/index.md', '/data/sql-python-analytics-pipeline/': 'content/data/sql-python-analytics-pipeline/index.md' };
+    for (const [path, file] of Object.entries(files)) {
+      const fm = front(file);
+      expect(fm.problem && fm.role, `${path} declares problem and role`).toBeTruthy();
+      await page.goto(path);
+      await expect(page.locator('.artifact-header .problem')).toContainText(fm.problem!);
+      await expect(page.locator('.artifact-header .role')).toContainText(fm.role!);
+    }
     const note = front('content/notes/preserving-v1.md');
     expect(note.problem).toBeUndefined();
     await page.goto('/notes/preserving-v1/');

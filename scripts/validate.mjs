@@ -75,6 +75,8 @@ for (const file of walk('content', ['.md'])) {
   for (const f of data.files ?? []) refs.add(f);
   for (const img of data.images ?? []) refs.add(img.src);
   for (const m of content.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) refs.add(m[1]);
+  // Raw HTML figures in Markdown bodies (the case-study convention) count as media references too.
+  for (const m of content.matchAll(/<img[^>]+src="([^"]+)"/gi)) refs.add(m[1]);
   const local = [...refs].filter((r) => !/^https?:/.test(r) && mediaExts.includes(extname(r).toLowerCase()));
   if (local.length > 0 && !data.provenance) fail(`media without a provenance record in ${file}: ${local.join(', ')}`);
 }
