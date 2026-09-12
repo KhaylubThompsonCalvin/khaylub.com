@@ -137,10 +137,13 @@ available, selected, invoked, for which task, with what evidence), and a state-b
 
 `.claude/skills/phase/SKILL.md` is the procedure for running one roadmap phase: `/phase <number>`
 opens exactly that phase (explicit owner authorization; refused if the prior gate is not closed),
-`/phase resume` continues the open phase from the vault checkpoint, Git, and GitHub, and
-`/phase close` runs the post-merge closeout after the owner merges and accepts. The skill reads the
-phase definition from the vault roadmap at run time, never from itself, and stops at every owner
-gate. It is manual-only: Claude never triggers a phase transition on its own.
+`/phase resume` continues the open phase from the vault checkpoint, Git, and GitHub, `/phase gate`
+prints the current phase's owner-gate record (each acceptance criterion with its status, validated by
+`.claude/skills/phase/scripts/gate.mjs`; placeholder or template text never counts as evidence), and
+`/phase close` runs the post-merge closeout after the owner merges and accepts, recording PASS only
+when the gate is SATISFIED. The skill reads the phase definition from the vault roadmap at run time,
+never from itself, and stops at every owner gate. It is manual-only: Claude never triggers a phase
+transition on its own.
 
 ## Current phase pointer
 

@@ -46,12 +46,17 @@ Create it when the phase opens and grow it as milestones land. Sections that the
 
 Evidence folder: `AIDOCS/YYYY-MM-DD - V2 Phase <N> evidence/` for screenshots (`p<N>-<seq>-<what>-<viewport>.png`), `pull-request-body.md`, review outputs.
 
+## Owner gate note: `AIDOCS/Phase <N> - Owner Gate.md`
+
+One per active phase, format and rules in owner-gate.md. Explicit `status:` lines; content lines hold the evidence or the word `MISSING`, never a bracket or an example. Linked from the MOC state block. Edited only by targeted edits; validated by `node .claude/skills/phase/scripts/gate.mjs`.
+
 ## Planning MOC: `DOCS/Khaylub.com V2 - Planning MOC.md`
 
 Edit only these places, only with facts that happened, only by targeted edits:
 
 - State block row **Current phase**: opened by whom and when, branch and tip SHA, built and verified summary, acceptance PENDING or the owner's PASS, next phase NOT opened.
-- State block rows **Phases accepted**, **Last accepted gate**: only at an owner PASS.
+- State block rows **Phases accepted**, **Last accepted gate**: only at an owner PASS that the Owner Gate note shows SATISFIED.
+- State block line **Owner gate**: a wiki-link to the active phase's Owner Gate note.
 - State block row **Exact next action**: the owner's exact next step.
 - State block row **Last verified**: date, SHA, what ran.
 - **Gate log**: append a row per event (opened, built, pull request, exit gate, closeout, pointer); keep the "Phase N+1 gate | not opened" row last and current.
