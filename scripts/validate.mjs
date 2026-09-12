@@ -1,5 +1,6 @@
 // Build-time validation beyond the schemas. Runs before and after `astro build` in CI:
-//   banned private terms, em dashes, internal machine paths, credential patterns, media provenance,
+//   banned private terms, em dashes, internal machine paths, credential patterns, media provenance
+//   and size (including the climb island's assets), built-HTML media rules,
 //   the featured set, redirects in sync with render.yaml, security.txt expiry, heading structure,
 //   and the résumé HTML against the PDF text. Exit code 1 on any failure, with the file named.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -81,6 +82,36 @@ for (const file of walk('content', ['.md'])) {
   if (local.length > 0 && !data.provenance) fail(`media without a provenance record in ${file}: ${local.join(', ')}`);
 }
 
+// 4b. Media size (P2-CE-17): 5 MB per file anywhere; 25 MB in total outside public/climb/, whose
+//     assets count against the opt-in climb budget only. Both are failures, not warnings.
+const MAX_MEDIA_FILE = 5 * 1024 * 1024;
+const MAX_MEDIA_TOTAL = 25 * 1024 * 1024;
+let mediaTotal = 0;
+for (const file of [...walk('content', mediaExts), ...walk('public', mediaExts)]) {
+  const size = statSync(file).size;
+  if (size > MAX_MEDIA_FILE) fail(`media file over 5 MB: ${file} (${size} bytes)`);
+  if (!file.split(/[\\/]/).includes('climb')) mediaTotal += size;
+}
+if (mediaTotal > MAX_MEDIA_TOTAL) fail(`media in the repository outside public/climb/ totals ${mediaTotal} bytes (limit 25 MB)`);
+
+// 4c. The climb island's assets (P2-SEC-16): every file under public/climb/ has an entry in
+//     public/climb/provenance.yaml with source, license, and date, and every entry names a file.
+const climbDir = 'public/climb';
+if (existsSync(climbDir)) {
+  const recordPath = join(climbDir, 'provenance.yaml');
+  if (!existsSync(recordPath)) fail(`${recordPath} is missing`);
+  else {
+    const entries = load(readFileSync(recordPath, 'utf8'))?.files ?? {};
+    for (const file of walk(climbDir, mediaExts)) {
+      const name = relative(climbDir, file).replace(/\\/g, '/');
+      const entry = entries[name];
+      if (!entry) fail(`climb asset without a provenance entry: ${file}`);
+      else for (const key of ['source', 'license', 'date']) if (!entry[key]) fail(`climb asset ${name}: provenance entry lacks ${key}`);
+    }
+    for (const name of Object.keys(entries)) if (!existsSync(join(climbDir, name))) fail(`provenance entry names a missing climb asset: ${name}`);
+  }
+}
+
 // 5. Featured set: exactly the approved three (decision D-10), in any order.
 const approved = ['khaylub-com-v1', 'fuel-economy-regression', 'sql-python-analytics-pipeline'];
 const featured = [];
@@ -135,6 +166,21 @@ if (hasDist) {
     if (/\son[a-z]+="/i.test(html)) fail(`inline event handler attribute in ${file}`);
     for (const m of html.matchAll(/<a\s[^>]*target="_blank"[^>]*>/g)) {
       if (!/rel="[^"]*noopener/.test(m[0])) fail(`target=_blank without rel=noopener in ${file}`);
+    }
+    // Media rules (ADR-007, P2-FE-23, budget lines 19 and 20): every video has a poster, native
+    // controls, preload="none", and never autoplays; every audio has controls and preload="none".
+    for (const m of html.matchAll(/<video\b[^>]*>/gi)) {
+      const tag = m[0];
+      if (!/\sposter="[^"]+"/.test(tag)) fail(`video without a poster in ${file}`);
+      if (!/\spreload="none"/.test(tag)) fail(`video without preload="none" in ${file}`);
+      if (!/\scontrols\b/.test(tag)) fail(`video without native controls in ${file}`);
+      if (/\sautoplay\b/.test(tag)) fail(`video with autoplay in ${file}`);
+    }
+    for (const m of html.matchAll(/<audio\b[^>]*>/gi)) {
+      const tag = m[0];
+      if (!/\spreload="none"/.test(tag)) fail(`audio without preload="none" in ${file}`);
+      if (!/\scontrols\b/.test(tag)) fail(`audio without native controls in ${file}`);
+      if (/\sautoplay\b/.test(tag)) fail(`audio with autoplay in ${file}`);
     }
   }
 }

@@ -26,10 +26,12 @@
     "@astrojs/react": "^6.0.5",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
+    "@react-three/fiber": "^9.7.0",
     "astro": "^7.3.2",
     "js-yaml": "^4.1.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "~19.2.0",
+    "react-dom": "~19.2.0",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
@@ -38,6 +40,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.186.0",
     "cross-env": "^7.0.3",
     "gray-matter": "^4.0.3",
     "html-validate": "^9.0.0",
