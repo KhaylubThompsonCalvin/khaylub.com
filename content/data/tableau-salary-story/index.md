@@ -4,6 +4,7 @@ slug: tableau-salary-story
 type: story
 status: published
 date: 2026-09-10
+updated: 2026-09-11
 summary: A four-point Tableau Public story on 6,599 public salary records, comparing pay by location, job role, experience level, and year, with its own stated limit.
 tags: [data-storytelling, tableau]
 skills: [data-analysis, visualization]
@@ -27,9 +28,19 @@ answers with one public dataset and says plainly what that dataset can and canno
 ## Data
 
 Data Science Salaries 2024, a public Kaggle dataset of 6,599 salary records with 11 columns and
-no missing values. The story reads the file directly; no database or server is involved.
+no missing values (the author's publication record of 2026-09-10). The story reads the file
+directly; no database or server is involved.
 
-## The four story points
+## SQL and schema
+
+Not applicable: the workbook connects to a single CSV; Tableau performs the aggregation.
+
+## Method
+
+Built in Tableau from the CSV; four worksheets, one per factor, arranged as a story with captions
+that stay within what the data supports. No causal claims are made.
+
+## Result
 
 1. **Location.** The United States average is $157,073 against India at $41,699, a difference of
    about $115,000, the widest gap of any factor in the dataset.
@@ -39,13 +50,15 @@ no missing values. The story reads the file directly; no database or server is i
    limit: because the number of records differs greatly by year, this trend describes this dataset
    rather than proving a broader market trend.
 
-## Result
+Figures as published in the story on 2026-09-10 and verified live the same day.
 
-Read the [published story on Tableau Public](https://public.tableau.com/app/profile/khaylub.thompson/viz/DataScienceSalaryStory/DataScienceSalariesLocationRoleExperienceandTime).
-It was first published on 2026-09-10 and is story-only by choice; a dashboard finale can follow as a
-revision over the same address.
+## Notebook
 
-## Method
+Not applicable: a Tableau story, not a notebook. The published story is the working result.
 
-Built in Tableau from the CSV; four worksheets, one per factor, arranged as a story with captions
-that stay within what the data supports. No causal claims are made.
+## Repository
+
+Not applicable: there is no code repository. Read the
+[published story on Tableau Public](https://public.tableau.com/app/profile/khaylub.thompson/viz/DataScienceSalaryStory/DataScienceSalariesLocationRoleExperienceandTime),
+first published on 2026-09-10 and story-only by choice; a dashboard finale can follow as a revision
+over the same address.
