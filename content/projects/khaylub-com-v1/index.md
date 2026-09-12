@@ -5,10 +5,10 @@ type: case-study
 project_status: live
 status: published
 date: 2026-06-24
-updated: 2026-09-11
+updated: 2026-09-12
 summary: A scroll-driven 3D portfolio built with React Three Fiber and Blender, launched in June 2026 and kept as the opt-in front door of this site.
 problem: A first portfolio that showed who I am and what I can build, on a shipping deadline, before I had a body of public work to point at.
-role: "Sole author: concept, Blender assets, scene, copy, deployment, preservation; AI-assisted code."
+role: "Sole author of the concept, site design, scene assembly, Blender finishing, copy, deployment, and preservation; AI-assisted code, with Tripo-generated 3D bases and Higgsfield-generated atmosphere plates."
 tags: [three-js, react, blender, performance, portfolio]
 skills: [web-development, 3d-pipeline, performance-analysis]
 technologies: [react-three-fiber, three-js, vite, blender, lenis, zustand]
@@ -54,7 +54,7 @@ Given (from the project charter in my planning vault, June 2026):
 
 Self-imposed:
 
-- the character and the Phoenix finished and rigged by me in Blender from AI-generated base meshes, not bought as finished assets
+- the character and the Phoenix finished by me in Blender from AI-generated base meshes, not bought as finished assets
 - a cinematic read: night into day, six story beats, generated video atmosphere plates
 - reduced motion honored, keyboard reachable, no console errors at launch
 
@@ -89,8 +89,10 @@ the scroll and state wiring, the Render deployment, and later the preservation (
 release). The assets, stated plainly: the Wanderer's base mesh and auto-rig were generated in Tripo
 from a reference image, then cleaned, re-rigged where the generation failed (the glasses had fused
 into the head mesh and were rebuilt as a separate object), and finished by me in Blender; the
-Phoenix followed the same path, retopologized and rigged with Rigify, and its origin record is
-still marked for confirmation in my media inventory; the four atmosphere video plates were
+Phoenix began as a Tripo generation, was retopologized in Tripo and kept its Tripo auto-rig, and I
+authored its wing flap in Blender on that rig (a Rigify rebuild was documented as a fallback, not
+the rig that shipped); its origin record is still marked for confirmation in my media inventory
+(Phoenix SOP and integration notes of 2026-06-20 and 2026-06-21); the four atmosphere video plates were
 generated with Higgsfield from my prompts (session records of 2026-06-18 and 2026-06-21). The code
 was written with AI assistance in Claude Code, working from my own specifications, checkpoints, and
 review; the repository's `CLAUDE.md` and the dated checkpoint notes in my vault record that
@@ -109,11 +111,13 @@ had begun to fade, so the last words dissolved mid-sentence. Both were fixed the
 live (vault checkpoint of 2026-06-27).
 
 The structural one: the site asked every visitor to pay for the whole experience before reading a
-word. Measured on 2026-09-09 with Playwright and Lighthouse 12.8 at a 1440 by 900 desktop size, the
-cold load requested thirteen files and 14.5 MB before the "Tap to explore" prompt, most of it two
-video plates, and Lighthouse scored performance 69 on mobile (total blocking time 1,265 ms) and 79
-on desktop (the measurement is written up in [The 16 MB front door](/notes/the-16-mb-front-door/);
-Lighthouse figures from the V1 audit section 15). Projects lived inside dialogs with no addresses of their own, so
+word. Cold-load measurements on 2026-09-09 with Playwright at a 1440 by 900 desktop size ranged from
+14.5 MB in Chromium (thirteen files) to 15.9 MB in Edge before the "Tap to explore" prompt; the
+1.4 MB difference aligns with the vista texture appearing in the Edge resource accounting. Most of
+it was two video plates. Lighthouse 12.8 scored performance 69 on mobile (total blocking time
+1,265 ms) and 79 on desktop (the Chromium measurement is written up in
+[The 16 MB front door](/notes/the-16-mb-front-door/); the Edge runs and the Lighthouse figures are
+in the V1 audit section 15). Projects lived inside dialogs with no addresses of their own, so
 nothing was linkable and crawlability was never verified, and there was no skip link and almost no heading structure.
 None of that was a bug. It was the architecture I chose.
 
@@ -122,7 +126,7 @@ None of that was a bug. It was the architecture I chose.
 Through the build: the dated checkpoints record zero console errors and a passing build, each change
 checked live in the browser (for example the 2026-06-27 checkpoint). At the V2 planning gate on 2026-09-09: axe reported zero violations at desktop and mobile;
 Lighthouse gave accessibility, best practices, and SEO 100 on both; reduced motion paused all ten
-videos and rendered the reveals solid; no request failed. The same run produced the payload and
+videos and rendered the reveals solid; no request failed. The same day's runs produced the payload and
 performance numbers above (V1 audit section 15; [The 16 MB front door](/notes/the-16-mb-front-door/)).
 
 <figure>
@@ -149,9 +153,9 @@ browser and reading the numbers honestly, which is where the second version bega
 
 [github.com/KhaylubThompsonCalvin/khaylub-portfolio](https://github.com/KhaylubThompsonCalvin/khaylub-portfolio),
 frozen at tag `v1.0.0-3d-experiment` (commit `67edcc7`, merged 2026-07-06) with a locked branch, a
-protected tag pattern, and a GitHub Release. Since the freeze the live branch has taken two
-owner-approved content merges (the résumé PDF and an em dash sweep; V1 audit section 15); the tagged
-commit itself is unchanged. How and why it was frozen:
+protected tag pattern, and a GitHub Release. The live branch later received owner-approved
+content-only updates (V1 audit section 15), while the frozen V1 release tag remained unchanged. How
+and why it was frozen:
 [Preserving V1](/notes/preserving-v1/).
 
 ## Result
