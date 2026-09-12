@@ -1,0 +1,19 @@
+---
+// The media block under the artifact header: the player, gallery, or exhibit entry for the
+// media collections; nothing for the text collections.
+import MediaVideo from './MediaVideo.astro';
+import MediaAudio from './MediaAudio.astro';
+import MediaGallery from './MediaGallery.astro';
+import ExperimentEntry from './ExperimentEntry.astro';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+---
+
+{entry.collection === 'video' && <MediaVideo entry={entry} />}
+{entry.collection === 'music' && <MediaAudio entry={entry} />}
+{entry.collection === 'gallery' && <MediaGallery entry={entry} />}
+{entry.collection === 'experiments' && <ExperimentEntry entry={entry} />}

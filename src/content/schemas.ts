@@ -167,9 +167,15 @@ export const video = rules(
       files: z.array(z.string()).optional(),
       external_url: z.string().url().optional(),
       captions: z.string().optional(),
+      // Declared when the recording contains speech; the captions track is then required (FR-F2).
+      speech: z.boolean().optional(),
       provenance,
     })
     .strict()
+    .refine((d) => !d.speech || !!d.captions, {
+      message: 'a video with speech needs a captions track',
+      path: ['captions'],
+    })
 );
 
 export const gallery = rules(

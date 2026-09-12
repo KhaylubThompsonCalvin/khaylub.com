@@ -59,7 +59,7 @@ Any other key fails the build. That is how private fields stay impossible.
 - **notes**: `type` (`field-note`, `retrospective`, `how-to`).
 - **writing**: `type` (`essay`, `poem`, `fiction`, `book-note`). **journal**: `type: entry`.
 - **music**: `type: track`, `duration` (`m:ss`), `provenance`, `files` or `external_url`.
-- **video**: `type` (`film`, `recording`, `concept-film`), `poster`, `provenance`, `files` or `external_url`, `captions` when there is speech.
+- **video**: `type` (`film`, `recording`, `concept-film`), `poster`, `provenance`, `files` or `external_url`, `speech: true` when the recording has speech, and then `captions` (a WebVTT file) is required.
 - **gallery**: `type` (`still`, `set`, `render`), `images[]` with `src` and `alt`, `provenance`.
 - **experiments**: `type` (`prototype`, `exhibit`), `poster`, `entry_url`, optional `payload_mb`.
 
@@ -69,11 +69,36 @@ Small YAML files feed the identity card, availability line, Now block, interests
 certifications, Top 8, and security.txt. Each has a fixed set of keys (see `src/lib/profile.ts`).
 The availability statement lives in one place, `profile/availability.yaml`, and renders everywhere.
 
-## Media rules
+## Media rules (ADR-007; enforced by `npm run validate` and the media tests)
 
-Images beside the artifact; every image has alt text; the LCP image is never lazy. Video has a
-poster and `preload="none"` and never autoplays with sound. Audio uses native controls. Files over
-5 MB (or 25 MB total) live outside the repository. Every media file has a provenance record.
+- **Where files live.** Rasters (covers, posters, gallery images) sit beside the artifact in its
+  folder and go through the image pipeline at build (AVIF and WebP, `srcset`, width and height);
+  source them at 1600 px wide as PNG or high-quality WebP. Video and audio files live under
+  `public/media/<slug>/` and are named in frontmatter by file name (`files: [clip.mp4]`); a path
+  that starts with `/` is served as it is and skips the pipeline.
+- **Sizes.** 5 MB per file anywhere in the repository; 25 MB in total outside `public/climb/`
+  (the climb island's models and plates count against the opt-in climb only). Larger or long-form
+  media is hosted outside the repository (decision D-07) and referenced with `external_url`.
+- **Images.** Every image has alt text (`cover_alt`, `images[].alt`); the first image on a page is
+  the LCP candidate (eager, `fetchpriority="high"`, 150 KB or less at its largest candidate) and
+  every other image is lazy; card thumbnails are 400 px WebP at 30 KB or less; galleries open an
+  image at full size on its own URL, not in a lightbox.
+- **Video.** `poster` required; the player is native with `controls`, `preload="none"`,
+  `playsinline`, in a 16:9 frame; nothing autoplays. Short clips (under 60 s) may be self-hosted at
+  1080p H.264 CRF 23 capped at 5 Mbps (audio AAC 128 kbps, or none). Set `speech: true` when the
+  recording has speech; `captions` (WebVTT, beside the media file) is then required. External video
+  renders as the poster plus a link that names the host; no iframe is ever created.
+- **Audio.** MP3 at 160 to 192 kbps (Opus optional), native `<audio controls preload="none">`,
+  `duration` as `m:ss`, and the lyrics or a description in the artifact body. No autoplay, ever.
+- **3D and the climb.** Nothing 3D loads before an explicit click. The climb's assets live under
+  `public/climb/` with one entry per file in `public/climb/provenance.yaml`; the exhibit entry in
+  `content/experiments/` links to `/climb/` and states the payload (`payload_mb`).
+- **Provenance.** Every media file referenced by an artifact needs the artifact's `provenance`
+  record (`source`, `license`, `generator` when AI-made, `date`); every file under
+  `public/climb/` needs its entry in the sidecar; the build fails without them. AI-generated media
+  is labeled on the page.
+- **Reduced motion.** V2 pages never autoplay or animate media; inside the opted-in climb, V1's
+  own rules apply (plates paused and hidden, reveals solid, models still load).
 
 ## Public and private boundary
 

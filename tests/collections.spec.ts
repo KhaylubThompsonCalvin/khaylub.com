@@ -23,7 +23,7 @@ const titlesOn = async (page: import('@playwright/test').Page) => page.locator('
 
 test.describe('collection listing engine', () => {
   test('a collection index lists exactly its published artifacts, newest first', async ({ page }) => {
-    const expected = published('projects').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((a) => a.title);
+    const expected = published('projects').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || a.title.localeCompare(b.title)).map((a) => a.title);
     await page.goto('/projects/');
     expect(await titlesOn(page)).toEqual(expected);
     await expect(page.locator('main')).toContainText(`${expected.length} item`);
@@ -32,7 +32,7 @@ test.describe('collection listing engine', () => {
   test('sort variants reorder the same set: oldest and title', async ({ page }) => {
     const notes = published('notes');
     await page.goto('/notes/sort/oldest/');
-    expect(await titlesOn(page)).toEqual(notes.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((a) => a.title));
+    expect(await titlesOn(page)).toEqual(notes.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.title.localeCompare(b.title)).map((a) => a.title));
     await page.goto('/notes/sort/title/');
     expect(await titlesOn(page)).toEqual(notes.map((a) => a.title).sort((a, b) => a.localeCompare(b)));
     await expect(page.locator('.sort-links a[aria-current="page"]')).toHaveText('Title');

@@ -20,7 +20,7 @@ function artifacts(): (Front & { collection: string })[] {
 const expected = (collection?: string) =>
   artifacts()
     .filter((a) => a.status === 'published' && (!collection || a.collection === collection))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || a.title.localeCompare(b.title))
     .slice(0, 20);
 
 test.describe('feeds', () => {
