@@ -146,9 +146,10 @@ gate. It is manual-only: Claude never triggers a phase transition on its own.
 
 Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 (PR #15);
 its content deliverable (20 real artifacts across 4 collections; 7 across 3 today) and the ADR-002
-Quarto proof stay open on the owner's side. Phase 12 (Project case studies) was accepted by the owner
-on 2026-09-12 ("Phase 12 PASS"): the three featured case studies with the owner-review corrections are
-on `main` (PR #17 and PR #19; `/phase` runner skill PR #18), post-merge verification green at `4848f7a`.
-Phase 13 (Creative media, including the real V1 climb integration as the opt-in island; integration,
-not cutover) is the next gated phase and is NOT opened; it opens only on the owner's instruction
-through `/phase 13`, on branch `feat/phase-13-creative-media`.
+Quarto proof stay open on the owner's side. Phase 12 (Project case studies: the three featured case
+studies to the thirteen-question standard and the data template, with real proof figures) was built
+on 2026-09-11 on branch `feat/phase-12-project-case-studies` (vault document 35 is its plan) and
+merged by the owner as PR #17 on 2026-09-12; the owner's review corrections follow on
+`fix/phase-12-owner-review`. Phase 12 is not yet PASS: the human Journey 3 reader (two interview
+questions from the SQL case study) is the remaining acceptance item. Phase 13 (Creative media,
+including the real V1 climb integration) opens only on the owner's instruction.
