@@ -84,7 +84,7 @@ window that says nothing about modern vehicles; unequal origin groups; six dropp
 violated linear-model assumptions. Sources: README headline table and notebook outputs.
 
 <figure>
-  <img src="/media/fuel-economy-regression/residuals.webp" alt="Two panels: residuals plotted against predicted miles per gallon, fanning wider and bending upward at the high end, and a histogram of the residuals centered near zero" width="1200" height="462" loading="lazy" decoding="async" />
+  <img src="/media/fuel-economy-regression/residuals.webp" alt="Two panels: residuals plotted against predicted miles per gallon, fanning wider and bending upward at the high end, and a histogram of the residuals centered near zero" width="1200" height="462" loading="lazy" decoding="async">
   <figcaption>Residuals versus predicted mpg, and their distribution. The widening fan and the curve at the right are the two assumption violations named above. Source: figure 06 saved by the executed notebook in the repository.</figcaption>
 </figure>
 

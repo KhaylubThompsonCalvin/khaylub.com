@@ -128,6 +128,8 @@ if (hasDist) {
     if (!/<a[^>]+class="skip-link"[^>]+href="#main"/.test(html)) fail(`skip link missing in ${file}`);
     if (/<script(?![^>]*type="application\/ld\+json")(?![^>]*\ssrc=)[^>]*>/.test(html)) fail(`inline script (not JSON-LD) in ${file}`);
     if (/<style[\s>]/.test(html)) fail(`inline style element in ${file}`);
+    // CSP style-src is 'self': no component, highlighter, or Markdown HTML may emit a style attribute.
+    if (/<[a-z][^>]*\sstyle="/i.test(html)) fail(`inline style attribute in ${file}`);
     if (/\son[a-z]+="/i.test(html)) fail(`inline event handler attribute in ${file}`);
     for (const m of html.matchAll(/<a\s[^>]*target="_blank"[^>]*>/g)) {
       if (!/rel="[^"]*noopener/.test(m[0])) fail(`target=_blank without rel=noopener in ${file}`);

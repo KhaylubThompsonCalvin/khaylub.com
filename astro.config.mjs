@@ -13,6 +13,11 @@ export default defineConfig({
     // Never inline stylesheets: one external CSS file keeps the Content Security Policy strict.
     inlineStylesheets: 'never',
   },
+  markdown: {
+    // No inline style attributes anywhere (CSP style-src 'self'; html-validate no-inline-style):
+    // code blocks render as plain <pre><code class="language-x"> and take their look from base.css.
+    syntaxHighlight: false,
+  },
   integrations: [
     // React is used for islands only (the climb, and later the optional graph map and orbit view).
     react(),

@@ -119,7 +119,7 @@ videos and rendered the reveals solid; no request failed. The same run produced 
 performance numbers above (V1 audit section 15; [The 16 MB front door](/notes/the-16-mb-front-door/)).
 
 <figure>
-  <img src="/media/khaylub-com-v1/release-2026-09-07.webp" alt="The V1 home page at the load gate: the Wanderer standing in a night scene under the site name, with the Tap to explore prompt centered below" width="1200" height="750" loading="lazy" decoding="async" />
+  <img src="/media/khaylub-com-v1/release-2026-09-07.webp" alt="The V1 home page at the load gate: the Wanderer standing in a night scene under the site name, with the Tap to explore prompt centered below" width="1200" height="750" loading="lazy" decoding="async">
   <figcaption>The preserved build at its release, 2026-09-07. Source: the author's screenshot attached to the GitHub Release v1.0.0-3d-experiment.</figcaption>
 </figure>
 
