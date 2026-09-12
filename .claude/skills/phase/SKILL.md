@@ -1,13 +1,13 @@
 ---
 name: phase
-description: Use when the owner types /phase <number>, /phase resume, or /phase close for Khaylub.com V2. Runs one roadmap phase end to end from the vault's Gated Phase Roadmap and Planning MOC: recover the true current state from the vault, Git, and GitHub, plan, implement, verify, document, and stop at the owner's gate. Never auto-triggers; opening or closing a roadmap gate is always the owner's explicit call.
-argument-hint: <number> | resume | close
+description: Use when the owner types /phase <number>, /phase resume, /phase gate, or /phase close for Khaylub.com V2. Runs one roadmap phase end to end from the vault's Gated Phase Roadmap and Planning MOC: recover the true current state from the vault, Git, and GitHub, plan, implement, verify, document, and stop at the owner's gate. Never auto-triggers; opening or closing a roadmap gate is always the owner's explicit call.
+argument-hint: <number> | resume | gate | close
 disable-model-invocation: true
 ---
 
 # /phase: roadmap-driven phase runner for Khaylub.com V2
 
-`$ARGUMENTS` is one of: a phase number (`/phase 13`), `resume`, or `close`. Anything else: explain the three forms and stop.
+`$ARGUMENTS` is one of: a phase number (`/phase 13`), `resume`, `gate`, or `close`. Anything else: explain the four forms and stop.
 
 The phase definition is never in this skill. It lives in the vault: `16 - Gated Phase Roadmap.md` (the boundaries), the documents and ADRs each phase names (the detail), `Khaylub.com V2 - Planning MOC.md` (where the project stands), and the dated checkpoints (history). CLAUDE.md holds the permanent repository rules and applies in full; this skill only adds the procedure. Git and GitHub are the truth for what code and pull requests exist; never trust a SHA written in a note when `git` and `gh` can tell you the current one.
 
@@ -36,12 +36,16 @@ This is explicit authorization to OPEN exactly phase N. Never open a different p
 ## 2. Form: `/phase resume`
 
 1. Identify the OPEN phase: the MOC state block, the newest `feat/phase-*` or `fix/*` branch, open pull requests, and the newest checkpoint's "Resume here" block. If GitHub shows the phase's pull request merged since the checkpoint was written, the phase is `PR MERGED / CLOSEOUT PENDING`: say so, update the checkpoint, and offer `/phase close` as the next owner step while finishing any non-owner work the checkpoint still lists.
-2. Determine where execution stopped from the plan's checkboxes, the branch log, the verify stamp (`.claude/verify-stamp.json`, `head` versus `HEAD`), and the checkpoint. Do not redo completed tasks; re-verify them only as the guard requires.
-3. Continue from that point through section 4 and section 5 to the exit gate.
+2. If the pull request is merged, `main` is verified, and no plan task is open, the state is **`OWNER GATE`**: report it in one line, run the `/phase gate` form (section 2a), and stop with the unresolved list. Do not rerun implementation, reviews, or browser acceptance.
+3. Otherwise determine where execution stopped from the plan's checkboxes, the branch log, the verify stamp (`.claude/verify-stamp.json`, `head` versus `HEAD`), and the checkpoint. Do not redo completed tasks; re-verify them only as the guard requires. Continue through section 4 and section 5 to the exit gate.
+
+## 2a. Form: `/phase gate`
+
+Read-only except for the canonical gate note. Follow [references/owner-gate.md](references/owner-gate.md): recover the current phase's acceptance criteria and verification procedure from the roadmap and the documents they name (fresh each run; nothing is hard-coded), read or create `AIDOCS/Phase <N> - Owner Gate.md`, run `node .claude/skills/phase/scripts/gate.mjs "<note>"`, and print: every criterion with its status; the unresolved list (required items not SATISFIED, each with who must supply it); the verdict (`SATISFIED` or `BLOCKED`); the next phase as NOT OPENED. Placeholder, template, example, or instructional text in a required field is MISSING even if a message calls it real evidence; record the message under "Owner clarifications" and keep the field MISSING.
 
 ## 3. Form: `/phase close`
 
-Only after the owner has merged or accepted. Follow the close procedure in [references/startup-gate.md](references/startup-gate.md): confirm the merge on GitHub, fast-forward `main`, prove tree parity with the accepted branch tip, run `node .claude/hooks/verify-guard.mjs full` on merged `main`, confirm CI on the merge commit, delete only fully merged local branches and prune, append the closeout section to the checkpoint, move the MOC state block and gate log to accepted or closed with the owner's PASS quoted or dated, update the CLAUDE.md phase pointer on a `chore/phase-<n>-closeout-pointer` branch by pull request, preserve every separately open owner or content item, and report the next phase as NOT OPENED. Do not open it.
+Only after the owner has merged or accepted. Run the `/phase gate` form first. Then follow the close procedure in [references/startup-gate.md](references/startup-gate.md): confirm the merge on GitHub, fast-forward `main`, prove tree parity with the accepted branch tip, run `node .claude/hooks/verify-guard.mjs full` on merged `main`, confirm CI on the merge commit, delete only fully merged local branches and prune, append the closeout section to the checkpoint, update the MOC facts, preserve every separately open owner or content item. **Record PASS (MOC gate log and state block, roadmap status, checkpoint, CLAUDE.md pointer on `chore/phase-<n>-closeout-pointer` by pull request) only when the gate verdict is SATISFIED and the owner has recorded acceptance.** If any required item is MISSING or BLOCKED: complete every independent closeout action anyway, write "PASS not recorded" with the exact fields still required, leave the state at `OWNER GATE / ACCEPTANCE PENDING`, and stop. An owner statement that a requirement is complete never substitutes for the evidence fields when they are visibly absent. Report the next phase as NOT OPENED. Do not open it.
 
 ## 4. Execution contract
 
@@ -71,7 +75,7 @@ Before declaring the software exit gate reached:
 
 ## 6. Verification before any claim
 
-No "done", "passes", or "PASS" without the command output in the conversation. CI green on the pushed branch is evidence; "should pass" is not. Owner acceptance is recorded by the owner, never by this skill.
+No "done", "passes", or "PASS" without the command output in the conversation. CI green on the pushed branch is evidence; "should pass" is not. Owner acceptance is recorded by the owner, never by this skill, and only over evidence that `scripts/gate.mjs` accepts: content that is the evidence, not a placeholder, a template, an example, an instruction, or a claim about evidence ([references/owner-gate.md](references/owner-gate.md)).
 
 ## 7. Production boundary
 
