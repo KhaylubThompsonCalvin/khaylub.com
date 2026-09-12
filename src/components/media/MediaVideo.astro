@@ -11,7 +11,7 @@ interface Props {
   entry: AnyEntry;
 }
 const { entry } = Astro.props;
-const data = entry.data as { poster: string; files?: string[]; external_url?: string; captions?: string; speech?: boolean; summary: string; type: string };
+const data = entry.data as { poster: string; files?: string[]; external_url?: string; captions?: string; speech?: boolean; summary: string; type: string; title: string };
 const files = data.files ?? [];
 const poster = resolveRaster(entry, data.poster);
 const posterImg = poster ? await webpAt(poster, 1280) : { src: data.poster, width: 1280, height: 720 };
@@ -23,7 +23,7 @@ const host = external ? external.hostname.replace(/^www\./, '') : '';
   {
     files.length > 0 ? (
       <div class="frame">
-        <video controls preload="none" poster={posterImg.src} width={posterImg.width} height={posterImg.height} playsinline>
+        <video controls preload="none" poster={posterImg.src} width={posterImg.width} height={posterImg.height} playsinline aria-label={data.title}>
           {files.map((f) => (
             <source src={mediaUrl(entry, f)} type={mimeFor(f)} />
           ))}

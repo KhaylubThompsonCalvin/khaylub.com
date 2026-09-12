@@ -25,7 +25,7 @@ export default function SelectiveBloom({ strength = 1.0, radius = 0.5, threshold
   const { gl, scene, camera, size } = useThree();
   const stash = useRef(new Map<string, THREE.Material | THREE.Material[]>());
 
-  const { bloomComposer, finalComposer, bloomPass } = useMemo(() => {
+  const { bloomComposer, finalComposer, bloomPass, mixPass } = useMemo(() => {
     const renderScene = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(new THREE.Vector2(size.width, size.height), strength, radius, threshold);
     const bloomComposer = new EffectComposer(gl);
@@ -61,7 +61,7 @@ export default function SelectiveBloom({ strength = 1.0, radius = 0.5, threshold
     finalComposer.addPass(renderScene);
     finalComposer.addPass(mixPass);
     finalComposer.addPass(new OutputPass());
-    return { bloomComposer, finalComposer, bloomPass };
+    return { bloomComposer, finalComposer, bloomPass, mixPass };
     // Rebuilt only when the renderer, scene, or camera identity changes; size and the bloom
     // parameters are kept in sync by the effects below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,12 +79,16 @@ export default function SelectiveBloom({ strength = 1.0, radius = 0.5, threshold
     bloomPass.threshold = threshold;
   }, [bloomPass, strength, radius, threshold]);
 
+  // EffectComposer.dispose() frees only its own targets; the bloom pass and the mix material are
+  // disposed here so a skip-and-enter cycle leaves nothing behind.
   useEffect(
     () => () => {
+      bloomPass.dispose();
+      mixPass.material.dispose();
       bloomComposer.dispose();
       finalComposer.dispose();
     },
-    [bloomComposer, finalComposer]
+    [bloomComposer, finalComposer, bloomPass, mixPass]
   );
 
   useFrame(() => {

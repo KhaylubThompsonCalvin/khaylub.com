@@ -60,7 +60,7 @@ Any other key fails the build. That is how private fields stay impossible.
 - **writing**: `type` (`essay`, `poem`, `fiction`, `book-note`). **journal**: `type: entry`.
 - **music**: `type: track`, `duration` (`m:ss`), `provenance`, `files` or `external_url`.
 - **video**: `type` (`film`, `recording`, `concept-film`), `poster`, `provenance`, `files` or `external_url`, `speech: true` when the recording has speech, and then `captions` (a WebVTT file) is required.
-- **gallery**: `type` (`still`, `set`, `render`), `images[]` with `src` and `alt`, `provenance`.
+- **gallery**: `type` (`still`, `set`, `render`), `images[]` with `src`, `alt` (up to 200 characters, the image for those who cannot see it), and an optional short `caption` (the visible line), `provenance`.
 - **experiments**: `type` (`prototype`, `exhibit`), `poster`, `entry_url`, optional `payload_mb`.
 
 ## Profile data

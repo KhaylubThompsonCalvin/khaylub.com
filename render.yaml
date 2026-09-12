@@ -97,6 +97,14 @@ services:
       - path: /*.glb
         name: Cache-Control
         value: public, max-age=604800
+      # The climb island's assets and self-hosted media folders, named explicitly in case the host
+      # matches * within one path segment only.
+      - path: /climb/*
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /media/*
+        name: Cache-Control
+        value: public, max-age=604800
       - path: /robots.txt
         name: Cache-Control
         value: public, max-age=3600

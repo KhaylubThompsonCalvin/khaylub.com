@@ -4,7 +4,7 @@ slug: the-climb
 type: exhibit
 status: published
 date: 2026-09-12
-summary: The first version of this site, a scroll-driven 3D climb, ported into this site as an opt-in island. Two models, four short video plates, six beats, and about 7 MB that load only when you ask.
+summary: The first version of this site, a scroll-driven 3D climb, ported into this site as an opt-in island. Two models, four short video plates, six beats, and a little over 7 MB that load only when you ask.
 tags: [three-js, react, blender, performance, portfolio]
 skills: [web-development, 3d-pipeline, performance-analysis]
 technologies: [three-js, react-three-fiber, react, astro, blender]
@@ -15,7 +15,7 @@ cover: poster.webp
 cover_alt: The Spark Wakes beat of the climb, with the Wanderer facing the viewer under a warm sunrise sky while a small orange phoenix ignites in the upper right.
 poster: poster.webp
 entry_url: /climb/
-payload_mb: 7
+payload_mb: 7.4
 related: [khaylub-com-v1, the-16-mb-front-door, preserving-v1, the-climb-recording, the-climb-beat-by-beat]
 provenance:
   source: The author's own screenshot of the ported climb on this site (the Spark Wakes beat at 1440 by 900), taken with Playwright on 2026-09-12. The scene contains the Wanderer and the Phoenix (Tripo base meshes finished in Blender by the author) and a Higgsfield atmosphere plate, each recorded in public/climb/provenance.yaml.
@@ -30,7 +30,9 @@ The scene that launched as khaylub.com on 2026-06-24 and still serves the public
 site takes over only at a later phase), kept as it shipped at tag `v1.0.0-3d-experiment` and
 ported into this site as an island: the Wanderer walking from
 night into day, the Phoenix igniting at the midpoint and filling the sky at the summit, the same
-camera choreography, the same six beats, and the same words. It opens from "Enter the climb" on
+models and camera choreography, the same six beats, the words as shipped (except the availability
+line, which is this site's), and the atmosphere plates re-encoded. What the port leaves out is
+listed under "What changed in the port". It opens from "Enter the climb" on
 the home page or from "Tap to explore" on [its own page](/climb/), and nothing from it downloads
 before that press.
 
@@ -38,10 +40,11 @@ before that press.
 
 Before the press: nothing from the climb, on any page (a test asserts zero such requests on the
 home page and the climb page). After the press, measured on 2026-09-12 with Playwright over one
-full scroll: 7.01 MB in total, made of the island's code (997 KB) and its React runtime (186 KB),
-its stylesheet (9 KB), the two models (the Wanderer 1.78 MB and the Phoenix 0.90 MB), and the
-four atmosphere plates (fog 1.29 MB, dawn grass 0.67 MB, embers 0.75 MB, summit clouds 0.60 MB).
-The two plates that belong to later beats are fetched only as you approach them. For comparison,
+full scroll (`scripts/capture-climb.mjs`): 7.36 MB in total (7,355,051 bytes, served uncompressed
+by the local test server), made of the island's code (1.02 MB), its React runtime (0.19 MB), its
+stylesheet (9 KB), the two models (the Wanderer 1.82 MB and the Phoenix 0.92 MB), and the four
+atmosphere plates (fog 1.32 MB, dawn grass 0.69 MB, embers 0.76 MB, summit clouds 0.62 MB). The
+two plates that belong to later beats are fetched only as you approach them. For comparison,
 the first version requested 14.5 MB across thirteen files before its gate could be tapped
 ([The 16 MB front door](/notes/the-16-mb-front-door/)).
 
@@ -49,7 +52,8 @@ the first version requested 14.5 MB across thirteen files before its gate could 
 
 - The scene, models, plates, camera, beats, and copy are the first version's. The plates were
   re-encoded to this site's video rules (H.264 CRF 23, capped at 5 Mbps, no audio track), which
-  took the four from 18.6 MB to 3.3 MB without changing their length or resolution.
+  took the four from 19.06 MB to 3.39 MB (file sizes on disk) without changing their length or
+  resolution.
 - Scrolling is the browser's own; the first version's smooth-scroll library is not included, so
   the page around the climb behaves like every other page here.
 - The five concept-film cards of the Camps beat are not included: the films and their posters

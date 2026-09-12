@@ -1,14 +1,15 @@
 ---
 // Where the climb island mounts once the door is pressed: an empty block that takes no space until
 // then. Placed by the page so the island can span its full width (the identity card grid on Home,
-// the full-bleed main on /climb/) instead of the door's own column.
+// the full-bleed main on /climb/) instead of the door's own column. Not a live region: the
+// island's own role="status" line and the focus move to its heading announce the change.
 interface Props {
   class?: string;
 }
 const { class: className } = Astro.props;
 ---
 
-<div class:list={['climb-mount', className]} data-climb-mount aria-live="polite"></div>
+<div class:list={['climb-mount', className]} data-climb-mount></div>
 
 <style>
   .climb-mount:empty {

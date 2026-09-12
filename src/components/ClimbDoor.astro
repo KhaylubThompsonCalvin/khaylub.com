@@ -48,11 +48,13 @@ const resume = resumeMeta();
     const button = door.querySelector<HTMLButtonElement>('[data-climb-enter]');
     if (!button || !mount) return;
     button.addEventListener('click', async () => {
-      button.disabled = true;
+      // aria-disabled, not disabled: a disabled control drops focus to the body mid-load.
+      if (button.getAttribute('aria-disabled') === 'true') return;
+      button.setAttribute('aria-disabled', 'true');
       button.textContent = 'Loading the climb';
       const { mountClimb } = await import('../islands/climb-mount');
       mountClimb(mount, door, () => {
-        button.disabled = false;
+        button.removeAttribute('aria-disabled');
         button.textContent = door.dataset.standalone ? 'Tap to explore' : 'Enter the climb';
         button.focus();
       });

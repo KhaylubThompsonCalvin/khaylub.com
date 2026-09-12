@@ -17,7 +17,7 @@ const external = files.length === 0 && data.external_url ? new URL(data.external
 <figure class="media-audio">
   {
     files.length > 0 ? (
-      <audio controls preload="none">
+      <audio controls preload="none" aria-label={data.title}>
         {files.map((f) => (
           <source src={mediaUrl(entry, f)} type={mimeFor(f)} />
         ))}

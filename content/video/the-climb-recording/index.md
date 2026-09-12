@@ -27,9 +27,10 @@ provenance:
 One scroll through [the climb](/climb/) as it runs inside this site: the Wanderer at the trailhead
 under the night sky, the first light and the Footholds, the Phoenix igniting at the midpoint, the
 Camps, and the summit where the firebird fills the sky over the closing principle and the
-contact links. The scroll is scripted (a 24 second ease from the top of the island to its end,
-with a two second hold before and after), so the pace is steady rather than a person's hand.
-There is no audio track; the climb has no sound.
+contact links. The scroll is scripted (`scripts/capture-climb.mjs`: a 24 second ease from the top
+of the island to its end, with a two second hold before and after), so the pace is steady rather
+than a person's hand. The 36 seconds also include the first eight or so while the models loaded
+after the door was pressed. There is no audio track; the climb has no sound.
 
 ## How it was made
 

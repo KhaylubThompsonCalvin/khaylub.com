@@ -4,7 +4,7 @@
 // it. Progress is measured from the track's own top edge (scroll.ts), so the V2 header, footer,
 // and the rest of the page are untouched. V2's door is the gesture (no in-island gate); the exit
 // is always visible (P2-FE-08). V1's nav, audio manager, and the case-study dialog are gone.
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Scene from './three/Scene';
 import VideoPlate from './ui/VideoPlate';
 import { Hero, Philosophy, Footholds, Spark, Contact, type ContactLink } from './ui/Beats';
@@ -29,6 +29,20 @@ export function Climb({ name, roleLine, availability, links, onSkip }: ClimbProp
   const reachedStageIndex = useStore((s) => s.reachedStageIndex);
   const ready = useStore((s) => s.ready);
   const started = useStore((s) => s.started);
+  // The status line is a live region: it announces changes, so it mounts empty, reports loading a
+  // moment later, says when the models are in, and then clears (climb.css hides it while empty).
+  const [status, setStatus] = useState('');
+  useEffect(() => {
+    if (ready) return undefined;
+    const t = setTimeout(() => setStatus('Loading the climb: two models and four short video plates.'), 60);
+    return () => clearTimeout(t);
+  }, [ready]);
+  useEffect(() => {
+    if (!ready) return undefined;
+    setStatus('The climb is ready. Scroll to walk.');
+    const t = setTimeout(() => setStatus(''), 4000);
+    return () => clearTimeout(t);
+  }, [ready]);
 
   // The scroll spine over the island's own track; focus lands on the hero once the tree is committed
   // (an effect, not a frame callback: React 19 may commit this tree later than the next frame).
@@ -62,7 +76,9 @@ export function Climb({ name, roleLine, availability, links, onSkip }: ClimbProp
       el.style.setProperty('--climb-fire', (fire * fire * (3 - 2 * fire)).toFixed(3));
     };
     apply(store.getState().scrollProgress);
-    return store.subscribe((s) => apply(s.scrollProgress));
+    return store.subscribe((s, prev) => {
+      if (s.scrollProgress !== prev.scrollProgress) apply(s.scrollProgress);
+    });
   }, []);
 
   // Mirror the OS reduced-motion preference into the store.
@@ -92,7 +108,7 @@ export function Climb({ name, roleLine, availability, links, onSkip }: ClimbProp
     <section className="climb" aria-label="The climb" ref={root}>
       <div className="climb-exit">
         <p className="climb-status" role="status">
-          {ready ? '' : 'Loading the climb: two models and four short video plates.'}
+          {status}
         </p>
         <button type="button" className="climb-skip" onClick={onSkip}>
           Skip the climb

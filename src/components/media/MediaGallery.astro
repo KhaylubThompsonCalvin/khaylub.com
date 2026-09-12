@@ -11,12 +11,12 @@ interface Props {
   entry: AnyEntry;
 }
 const { entry } = Astro.props;
-const data = entry.data as { images: { src: string; alt: string }[] };
+const data = entry.data as { images: { src: string; alt: string; caption?: string }[] };
 const items = await Promise.all(
   data.images.map(async (img) => {
     const meta = resolveRaster(entry, img.src);
     if (!meta) throw new Error(`gallery images must live beside the artifact: ${img.src}`);
-    return { meta, alt: img.alt, full: await webpAt(meta, 1600) };
+    return { meta, alt: img.alt, caption: img.caption, full: await webpAt(meta, 1600) };
   })
 );
 ---
@@ -25,7 +25,7 @@ const items = await Promise.all(
   {
     items.map((it, i) => (
       <li>
-        <a href={it.full.src} aria-label={`${it.alt} (full size)`}>
+        <a href={it.full.src}>
           <Picture
             src={it.meta}
             widths={[400, 800, 1600]}
@@ -36,8 +36,9 @@ const items = await Promise.all(
             fetchpriority={i === 0 ? 'high' : undefined}
             decoding="async"
           />
+          <span class="visually-hidden">(full size)</span>
         </a>
-        <p class="small muted">{it.alt}</p>
+        {it.caption && <p class="small muted">{it.caption}</p>}
       </li>
     ))
   }

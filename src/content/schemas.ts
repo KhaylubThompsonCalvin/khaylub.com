@@ -182,7 +182,8 @@ export const gallery = rules(
   base
     .extend({
       type: z.enum(['still', 'set', 'render']),
-      images: z.array(z.object({ src: z.string(), alt: z.string().min(5) }).strict()).min(1),
+      // alt describes the image for those who cannot see it; caption is the short visible line.
+      images: z.array(z.object({ src: z.string(), alt: z.string().min(5).max(200), caption: z.string().max(120).optional() }).strict()).min(1),
       provenance,
     })
     .strict()

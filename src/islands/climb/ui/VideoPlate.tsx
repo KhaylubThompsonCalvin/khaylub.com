@@ -23,6 +23,8 @@ export default function VideoPlate({ src, blend = 'soft-light', max = 0.45, fade
   const ref = useRef<HTMLVideoElement | null>(null);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const [armed, setArmed] = useState(deferUntil == null);
+  // Under reduced motion the plate is never shown, so it is never fetched either.
+  const live = armed && !reducedMotion;
 
   useEffect(() => {
     if (armed || deferUntil == null) return undefined;
@@ -37,12 +39,7 @@ export default function VideoPlate({ src, blend = 'soft-light', max = 0.45, fade
 
   useEffect(() => {
     const v = ref.current;
-    if (!v || !armed) return undefined;
-    if (reducedMotion) {
-      v.pause();
-      v.style.opacity = '0';
-      return undefined;
-    }
+    if (!v || !live) return undefined;
     const ramp = (p: number, a: number, b: number) => Math.min(1, Math.max(0, (p - a) / (b - a || 1)));
     const apply = (p: number) => {
       let o = ramp(p, fadeIn[0], fadeIn[1]);
@@ -57,7 +54,7 @@ export default function VideoPlate({ src, blend = 'soft-light', max = 0.45, fade
     if (scrub) v.pause();
     else v.play?.().catch(() => {});
     return unsub;
-  }, [reducedMotion, fadeIn, fadeOut, max, scrub, armed]);
+  }, [live, fadeIn, fadeOut, max, scrub]);
 
   const style: CSSProperties = { mixBlendMode: blend };
   if (anchor === 'bottom') style.objectPosition = 'center bottom';
@@ -67,5 +64,5 @@ export default function VideoPlate({ src, blend = 'soft-light', max = 0.45, fade
     style.WebkitMaskImage = g;
   }
 
-  return <video ref={ref} className="climb-plate" style={style} src={armed ? src : undefined} muted loop playsInline preload={armed ? 'auto' : 'none'} aria-hidden="true" />;
+  return <video ref={ref} className="climb-plate" style={style} src={live ? src : undefined} muted loop playsInline preload={live ? 'auto' : 'none'} aria-hidden="true" />;
 }

@@ -73,9 +73,14 @@
   cursor: pointer;
   margin-left: auto;
 }
-.climb-skip:focus-visible {
-  outline: 3px solid var(--focus);
+/* One focus ring for the whole island, readable over the night sky and the summit alike: a dark
+   ring with a pale halo, independent of the page theme and the scroll-driven sky. */
+.climb-skip:focus-visible,
+.climb .camp--link:focus-visible,
+.climb .contact-links a:focus-visible {
+  outline: 3px solid #241c12;
   outline-offset: 3px;
+  box-shadow: 0 0 0 6px #fbf6ee;
 }
 
 /* The track is the six beats; the stage is sticky for one viewport inside it. */
@@ -126,11 +131,13 @@
   padding: 0 8vw;
   pointer-events: none;
 }
+/* Reveal-and-stay by opacity and transform only (V1 also hid with visibility): a link inside a beat
+   not yet reached stays reachable by keyboard, and focusing it scrolls the beat into view, which
+   reveals it. */
 .climb-section .inner {
   max-width: 60ch;
   pointer-events: auto;
   opacity: 0;
-  visibility: hidden;
   transform: translateY(12px);
   transition:
     opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -220,7 +227,6 @@
 .climb-overlay[data-reached='4'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus'], [data-beat='spark'], [data-beat='camps']) .inner,
 .climb-overlay[data-reached='5'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus'], [data-beat='spark'], [data-beat='camps'], [data-beat='contact']) .inner {
   opacity: 1;
-  visibility: visible;
   transform: none;
 }
 
@@ -267,7 +273,6 @@
 }
 .climb-section .inner.inner--reveal {
   opacity: 1;
-  visibility: visible;
   transform: none;
 }
 .climb .body {
@@ -282,8 +287,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--climb-muted);
-  opacity: 0.8;
+  color: var(--climb-ink);
 }
 .climb .focus-list {
   list-style: none;
@@ -388,10 +392,6 @@
 .climb .camp--link:focus-visible .camp-cue {
   color: var(--climb-accent);
 }
-.climb .camp--link:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
 .climb .status {
   display: inline-flex;
   align-items: center;
@@ -449,16 +449,10 @@
   text-shadow: 0 0 16px rgba(255, 140, 60, 0.85);
   border-bottom-color: #ff7a2e;
 }
-.climb .contact-links a:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 4px;
-  border-radius: 2px;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .climb-section .inner {
     opacity: 1;
-    visibility: visible;
     transform: none;
     transition: none;
   }

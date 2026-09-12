@@ -9,7 +9,9 @@ interface Props {
   entry: AnyEntry;
 }
 const { entry } = Astro.props;
-const data = entry.data as { poster: string; entry_url: string; payload_mb?: number; title: string; type: string };
+const data = entry.data as { poster: string; entry_url: string; payload_mb?: number; title: string; type: string; cover_alt?: string };
+// The frontmatter's cover_alt describes the still; the generic phrase is only the fallback.
+const alt = data.cover_alt ?? `${data.title}: a still from the ${data.type}`;
 const poster = resolveRaster(entry, data.poster);
 const internal = data.entry_url.startsWith('/');
 ---
@@ -17,9 +19,9 @@ const internal = data.entry_url.startsWith('/');
 <figure class="experiment">
   {
     poster ? (
-      <Picture src={poster} widths={[640, 1280]} sizes="(min-width: 1024px) 65ch, 100vw" formats={['avif', 'webp']} alt={`${data.title}: a still from the ${data.type}`} loading="eager" fetchpriority="high" decoding="async" />
+      <Picture src={poster} widths={[640, 1280]} sizes="(min-width: 1024px) 65ch, 100vw" formats={['avif', 'webp']} alt={alt} loading="eager" fetchpriority="high" decoding="async" />
     ) : (
-      <img src={data.poster} alt={`${data.title}: a still from the ${data.type}`} width="1280" height="720" loading="eager" fetchpriority="high" decoding="async" />
+      <img src={data.poster} alt={alt} width="1280" height="720" loading="eager" fetchpriority="high" decoding="async" />
     )
   }
   <figcaption class="small muted">
