@@ -133,6 +133,15 @@ vault under `01 Projects/Khaylub.com/docs/V2/` and `01 Projects/Khaylub.com/ai-d
 phase ends with a checkpoint note there, including the skill and capability ledger (what was
 available, selected, invoked, for which task, with what evidence), and a state-block update.
 
+## Phase runner (`/phase`)
+
+`.claude/skills/phase/SKILL.md` is the procedure for running one roadmap phase: `/phase <number>`
+opens exactly that phase (explicit owner authorization; refused if the prior gate is not closed),
+`/phase resume` continues the open phase from the vault checkpoint, Git, and GitHub, and
+`/phase close` runs the post-merge closeout after the owner merges and accepts. The skill reads the
+phase definition from the vault roadmap at run time, never from itself, and stops at every owner
+gate. It is manual-only: Claude never triggers a phase transition on its own.
+
 ## Current phase pointer
 
 Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 (PR #15);
