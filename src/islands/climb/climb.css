@@ -1,0 +1,474 @@
+/* The climb island's stylesheet: V1's index.css (khaylub-portfolio, tag v1.0.0-3d-experiment)
+   scoped under .climb, with V1's root variables prefixed --climb-* so they never touch V2's tokens.
+   Loaded by climb-mount.tsx as its own <link> after the door is pressed, so it never joins the
+   site stylesheet or the 30 KB CSS budget. The island reproduces V1's palette and type scale on
+   purpose: the roadmap's acceptance for the port is that /climb/ matches the V1 stills. */
+.climb {
+  --climb-bg: #e9e1d6;
+  --climb-ink: #241c12;
+  --climb-ink-day: #241c12;
+  --climb-muted: #5b513f;
+  --climb-accent: #caa46f;
+  --climb-fire: 0;
+  --climb-scrim: 236, 232, 224;
+  --climb-scrim-day: 236, 232, 224;
+  position: relative;
+  margin: var(--space-2) 0 0;
+  /* Never wider than its column: the canvas and the beats size to the page, not the page to them. */
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  color: var(--climb-ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+.climb * {
+  box-sizing: border-box;
+}
+.climb p,
+.climb ul,
+.climb h2 {
+  margin: 0;
+}
+.climb a {
+  color: inherit;
+}
+
+/* Exit bar: the status line and the skip control stay visible while the climb scrolls. */
+.climb-exit {
+  position: sticky;
+  top: calc(var(--header-height) + 0.5rem);
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1rem;
+  pointer-events: none;
+}
+.climb-status {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--climb-ink);
+  text-shadow: 0 1px 8px rgba(var(--climb-scrim), 0.8);
+}
+.climb-status:empty {
+  display: none;
+}
+.climb-skip {
+  pointer-events: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 44px;
+  border: 1px solid rgba(40, 32, 20, 0.35);
+  background: rgba(255, 250, 240, 0.85);
+  color: #241c12;
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+.climb-skip:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* The track is the six beats; the stage is sticky for one viewport inside it. */
+.climb-track {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+.climb-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+  background: var(--climb-bg);
+}
+.climb-stage > div {
+  position: absolute;
+  inset: 0;
+}
+.climb-canvas canvas {
+  display: block;
+  max-width: 100%;
+}
+.climb-plate {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.climb-overlay {
+  position: relative;
+  z-index: 2;
+  margin-top: -100vh;
+}
+
+/* Each beat is a viewport-sized block; stacked, they create the scroll track. */
+.climb-section {
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8vw;
+  pointer-events: none;
+}
+.climb-section .inner {
+  max-width: 60ch;
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Readability scrim behind the copy where the Wanderer passes under a text column. */
+.climb [data-beat='arrival'] .inner,
+.climb [data-beat='philosophy'] .inner,
+.climb [data-beat='focus'] .inner,
+.climb [data-beat='spark'] .inner,
+.climb [data-beat='camps'] .work-intro,
+.climb [data-beat='contact'] .inner {
+  position: relative;
+  isolation: isolate;
+}
+.climb [data-beat='arrival'] .inner::before,
+.climb [data-beat='philosophy'] .inner::before,
+.climb [data-beat='focus'] .inner::before,
+.climb [data-beat='spark'] .inner::before,
+.climb [data-beat='camps'] .work-intro::before,
+.climb [data-beat='contact'] .inner::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -0.7em -1.4em;
+  border-radius: 1.2em;
+  background: linear-gradient(105deg, rgba(var(--climb-scrim), 0.82) 0%, rgba(var(--climb-scrim), 0.7) 55%, rgba(var(--climb-scrim), 0.52) 100%);
+  filter: blur(16px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  pointer-events: none;
+}
+.climb [data-beat='contact'] .inner::before {
+  inset: -0.5em -1.6em;
+  background: radial-gradient(ellipse 78% 76% at 22% 46%, rgba(var(--climb-scrim), 0.5) 0%, rgba(var(--climb-scrim), 0.24) 44%, rgba(var(--climb-scrim), 0) 74%);
+  filter: blur(24px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.climb [data-beat='contact'] .lead,
+.climb [data-beat='contact'] .body,
+.climb [data-beat='contact'] .availability,
+.climb [data-beat='contact'] .contact-links a {
+  text-shadow: 0 1px 12px rgba(var(--climb-scrim), 0.6);
+}
+
+/* Beat heights (viewport-heights): 84 + 126 + 126 + 70 + 210 + 184 = 800 = SCROLL_VH. */
+.climb [data-beat='arrival'] {
+  min-height: 84vh;
+}
+.climb [data-beat='philosophy'] {
+  min-height: 126vh;
+}
+.climb [data-beat='focus'] {
+  min-height: 126vh;
+}
+.climb [data-beat='spark'] {
+  min-height: 70vh;
+}
+.climb [data-beat='spark'] .inner {
+  width: fit-content;
+}
+.climb [data-beat='spark'] .kicker {
+  color: var(--climb-ink-day);
+}
+.climb [data-beat='spark'] .inner::before {
+  background: linear-gradient(105deg, rgba(var(--climb-scrim-day), 0.82) 0%, rgba(var(--climb-scrim-day), 0.7) 55%, rgba(var(--climb-scrim-day), 0.52) 100%);
+}
+.climb [data-beat='camps'] {
+  min-height: 210vh;
+}
+.climb [data-beat='contact'] {
+  min-height: 184vh;
+  justify-content: flex-start;
+}
+.climb [data-beat='contact'] .inner {
+  position: sticky;
+  top: 28vh;
+}
+
+/* Reveal-and-stay: each reached beat reveals its section and every earlier one. */
+.climb-overlay[data-reached='0'] :is([data-beat='arrival']) .inner,
+.climb-overlay[data-reached='1'] :is([data-beat='arrival'], [data-beat='philosophy']) .inner,
+.climb-overlay[data-reached='2'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus']) .inner,
+.climb-overlay[data-reached='3'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus'], [data-beat='spark']) .inner,
+.climb-overlay[data-reached='4'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus'], [data-beat='spark'], [data-beat='camps']) .inner,
+.climb-overlay[data-reached='5'] :is([data-beat='arrival'], [data-beat='philosophy'], [data-beat='focus'], [data-beat='spark'], [data-beat='camps'], [data-beat='contact']) .inner {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* Type scale (V1's 2026-07-05 spec): ratio 1.25 on a 1rem base. */
+.climb .kicker {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--climb-muted);
+  margin-bottom: 1rem;
+}
+.climb .h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+.climb .h1:focus {
+  outline: none;
+}
+.climb .role {
+  margin-top: 1rem;
+  font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+  color: var(--climb-muted);
+}
+.climb .statement {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.5;
+  max-width: 56ch;
+}
+.climb .lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.44rem);
+  line-height: 1.1;
+}
+.climb .lead--connector {
+  font-size: clamp(1.25rem, 2.6vw, 1.95rem);
+}
+.climb .reveal-word {
+  display: inline-block;
+  will-change: opacity, filter, transform;
+}
+.climb-section .inner.inner--reveal {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.climb .body {
+  margin-top: 1rem;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.5;
+  color: var(--climb-muted);
+  max-width: 56ch;
+}
+.climb .availability {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--climb-muted);
+  opacity: 0.8;
+}
+.climb .focus-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  padding: 0;
+}
+.climb .focus-list li {
+  font-size: clamp(0.95rem, 1.6vw, 1rem);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(40, 32, 20, 0.25);
+  border-radius: 999px;
+}
+
+/* The camps: five worlds as cards. No film behind them until their provenance is recorded. */
+.climb .work-lede {
+  margin-top: 1rem;
+  max-width: 56ch;
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  line-height: 1.5;
+  color: var(--climb-muted);
+}
+.climb [data-beat='camps'] .kicker,
+.climb [data-beat='camps'] .work-lede {
+  text-shadow: 0 1px 12px rgba(var(--climb-scrim), 0.7);
+}
+.climb .camps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  max-width: 1100px;
+}
+.climb .camp {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 12rem;
+  aspect-ratio: 16 / 10;
+  padding: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--climb-accent), transparent 86%);
+  border-radius: 16px;
+  overflow: hidden;
+  color: #f3ece0;
+  background:
+    radial-gradient(ellipse 90% 70% at 70% 20%, rgba(202, 164, 111, 0.22), transparent 70%),
+    linear-gradient(to top, #0c0906 0%, #15110b 60%, #1f1810 100%);
+  box-shadow: 0 12px 34px rgba(12, 9, 6, 0.24);
+  pointer-events: auto;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(26px) scale(0.977);
+  filter: blur(10px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) calc(var(--card-i, 0) * 110ms),
+    transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) calc(var(--card-i, 0) * 110ms),
+    filter 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) calc(var(--card-i, 0) * 110ms),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+.climb .camp.is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.climb .camp-title {
+  font-family: var(--font-display);
+  font-size: 1.56rem;
+  line-height: 1.1;
+  color: #fbf6ee;
+}
+.climb .camp-concept {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(243, 236, 224, 0.88);
+  max-width: 38ch;
+}
+.climb .camp-cue,
+.climb .camp-note {
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: rgba(243, 236, 224, 0.82);
+}
+.climb .camp-note {
+  font-style: italic;
+}
+.climb .camp--link:hover,
+.climb .camp--link:focus-visible {
+  border-color: color-mix(in srgb, var(--climb-accent), transparent 35%);
+  box-shadow:
+    0 16px 40px rgba(12, 9, 6, 0.34),
+    0 0 26px color-mix(in srgb, var(--climb-accent), transparent 74%);
+}
+.climb .camp--link:hover .camp-cue,
+.climb .camp--link:focus-visible .camp-cue {
+  color: var(--climb-accent);
+}
+.climb .camp--link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.climb .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: rgba(243, 236, 224, 0.82);
+}
+.climb .status .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.climb .status--live .dot {
+  background: var(--climb-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--climb-accent), transparent 72%);
+}
+.climb .status--progress .dot {
+  background: var(--climb-accent);
+}
+.climb .status--concept .dot {
+  background: transparent;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+}
+
+/* Contact: the links carry the phoenix's fire as --climb-fire ramps over the summit. */
+.climb .contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.climb .contact-links a {
+  position: relative;
+  pointer-events: auto;
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+  font-size: 1rem;
+  text-decoration: none;
+  color: var(--climb-ink);
+  border-bottom: 1px solid color-mix(in srgb, var(--climb-accent), #ff7a2e calc(var(--climb-fire) * 70%));
+  text-shadow: 0 0 calc(var(--climb-fire) * 12px) rgba(255, 150, 70, calc(var(--climb-fire) * 0.55));
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+.climb .contact-links a:hover,
+.climb .contact-links a:focus-visible {
+  color: #b8431a;
+  text-shadow: 0 0 16px rgba(255, 140, 60, 0.85);
+  border-bottom-color: #ff7a2e;
+}
+.climb .contact-links a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .climb-section .inner {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: none;
+  }
+  .climb .camp {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .climb-plate {
+    display: none;
+  }
+}

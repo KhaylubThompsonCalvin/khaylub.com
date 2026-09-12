@@ -3,6 +3,7 @@ import { identity, availability, monthLabel } from '@lib/profile';
 import RecruiterRow from './RecruiterRow.astro';
 import Doors from './Doors.astro';
 import ClimbDoor from './ClimbDoor.astro';
+import ClimbMount from './ClimbMount.astro';
 
 const id = identity();
 const avail = availability();
@@ -27,6 +28,8 @@ const avail = availability();
       </div>
     )
   }
+  {/* The climb mounts here, across both columns, once the door is pressed. */}
+  <ClimbMount class="hero-mount" />
 </section>
 
 <style>
@@ -48,6 +51,10 @@ const avail = availability();
   .availability {
     font-weight: 600;
     margin: 0 0 var(--space-2);
+  }
+  .hero :global(.hero-mount) {
+    grid-column: 1 / -1;
+    min-width: 0;
   }
   .hero-photo img {
     border-radius: 12px;

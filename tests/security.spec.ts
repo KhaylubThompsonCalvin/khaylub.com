@@ -26,6 +26,10 @@ test.describe('security regression', () => {
       if (path === '/') {
         await page.getByRole('button', { name: 'Enter the climb' }).click();
         await page.getByRole('button', { name: 'Skip the climb' }).waitFor();
+        // The ported scene: models, meshopt WebAssembly, webp textures through blob: URLs.
+        await page.locator('.climb canvas').waitFor({ timeout: 60_000 });
+        await page.locator('.climb-status').filter({ hasText: /^$/ }).waitFor({ state: 'attached', timeout: 60_000 });
+        await page.waitForTimeout(1000);
       }
       expect(await page.evaluate(() => (window as any).__csp), path).toEqual([]);
     }

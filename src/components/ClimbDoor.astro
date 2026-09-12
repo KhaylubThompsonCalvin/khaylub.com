@@ -1,39 +1,57 @@
 ---
-// "Enter the climb": the opt-in door. Nothing from the climb (React, the scene, models, video)
-// is requested until this button is activated; the island chunk is imported on click.
+// "Enter the climb": the opt-in door. Nothing from the climb (React, three.js, the scene, models,
+// plates, the island stylesheet) is requested until this button is activated; the island chunk is
+// imported on click and mounts into the page's ClimbMount. The door carries the profile facts the
+// island renders (name, role line, the one availability statement, contact links) so the climb
+// never holds a second copy of them.
+import { identity, availability, resumeMeta } from '@lib/profile';
+
 interface Props {
   standalone?: boolean;
 }
 const { standalone = false } = Astro.props;
+const id = identity();
+const avail = availability();
+const resume = resumeMeta();
 ---
 
-<div class="climb-door" data-climb-door data-standalone={standalone ? 'true' : undefined}>
+<div
+  class="climb-door"
+  data-climb-door
+  data-standalone={standalone ? 'true' : undefined}
+  data-name={id.name}
+  data-role={id.role_line}
+  data-availability={avail.statement}
+  data-github={id.github}
+  data-linkedin={id.linkedin}
+  data-email={id.email}
+  data-resume={resume.pdf}
+>
   <button class="btn btn-dashed" type="button" aria-describedby="climb-hint" data-climb-enter>
     {standalone ? 'Tap to explore' : 'Enter the climb'}
   </button>
   <p class="small muted" id="climb-hint">
     {
       standalone
-        ? 'The original 3D experience loads on request (about 16 MB) and runs here.'
-        : 'The original 3D experience. Loads on request (about 16 MB). Also at '
+        ? 'The original 3D experience loads on request (about 7 MB: two models and four short video plates) and runs here.'
+        : 'The original 3D experience. Loads on request (about 7 MB). Also at '
     }
     {!standalone && <a href="/climb/">/climb</a>}
   </p>
-  <div class="climb-mount" data-climb-mount aria-live="polite"></div>
 </div>
 
 <script>
   // The import below is the only path to the climb's code. It runs after the click, never before.
   const doors = document.querySelectorAll<HTMLElement>('[data-climb-door]');
+  const mount = document.querySelector<HTMLElement>('[data-climb-mount]');
   doors.forEach((door) => {
     const button = door.querySelector<HTMLButtonElement>('[data-climb-enter]');
-    const mount = door.querySelector<HTMLElement>('[data-climb-mount]');
     if (!button || !mount) return;
     button.addEventListener('click', async () => {
       button.disabled = true;
       button.textContent = 'Loading the climb';
       const { mountClimb } = await import('../islands/climb-mount');
-      mountClimb(mount, () => {
+      mountClimb(mount, door, () => {
         button.disabled = false;
         button.textContent = door.dataset.standalone ? 'Tap to explore' : 'Enter the climb';
         button.focus();
@@ -53,11 +71,5 @@ const { standalone = false } = Astro.props;
   .climb-door p {
     margin: 0;
     flex: 1 1 16rem;
-  }
-  .climb-mount {
-    flex-basis: 100%;
-  }
-  .climb-mount:empty {
-    display: none;
   }
 </style>

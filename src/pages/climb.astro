@@ -2,11 +2,12 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import ClimbDoor from '@components/ClimbDoor.astro';
 import Doors from '@components/Doors.astro';
+import ClimbMount from '@components/ClimbMount.astro';
 ---
 
 <BaseLayout
   title="The climb"
-  description="The original 3D experience of khaylub.com, kept as it shipped in June 2026 and loaded only on request."
+  description="The original 3D experience of khaylub.com, ported from the June 2026 release and loaded only on request."
   current="climb"
   fullBleed
 >
@@ -14,11 +15,16 @@ import Doors from '@components/Doors.astro';
     <h1>The climb</h1>
     <p class="measure">
       The first version of this site: one continuous scroll, a traveler walking from night into day,
-      and a Phoenix near the end. It is kept exactly as it launched. Press the button to load it; the
-      home page is fast because nothing here downloads until you ask.
+      and a Phoenix near the end. It is the June 2026 scene ported into this site, with the same
+      models, video plates, camera, and words. Press the button to load it; the home page is fast
+      because nothing here downloads until you ask. Scroll to walk; the cursor steers the firebird
+      near the summit; the concept-film cards of the original camps now link to the project pages.
     </p>
     <ClimbDoor standalone />
   </section>
+
+  {/* Full-bleed (W-Climb): the island spans the page between the intro and the doors. */}
+  <ClimbMount />
 
   <section class="after container" aria-labelledby="after-heading">
     <h2 id="after-heading">After the climb</h2>
@@ -27,7 +33,8 @@ import Doors from '@components/Doors.astro';
     <p class="small muted">
       The frozen original also lives at
       <a href="https://v1.khaylub.com" rel="noopener noreferrer">v1.khaylub.com</a>, and the story of how it
-      was preserved is in <a href="/notes/preserving-v1/">Preserving V1</a>.
+      was preserved is in <a href="/notes/preserving-v1/">Preserving V1</a>. What the port keeps and what it
+      leaves out is recorded in <a href="/experiments/the-climb/">the exhibit entry</a>.
     </p>
   </section>
 </BaseLayout>
@@ -38,6 +45,7 @@ import Doors from '@components/Doors.astro';
     padding-bottom: var(--space-4);
   }
   .after {
+    padding-top: var(--space-4);
     padding-bottom: var(--space-6);
   }
 </style>
