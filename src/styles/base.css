@@ -306,3 +306,30 @@ small,
   padding: var(--space-1) var(--space-2);
   margin-bottom: var(--space-3);
 }
+
+/* Code blocks (syntax highlighting is off so no inline styles are emitted) */
+pre {
+  padding: var(--space-2);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+code {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;
+}
+
+/* Figures inside artifact bodies */
+figure {
+  margin: var(--space-3) 0;
+}
+figure img {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+figcaption {
+  margin-top: var(--space-1);
+  font-size: var(--size-sm);
+  color: var(--muted);
+}

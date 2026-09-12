@@ -61,6 +61,10 @@ export const base = z
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     summary: z.string().min(40).max(240),
+    // The case-study summary card (content model section 5): the problem in one or two sentences
+    // and the author's role, stated plainly. Optional so notes and short entries stay light.
+    problem: z.string().min(20).max(240).optional(),
+    role: z.string().min(3).max(120).optional(),
     tags: z.array(term(TAGS)).min(1),
     skills: z.array(term(SKILLS)).optional(),
     technologies: z.array(term(TECH)).optional(),
@@ -91,6 +95,11 @@ const rules = <T extends z.ZodTypeAny>(schema: T) =>
     .refine((d: any) => !d.cover || !!d.provenance, {
       message: 'a cover image requires a provenance record',
       path: ['provenance'],
+    })
+    // Content model section 5: every featured case study opens with its summary card.
+    .refine((d: any) => !d.featured || (!!d.problem && !!d.role), {
+      message: 'a featured case study needs problem and role for its summary card',
+      path: ['problem'],
     });
 
 export const PROJECT_STATUS = ['live', 'prototype', 'private-beta', 'concept', 'archived'] as const;

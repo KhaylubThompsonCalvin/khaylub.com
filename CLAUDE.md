@@ -135,9 +135,10 @@ available, selected, invoked, for which task, with what evidence), and a state-b
 
 ## Current phase pointer
 
-Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 as
-PR #15 (`main` at `b157663`, post-merge verification green). Two Phase 11 items stay open on the
-owner's side without blocking the gate: the content deliverable (20 real artifacts across 4
-collections; 7 across 3 today) and the ADR-002 Quarto proof (Quarto not installed). Phase 12
-(Project case studies) is the next gated phase and is NOT opened; it opens only on the owner's
-instruction, on a new branch from `main`.
+Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 (PR #15);
+its content deliverable (20 real artifacts across 4 collections; 7 across 3 today) and the ADR-002
+Quarto proof stay open on the owner's side. Phase 12 (Project case studies: the three featured case
+studies to the thirteen-question standard and the data template, with real proof figures) was built
+on 2026-09-11 on branch `feat/phase-12-project-case-studies` (vault document 35 is its plan) and
+awaits the owner's line-by-line sign-off at the pull request. Phase 13 (Creative media, including the
+real V1 climb integration) opens only on the owner's instruction.
