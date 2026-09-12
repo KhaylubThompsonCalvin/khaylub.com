@@ -61,6 +61,10 @@ export const base = z
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     summary: z.string().min(40).max(240),
+    // The case-study summary card (content model section 5): the problem in one or two sentences
+    // and the author's role, stated plainly. Optional so notes and short entries stay light.
+    problem: z.string().min(20).max(240).optional(),
+    role: z.string().min(3).max(120).optional(),
     tags: z.array(term(TAGS)).min(1),
     skills: z.array(term(SKILLS)).optional(),
     technologies: z.array(term(TECH)).optional(),

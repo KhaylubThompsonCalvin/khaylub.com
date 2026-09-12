@@ -35,6 +35,8 @@ content/
 | `date` | yes | ISO date |
 | `updated` | no | on or after `date` |
 | `summary` | yes | 40 to 240 characters; used on cards, search, and feeds |
+| `problem` | no (featured case studies: yes) | 20 to 240 characters; the summary card's one-line problem statement |
+| `role` | no (featured case studies: yes) | 3 to 120 characters; the author's role, stated plainly |
 | `tags` | yes | one or more slugs from `vocabulary/tags.yaml` |
 | `skills` | no | slugs from `vocabulary/skills.yaml`; never AI. Each term there carries an `area` that groups the Work page |
 | `technologies` | no (yes for projects) | slugs from `vocabulary/technologies.yaml`; the Work page counts the published items that name each one |

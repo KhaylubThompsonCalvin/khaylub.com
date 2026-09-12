@@ -22,6 +22,24 @@ const isData = entry.collection === 'data';
     <span class="muted">{collectionLabel(entry.collection)} · <time datetime={date} data-pagefind-meta="date">{date}</time>{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
   </p>
   {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
+  {
+    (data.problem || data.role) && (
+      <dl class="summary-card">
+        {data.problem && (
+          <>
+            <dt>Problem</dt>
+            <dd class="problem">{data.problem}</dd>
+          </>
+        )}
+        {data.role && (
+          <>
+            <dt>My role</dt>
+            <dd class="role">{data.role}</dd>
+          </>
+        )}
+      </dl>
+    )
+  }
   <ProjectFacts entry={entry} />
   {
     isData && (
@@ -43,6 +61,22 @@ const isData = entry.collection === 'data';
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-1) var(--space-2);
+  }
+  .summary-card {
+    margin: 0 0 var(--space-2);
+    padding: var(--space-2);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .summary-card dt {
+    font-weight: 600;
+  }
+  .summary-card dd {
+    margin: 0 0 var(--space-1);
+  }
+  .summary-card dd:last-child {
+    margin-bottom: 0;
   }
   .facts dt {
     font-weight: 600;
