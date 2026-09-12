@@ -149,10 +149,11 @@ transition on its own.
 
 Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 (PR #15);
 its content deliverable (20 real artifacts across 4 collections; 7 across 3 today) and the ADR-002
-Quarto proof stay open on the owner's side. Phase 12 (Project case studies: the three featured case
-studies to the thirteen-question standard and the data template, with real proof figures) was built
-on 2026-09-11 on branch `feat/phase-12-project-case-studies` (vault document 35 is its plan) and
-merged by the owner as PR #17 on 2026-09-12; the owner's review corrections follow on
-`fix/phase-12-owner-review`. Phase 12 is not yet PASS: the human Journey 3 reader (two interview
-questions from the SQL case study) is the remaining acceptance item. Phase 13 (Creative media,
-including the real V1 climb integration) opens only on the owner's instruction.
+Quarto proof stay open on the owner's side. Phase 12 (Project case studies) is ACCEPTED and CLOSED:
+the owner recorded "Phase 12 PASS" on 2026-09-12 under decision D-25, which made the external human
+Journey 3 review optional rather than a release gate (the vault records why; no reviewer evidence was
+fabricated). The three featured case studies with the owner-review corrections are on `main`
+(PR #17, PR #19; the `/phase` runner and its gate hardening, PR #18 and PR #20). Phase 13 (Creative
+media, which integrates the real V1 climb into V2 as the opt-in island) is the next gated phase and is
+NOT opened; it opens only on the owner's instruction through `/phase 13`. Integration is not cutover:
+Phase 21 owns the production move of khaylub.com from V1 to V2.
