@@ -14,6 +14,7 @@ skills: [web-development, 3d-pipeline, performance-analysis]
 technologies: [react-three-fiber, three-js, vite, blender, lenis, zustand]
 employer_visible: true
 featured: true
+ai_assisted: true
 source: https://github.com/KhaylubThompsonCalvin/khaylub-portfolio
 links:
   code: https://github.com/KhaylubThompsonCalvin/khaylub-portfolio
@@ -53,8 +54,8 @@ Given (from the project charter in my planning vault, June 2026):
 
 Self-imposed:
 
-- the character and the Phoenix modeled and rigged by me in Blender, not bought
-- a cinematic read: night into day, six story beats, video atmosphere plates
+- the character and the Phoenix finished and rigged by me in Blender from AI-generated base meshes, not bought as finished assets
+- a cinematic read: night into day, six story beats, generated video atmosphere plates
 - reduced motion honored, keyboard reachable, no console errors at launch
 
 ## Design
@@ -83,14 +84,19 @@ because it would not have taught me the pipeline I wanted to learn.
 
 ## What I built
 
-The concept, the Wanderer and Phoenix models and their rigs in Blender, the export path to
-meshopt-compressed GLB, the scene composition, the six-beat copy and its per-word reveal, the
-project dialog, the scroll and state wiring, the Render deployment, and later the preservation
-(tag, locked branch, release). The code was written with AI assistance in Claude Code, working from
-my own specifications, checkpoints, and review; the repository's `CLAUDE.md` and the dated
-checkpoint notes in my vault record that working method. The design decisions, the asset work, and
-the testing are mine. 119 commits by a single author between 2026-06-20 and 2026-07-06 (repository
-history, V1 audit section 1).
+The concept, the scene composition, the six-beat copy and its per-word reveal, the project dialog,
+the scroll and state wiring, the Render deployment, and later the preservation (tag, locked branch,
+release). The assets, stated plainly: the Wanderer's base mesh and auto-rig were generated in Tripo
+from a reference image, then cleaned, re-rigged where the generation failed (the glasses had fused
+into the head mesh and were rebuilt as a separate object), and finished by me in Blender; the
+Phoenix followed the same path, retopologized and rigged with Rigify, and its origin record is
+still marked for confirmation in my media inventory; the four atmosphere video plates were
+generated with Higgsfield from my prompts (session records of 2026-06-18 and 2026-06-21). The code
+was written with AI assistance in Claude Code, working from my own specifications, checkpoints, and
+review; the repository's `CLAUDE.md` and the dated checkpoint notes in my vault record that
+working method. The design decisions, the direction of every asset, and the testing are mine.
+119 commits by a single author between 2026-06-20 and 2026-07-05 as counted in the V1 audit
+(section 1), with the final merge (PR #30) landing on 2026-07-06.
 
 ## What went wrong
 
@@ -108,13 +114,13 @@ cold load requested thirteen files and 14.5 MB before the "Tap to explore" promp
 video plates, and Lighthouse scored performance 69 on mobile (total blocking time 1,265 ms) and 79
 on desktop (the measurement is written up in [The 16 MB front door](/notes/the-16-mb-front-door/);
 Lighthouse figures from the V1 audit section 15). Projects lived inside dialogs with no addresses of their own, so
-nothing was linkable or crawlable, and there was no skip link and almost no heading structure.
+nothing was linkable and crawlability was never verified, and there was no skip link and almost no heading structure.
 None of that was a bug. It was the architecture I chose.
 
 ## Verification
 
-At launch: zero console errors and a passing build on every checkpoint, each change checked in the
-browser. At the V2 planning gate on 2026-09-09: axe reported zero violations at desktop and mobile;
+Through the build: the dated checkpoints record zero console errors and a passing build, each change
+checked live in the browser (for example the 2026-06-27 checkpoint). At the V2 planning gate on 2026-09-09: axe reported zero violations at desktop and mobile;
 Lighthouse gave accessibility, best practices, and SEO 100 on both; reduced motion paused all ten
 videos and rendered the reveals solid; no request failed. The same run produced the payload and
 performance numbers above (V1 audit section 15; [The 16 MB front door](/notes/the-16-mb-front-door/)).
@@ -142,13 +148,15 @@ browser and reading the numbers honestly, which is where the second version bega
 ## Code
 
 [github.com/KhaylubThompsonCalvin/khaylub-portfolio](https://github.com/KhaylubThompsonCalvin/khaylub-portfolio),
-frozen at tag `v1.0.0-3d-experiment` (commit `67edcc7`, the deployed build since 2026-07-06) with a
-locked branch, a protected tag pattern, and a GitHub Release. How and why it was frozen:
+frozen at tag `v1.0.0-3d-experiment` (commit `67edcc7`, merged 2026-07-06) with a locked branch, a
+protected tag pattern, and a GitHub Release. Since the freeze the live branch has taken two
+owner-approved content merges (the résumé PDF and an em dash sweep; V1 audit section 15); the tagged
+commit itself is unchanged. How and why it was frozen:
 [Preserving V1](/notes/preserving-v1/).
 
 ## Result
 
-Live and unchanged. The full experience runs at its own address, and this site offers it as
+Live. The full experience runs at its own address, and this site offers it as
 [the climb](/climb/), one click away; the second version's plan integrates the real scene as that
 opt-in island at a later phase (Phase 13 of the build) and moves the public domain only at the
 final cutover. Until then, the launch is the shipped product: a first portfolio, delivered early,

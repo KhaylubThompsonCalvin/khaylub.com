@@ -17,7 +17,7 @@ dataset:
   source: Kaggle, kaggle.com/datasets/sazidthe1/data-science-salaries
   license: Public Kaggle dataset; see the dataset page for its terms
 story_url: https://public.tableau.com/app/profile/khaylub.thompson/viz/DataScienceSalaryStory/DataScienceSalariesLocationRoleExperienceandTime
-result: Location shows the widest gap in this dataset, about $115,000 between the highest and lowest country averages; the story states that its year trend describes this dataset, not the wider market.
+result: Location shows the largest spread of the four factors examined, about $115,000 between the highest and lowest country averages; the story states that its year trend describes this dataset, not the wider market.
 ---
 
 ## Question
@@ -43,8 +43,8 @@ that stay within what the data supports. No causal claims are made.
 ## Result
 
 1. **Location.** The United States average is $157,073 against India at $41,699, a difference of
-   about $115,000, the widest gap of any factor in the dataset.
-2. **Job role.** Average pay varies by title within the same country.
+   about $115,000, the largest spread among the four factors the story examines.
+2. **Job role.** Average pay varies widely by job title.
 3. **Experience.** In this dataset, average salary rises steadily with experience level.
 4. **Time.** The average moves from $102,251 in 2020 to $153,124 in 2024. The story adds its own
    limit: because the number of records differs greatly by year, this trend describes this dataset

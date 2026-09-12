@@ -69,7 +69,7 @@ credentials and is not publicly reachable. Source: the notebook and README.
 
 ## Method
 
-The public path, as documented in the README:
+The public path, adapted from the README's pipeline diagram and workflow steps:
 
 ```text
 SSA public data files
