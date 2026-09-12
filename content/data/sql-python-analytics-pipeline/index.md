@@ -4,7 +4,7 @@ slug: sql-python-analytics-pipeline
 type: analysis
 status: published
 date: 2026-07-04
-updated: 2026-09-11
+updated: 2026-09-12
 summary: A reproducible analysis of 146 years of public Social Security name data, from download to chart, with an optional SQL Server path.
 problem: How did two spellings of one name, Marc and Mark, change in U.S. male births, and can the analysis stand on public data alone?
 role: Sole author. SQL Server extraction in Python, then the public pandas pipeline and the write-up.
@@ -88,8 +88,11 @@ identified. Correlation between the two series is reported in rank terms as well
 
 Mark peaked in 1960 at 58,727 births; Marc peaked in 1970 at 5,009. Both spellings follow the same
 broad arc: negligible before the 1940s, a sharp mid-century rise, a peak, then a long decline that
-continues through 2025 (Mark 1,416 and Marc 162 in 2025). Across their 117 overlapping years the
-series track each other closely in rank (Spearman 0.97; Pearson 0.80), with two qualifications:
+continues through 2025 (Mark 1,416 and Marc 162 in 2025). The correlation uses the 117 years where
+both names have reported values: the calendar span is 1901 to 2025, but eight years inside it have
+no Marc row because SSA suppresses name counts below five (notebook output: 29 missing Marc years
+in 146, none for Mark). Across those 117 years the series track each other closely in rank
+(Spearman 0.97; Pearson 0.80), with two qualifications:
 the peaks are ten years apart, and the volume gap is not constant (Marc reaches about 8.5 percent of
 Mark's height at their respective peaks, while the year-by-year ratio ranges from under 2 percent
 to about 28 percent, median 12 percent). The cautious reading in the README: the two spellings rose

@@ -149,5 +149,7 @@ its content deliverable (20 real artifacts across 4 collections; 7 across 3 toda
 Quarto proof stay open on the owner's side. Phase 12 (Project case studies: the three featured case
 studies to the thirteen-question standard and the data template, with real proof figures) was built
 on 2026-09-11 on branch `feat/phase-12-project-case-studies` (vault document 35 is its plan) and
-awaits the owner's line-by-line sign-off at the pull request. Phase 13 (Creative media, including the
-real V1 climb integration) opens only on the owner's instruction.
+merged by the owner as PR #17 on 2026-09-12; the owner's review corrections follow on
+`fix/phase-12-owner-review`. Phase 12 is not yet PASS: the human Journey 3 reader (two interview
+questions from the SQL case study) is the remaining acceptance item. Phase 13 (Creative media,
+including the real V1 climb integration) opens only on the owner's instruction.
