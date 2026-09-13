@@ -148,12 +148,16 @@ transition on its own.
 ## Current phase pointer
 
 Phase 11 (Collection and library engine) software scope was accepted and merged on 2026-09-11 (PR #15);
-its content deliverable (20 real artifacts across 4 collections; 7 across 3 today) and the ADR-002
-Quarto proof stay open on the owner's side. Phase 12 (Project case studies) is ACCEPTED and CLOSED:
-the owner recorded "Phase 12 PASS" on 2026-09-12 under decision D-25, which made the external human
-Journey 3 review optional rather than a release gate (the vault records why; no reviewer evidence was
-fabricated). The three featured case studies with the owner-review corrections are on `main`
-(PR #17, PR #19; the `/phase` runner and its gate hardening, PR #18 and PR #20). Phase 13 (Creative
-media, which integrates the real V1 climb into V2 as the opt-in island) is the next gated phase and is
-NOT opened; it opens only on the owner's instruction through `/phase 13`. Integration is not cutover:
+its content deliverable (20 real artifacts across 4 collections; 11 across 6 today) and the ADR-002
+Quarto proof stay open on the owner's side. Phase 12 (Project case studies) is ACCEPTED and CLOSED
+(owner "Phase 12 PASS", 2026-09-12, under decision D-25; PR #17, PR #19). Phase 13 (Creative media)
+is ACCEPTED and CLOSED: the owner recorded "Phase 13 PASS" on 2026-09-13 after reviewing and merging
+PR #23. The real V1 climb now runs inside V2 as the opt-in island (`src/islands/climb/`,
+`public/climb/`; nothing loads before the door; V1 untouched; integration is not cutover), and the
+video, gallery, and experiments collections carry their first artifacts with the media components
+and lints on `main`. Open on the owner's side and not gate items: the music collection (no track
+with a provenance record yet), the concept films and posters and the vista still (provenance to
+record), the Phoenix inventory row, the `v1.khaylub.com` links, Lenis, and three concept project
+pages. Phase 14 (Wiki relationships: wikilinks, backlinks, the related rail, the graph page) is the
+next gated phase and is NOT opened; it opens only on the owner's instruction through `/phase 14`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
