@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, statSync, existsSync, writeFileSync } from '
 import { join, extname, sep } from 'node:path';
 import matter from 'gray-matter';
 import { load } from 'js-yaml';
+import { parseWikilinks, scanTargets, resolveWikilink, unresolvedWikilinks, stripCode } from '../src/lib/wikilinks.mjs';
 
 const MEDIA = ['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.mp4', '.webm', '.mp3', '.ogg', '.glb'];
 const OVERSIZE_BYTES = 5 * 1024 * 1024;
@@ -47,8 +48,17 @@ const evidence = (kind) =>
 
 const slugs = new Set(artifacts.map((a) => a.slug));
 const unresolvedRelated = artifacts.flatMap((a) => (a.related ?? []).filter((r) => !slugs.has(r)).map((r) => ({ file: a.file, slug: r })));
-const referenced = new Set(artifacts.flatMap((a) => a.related ?? []));
-const orphans = published.filter((a) => !(a.related ?? []).length && !referenced.has(a.slug)).map((a) => `${a.collection}/${a.slug}`);
+// Orphans (ADR-006, FR-E6): no curated relation and no wikilink in either direction, among
+// published artifacts; a shared tag alone does not connect an item.
+const targets = scanTargets();
+const wikiOut = new Map(artifacts.map((a) => [a.slug, [...new Set(parseWikilinks(stripCode(matter(readFileSync(a.file, 'utf8')).content)).map((l) => resolveWikilink(l.target, targets, false)?.slug).filter((s) => s && slugs.has(s)))]]));
+const linked = new Set();
+for (const a of published) {
+  for (const r of [...(a.related ?? []), ...(wikiOut.get(a.slug) ?? [])]) if (published.some((p) => p.slug === r)) { linked.add(a.slug); linked.add(r); }
+}
+const orphans = published.filter((a) => !linked.has(a.slug)).map((a) => `${a.collection}/${a.slug}`);
+const unresolvedWiki = unresolvedWikilinks(process.cwd(), false);
+const relationEdges = published.reduce((n, a) => n + new Set([...(a.related ?? []), ...(wikiOut.get(a.slug) ?? [])].filter((r) => published.some((p) => p.slug === r))).size, 0);
 const coversWithoutAlt = artifacts.filter((a) => a.cover && !a.cover_alt).map((a) => a.file);
 const oversizeMedia = [...walk('content', (p) => MEDIA.includes(extname(p).toLowerCase())), ...walk('public', (p) => MEDIA.includes(extname(p).toLowerCase()))]
   .filter((p) => statSync(p).size > OVERSIZE_BYTES)
@@ -68,6 +78,8 @@ const report = {
   pages: { total: builtPages.length, byTopLevel: pagesByCollection },
   evidence: { skills: evidence('skills'), technologies: evidence('technologies') },
   unresolvedRelated,
+  unresolvedWikilinks: unresolvedWiki,
+  relationEdges,
   orphans,
   coversWithoutAlt,
   oversizeMedia,
@@ -78,6 +90,6 @@ writeFileSync('build-report.json', JSON.stringify(report, null, 2) + '\n');
 console.log(
   `build report: ${report.pages.total} pages, ${report.artifacts.published} published of ${report.artifacts.total} artifacts, ` +
     `${Object.keys(report.evidence.skills).length} skills and ${Object.keys(report.evidence.technologies).length} technologies with evidence, ` +
-    `${unresolvedRelated.length} unresolved related, ${orphans.length} orphans, ${coversWithoutAlt.length} covers without alt, ` +
+    `${unresolvedRelated.length} unresolved related, ${unresolvedWiki.length} unresolved wikilinks, ${relationEdges} relations, ${orphans.length} orphans, ${coversWithoutAlt.length} covers without alt, ` +
     `${oversizeMedia.length} oversize media, search index ${Math.round(indexBytes / 1024)} KB (written to build-report.json)`
 );

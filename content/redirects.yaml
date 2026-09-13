@@ -4,3 +4,4 @@ redirects:
   - { from: /work, to: /work/, note: V1 anchor target and the non-slash form }
   - { from: /contact, to: /contact/, note: V1 anchor target and the non-slash form }
   - { from: /resume.pdf, to: /resume/Khaylub-Thompson-Calvin-Resume.pdf, note: short alias for the unchanged PDF path }
+  - { from: /library/map, to: /graph/, note: the map view named in the story map lives on the graph page (Phase 14) }

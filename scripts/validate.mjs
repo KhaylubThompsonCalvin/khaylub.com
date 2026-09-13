@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
 import { load } from 'js-yaml';
 import matter from 'gray-matter';
+import { unresolvedWikilinks } from '../src/lib/wikilinks.mjs';
 
 const failures = [];
 const warnings = [];
@@ -224,6 +225,9 @@ for (const file of walk('content', ['.md'])) {
 for (const { file, slug } of relatedRefs) {
   if (!artifactSlugs.has(slug)) fail(`related slug "${slug}" in ${file} names no artifact`);
 }
+// 10b. Wikilinks in bodies (ADR-006, FR-E1): every [[slug]] names a visible artifact or page.
+//      Production ignores drafts; a preview build (PUBLIC_SITE_ENV=preview) may link to them.
+for (const { file, slug } of unresolvedWikilinks()) fail(`unresolved wikilink [[${slug}]] in ${file}`);
 for (const file of walk('content/profile/top8', ['.yaml'])) {
   for (const item of load(readFileSync(file, 'utf8')).items ?? []) {
     if (!artifactSlugs.has(item.slug)) warnings.push(`Top 8 slug "${item.slug}" in ${file} has no artifact yet (the slot is skipped at build)`);
