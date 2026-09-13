@@ -33,7 +33,7 @@ night into day, the Phoenix igniting at the midpoint and filling the sky at the 
 models and camera choreography, the same six beats, the words as shipped (except the availability
 line, which is this site's), and the atmosphere plates re-encoded. What the port leaves out is
 listed under "What changed in the port". It opens from "Enter the climb" on
-the home page or from "Tap to explore" on [its own page](/climb/), and nothing from it downloads
+the home page or from "Tap to explore" on [[climb|its own page]], and nothing from it downloads
 before that press.
 
 ## What loads, and when
@@ -46,7 +46,7 @@ stylesheet (9 KB), the two models (the Wanderer 1.82 MB and the Phoenix 0.92 MB)
 atmosphere plates (fog 1.32 MB, dawn grass 0.69 MB, embers 0.76 MB, summit clouds 0.62 MB). The
 two plates that belong to later beats are fetched only as you approach them. For comparison,
 the first version requested 14.5 MB across thirteen files before its gate could be tapped
-([The 16 MB front door](/notes/the-16-mb-front-door/)).
+([[the-16-mb-front-door|The 16 MB front door]]).
 
 ## What changed in the port
 

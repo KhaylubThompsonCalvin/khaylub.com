@@ -1,0 +1,36 @@
+---
+// "Related work" (FR-E3, W15): curated relations first, then vocabulary neighbours by shared skills
+// and tags, at most six, at least one other collection when one exists. Never "you might also like".
+import ArtifactCard from '../ArtifactCard.astro';
+import { relatedRail } from '@lib/graph';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const rail = await relatedRail(entry.data.slug);
+---
+
+{
+  rail.length > 0 && (
+    <section class="related-rail" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related work</h2>
+      <ul class="card-grid">
+        {rail.map((r) => (
+          <li>
+            <ArtifactCard entry={r.node.entry} showCollection>
+              <span class="small muted why">{r.why}</span>
+            </ArtifactCard>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .related-rail {
+    margin-top: var(--space-4);
+  }
+</style>

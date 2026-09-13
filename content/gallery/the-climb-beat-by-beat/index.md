@@ -45,8 +45,8 @@ explore" over the dawn-grass plate), the Trailhead, the First Ember, Footholds, 
 and the Summit. The six pills of the Footholds beat read Web Development, Interactive 3D, Linux
 and Systems, Python and SQL, Creative Technology, and Future Cybersecurity Path. The first five
 were captured on 2026-09-09 from the live first version during the
-audit that measured its cold load (see [The 16 MB front door](/notes/the-16-mb-front-door/)); the
-sixth was captured on 2026-09-12 from [the climb](/climb/) as it now runs inside this site.
+audit that measured its cold load (see [[the-16-mb-front-door|The 16 MB front door]]); the
+sixth was captured on 2026-09-12 from [[climb|the climb]] as it now runs inside this site.
 
 ## Why the summit comes from the port
 
@@ -58,6 +58,6 @@ distant ridges procedurally, so its summit frame carries only assets with a prov
 
 The Wanderer and the Phoenix began as Tripo generations and were finished in Blender by the
 author; the grass, fog, embers, and summit clouds are Higgsfield atmosphere plates generated from
-the author's prompts (the [V1 case study](/projects/khaylub-com-v1/) states both). Each still is
+the author's prompts (the [[khaylub-com-v1|V1 case study]] states both). Each still is
 the author's own screenshot at 1440 by 900, served through the image pipeline at the size your
 screen needs.

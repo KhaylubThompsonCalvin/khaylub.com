@@ -4,6 +4,7 @@
 import Badge from './Badge.astro';
 import ProjectFacts from './ProjectFacts.astro';
 import { badgeFor, collectionLabel, type AnyEntry } from '@lib/catalog';
+import { prevNext } from '@lib/graph';
 
 interface Props {
   entry: AnyEntry;
@@ -13,6 +14,8 @@ const data = entry.data as Record<string, any>;
 const badge = badgeFor(entry);
 const date = data.date.toISOString().slice(0, 10);
 const isData = entry.collection === 'data';
+const seq = await prevNext(data.slug);
+const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/${seq.series.name}/` : undefined;
 ---
 
 <header class="artifact-header measure-reading">
@@ -21,6 +24,13 @@ const isData = entry.collection === 'data';
     <Badge text={badge.text} tone={badge.tone} />
     <span class="muted">{collectionLabel(entry.collection)} · <time datetime={date} data-pagefind-meta="date">{date}</time>{data.updated ? `, updated ${data.updated.toISOString().slice(0, 10)}` : ''}</span>
   </p>
+  {
+    seq.series && (
+      <p class="series-line small muted">
+        Part {seq.series.part} of {seq.series.total} in the series {seriesRoute ? <a href={seriesRoute}>{seq.series.name.replace(/-/g, ' ')}</a> : seq.series.name.replace(/-/g, ' ')}
+      </p>
+    )
+  }
   {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
   {
     (data.problem || data.role) && (

@@ -30,7 +30,7 @@ One frame of the Wanderer rendered in Blender: the character walks away along a 
 curves between boulders, logs, and bare trees, with everything beyond the trail left soft. It is
 the hero image of the first version's no-WebGL fallback page, the static site kept in the
 `website/` folder of the V1 repository (its README names it so), and it shows the character the
-[V1 case study](/projects/khaylub-com-v1/) describes finishing.
+[[khaylub-com-v1|V1 case study]] describes finishing.
 
 ## How it was made
 
@@ -44,5 +44,5 @@ recorded separately.
 
 ## Where it lives now
 
-The same character walks through [the climb](/climb/), where the scene loads only on request. The
+The same character walks through [[climb|the climb]], where the scene loads only on request. The
 web model is 1.8 MB (`public/climb/wanderer-web.glb`, recorded in `public/climb/provenance.yaml`).

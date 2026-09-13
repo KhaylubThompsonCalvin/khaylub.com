@@ -1,0 +1,33 @@
+---
+// "Referenced by" (FR-E2, W15): every visible artifact whose curated relations or body wikilinks
+// point at this one. Computed from the whole catalog at build; absent when nothing references it.
+import { backlinksFor } from '@lib/graph';
+import { collectionLabel, type AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const links = await backlinksFor(entry.data.slug);
+---
+
+{
+  links.length > 0 && (
+    <section class="backlinks" aria-labelledby="backlinks-heading">
+      <h2 id="backlinks-heading">Referenced by</h2>
+      <ul>
+        {links.map((n) => (
+          <li>
+            <a href={n.route}>{n.title}</a> <span class="small muted">({collectionLabel(n.collection)})</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .backlinks {
+    margin-top: var(--space-3);
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+// The graph page (doc 18 `/graph`, P2-CE-08, W15): the list of every item and its relations first;
+// the drawing only after a disclosure; nothing loads or runs on the client.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import GraphList from '@components/relations/GraphList.astro';
+import GraphMap from '@components/relations/GraphMap.astro';
+---
+
+<BaseLayout title="Graph" description="How the items in this library relate: every artifact with what it links to and what references it, as a list first and a map behind a disclosure." current="library">
+  <Breadcrumb trail={[{ name: 'Home', path: '/' }, { name: 'Library', path: '/library/' }, { name: 'Graph', path: '/graph/' }]} />
+  <div class="measure">
+    <h1>Graph</h1>
+    <p>
+      Relationships are written into the items themselves: a curated list of related work, links in
+      the text, shared skills and tags. This page lists what each item links to and what references it,
+      computed when the site is built. Every item here is also reachable through its collection,
+      the <a href="/timeline/">timeline</a>, and <a href="/search/">search</a>.
+    </p>
+  </div>
+
+  <GraphList />
+
+  <details class="graph-details">
+    <summary>Map (optional)</summary>
+    <GraphMap />
+  </details>
+</BaseLayout>
+
+<style>
+  .graph-details {
+    margin-top: var(--space-4);
+  }
+  .graph-details summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+</style>
