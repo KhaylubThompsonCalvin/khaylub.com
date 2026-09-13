@@ -164,6 +164,13 @@ pages. Phase 14 (Wiki relationships) is ACCEPTED and CLOSED: the owner recorded 
 carries the related rail, backlinks, previous and next, and the series line, and `/graph/` lists the
 relationships first with the map behind a disclosure (`src/lib/wikilinks.mjs`, `src/lib/graph.ts`,
 `src/components/relations/`). Open on the owner's side and not gate items: series display names and
-two non-featured artifacts with no relation yet. Phase 15 (Performance) is the next gated phase and
-is NOT opened; it opens only on the owner's instruction through `/phase 15`.
+two non-featured artifacts with no relation yet. Phase 15 (Performance) is ACCEPTED and CLOSED: the
+owner recorded "Phase 15 PASS" on 2026-09-13 after reviewing and merging PR #27. Lighthouse CI runs the
+documented mobile profile (five runs, the median) over every template in `tests/helpers.ts`, every budget
+line is an assertion in `lighthouserc.json` pinned to `budget.json` by `tests/budget.spec.ts`, and CI runs
+Lighthouse in a three-shard job (`scripts/lhci-shard.mjs`); every template scores 100 with every line
+green. Two facts to keep in mind: the full local guard now carries about 24 minutes of Lighthouse (26
+templates, five runs, sequential), and the WebPageTest public-URL archive is deferred to Phase 19 by the
+owner's decision because V2 has no public URL yet. Phase 16 (Accessibility) is the next gated phase and
+is NOT opened; it opens only on the owner's instruction through `/phase 16`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
