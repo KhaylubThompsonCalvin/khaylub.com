@@ -158,6 +158,12 @@ video, gallery, and experiments collections carry their first artifacts with the
 and lints on `main`. Open on the owner's side and not gate items: the music collection (no track
 with a provenance record yet), the concept films and posters and the vista still (provenance to
 record), the Phoenix inventory row, the `v1.khaylub.com` links, Lenis, and three concept project
-pages. Phase 14 (Wiki relationships: wikilinks, backlinks, the related rail, the graph page) is the
-next gated phase and is NOT opened; it opens only on the owner's instruction through `/phase 14`.
+pages. Phase 14 (Wiki relationships) is ACCEPTED and CLOSED: the owner recorded "Phase 14 PASS" on
+2026-09-13 after reviewing and merging PR #25. Wikilinks resolve at build (an unresolved link fails
+`validate`, CI, and the production build; a preview build flags it in place), every artifact page
+carries the related rail, backlinks, previous and next, and the series line, and `/graph/` lists the
+relationships first with the map behind a disclosure (`src/lib/wikilinks.mjs`, `src/lib/graph.ts`,
+`src/components/relations/`). Open on the owner's side and not gate items: series display names and
+two non-featured artifacts with no relation yet. Phase 15 (Performance) is the next gated phase and
+is NOT opened; it opens only on the owner's instruction through `/phase 15`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
