@@ -1,0 +1,38 @@
+# Provenance record for the climb island's assets (P2-SEC-16). One entry per file under
+# public/climb/; scripts/validate.mjs fails the build when a file has no entry or an entry names a
+# missing file. Every statement below is the owner's own account from the published V1 case study
+# (content/projects/khaylub-com-v1/index.md, "What went wrong" and the role line), approved 2026-09-12.
+# The concept films, their posters, and the mountain vista still are NOT here: their generator and
+# terms are not yet recorded (26 - Project Media Inventory, "Needs Confirmation"), so they stay out
+# of the port until the owner records them.
+files:
+  wanderer-web.glb:
+    source: The Wanderer character. Base mesh and auto-rig generated in Tripo from the author's reference image, then cleaned, re-rigged where the generation failed, and finished in Blender by the author; exported with meshopt compression for the web. Copied unchanged from khaylub-portfolio at tag v1.0.0-3d-experiment.
+    license: All rights reserved for the author's finished asset; the base mesh is Tripo output under the author's account.
+    generator: Tripo (base mesh and auto-rig); Blender finishing by the author
+    date: 2026-06-18
+  phoenix-flap.glb:
+    source: The Phoenix. Began as a Tripo generation, retopologized in Tripo and kept its Tripo auto-rig, finished and animated (the flap clip) in Blender by the author. The author's V1 case study states this origin and notes that the media inventory's origin record for the model is still marked for confirmation; this entry repeats the case study's words pending that confirmation. Copied unchanged from khaylub-portfolio at tag v1.0.0-3d-experiment (PhoenixFlap.web.glb).
+    license: All rights reserved for the author's finished asset; the base mesh is Tripo output under the author's account.
+    generator: Tripo (base mesh, retopology, auto-rig); Blender finishing by the author
+    date: 2026-06-20
+  dawn-grass.mp4:
+    source: Atmosphere video plate for the V1 climb, generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's Higgsfield account; the service terms apply.
+    generator: Higgsfield
+    date: 2026-06-21
+  fog-trail.mp4:
+    source: Atmosphere video plate for the V1 climb (ground fog), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1920 by 1080, 7.0 s.
+    license: Generated output under the author's Higgsfield account; the service terms apply.
+    generator: Higgsfield
+    date: 2026-06-21
+  embers.mp4:
+    source: Atmosphere video plate for the V1 climb (embers), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's Higgsfield account; the service terms apply.
+    generator: Higgsfield
+    date: 2026-06-21
+  summit-clouds.mp4:
+    source: Atmosphere video plate for the V1 climb (summit clouds), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's Higgsfield account; the service terms apply.
+    generator: Higgsfield
+    date: 2026-06-21

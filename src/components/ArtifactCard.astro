@@ -3,6 +3,7 @@
 import Card from './Card.astro';
 import ProjectFacts from './ProjectFacts.astro';
 import { badgeFor, routeFor, type AnyEntry } from '@lib/catalog';
+import { coverThumb } from '@lib/media';
 
 interface Props {
   entry: AnyEntry;
@@ -17,8 +18,10 @@ const date = entry.data.date.toLocaleDateString('en-US', { month: 'short', year:
 const meta = [date];
 const plain = showCollection && entry.collection !== 'projects' && entry.collection !== 'data';
 if (plain) meta.unshift(badge.text);
+// Media collections lead with their cover (Journey 2 step 2); a 400 px WebP from the pipeline.
+const thumb = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
 ---
 
-<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank}>
+<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb}>
   {detail && <ProjectFacts entry={entry} compact />}
 </Card>

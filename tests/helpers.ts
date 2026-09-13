@@ -17,4 +17,4 @@ export function builtRoutes(): string[] {
   return out.sort();
 }
 
-export const TEMPLATES = ['/', '/work/', '/projects/khaylub-com-v1/', '/data/fuel-economy-regression/', '/notes/preserving-v1/', '/library/', '/climb/', '/search/', '/about/', '/contact/', '/resume/', '/timeline/', '/notes/sort/title/', '/projects/type/live/', '/skills/data-analysis/', '/technologies/python/', '/tags/python/', '/timeline/data/', '/top8/2026-09/', '/data/tableau-salary-story/'];
+export const TEMPLATES = ['/', '/work/', '/projects/khaylub-com-v1/', '/data/fuel-economy-regression/', '/notes/preserving-v1/', '/library/', '/climb/', '/search/', '/about/', '/contact/', '/resume/', '/timeline/', '/notes/sort/title/', '/projects/type/live/', '/skills/data-analysis/', '/technologies/python/', '/tags/python/', '/timeline/data/', '/top8/2026-09/', '/data/tableau-salary-story/', '/gallery/', '/gallery/the-climb-beat-by-beat/', '/gallery/wanderer-hero/', '/video/the-climb-recording/', '/experiments/the-climb/'];

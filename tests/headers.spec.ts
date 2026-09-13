@@ -36,5 +36,8 @@ test.describe('headers from render.yaml', () => {
     expect((await request.get('/resume/Khaylub-Thompson-Calvin-Resume.pdf')).headers()['cache-control']).toMatch(/max-age=86400/);
     expect((await request.get('/robots.txt')).headers()['cache-control']).toMatch(/max-age=3600/);
     expect((await request.get('/og-default.png')).headers()['cache-control']).toMatch(/max-age=604800/);
+    // The climb's models and plates are media: one week, like every other media file.
+    expect((await request.get('/climb/wanderer-web.glb')).headers()['cache-control']).toMatch(/max-age=604800/);
+    expect((await request.get('/climb/dawn-grass.mp4')).headers()['cache-control']).toMatch(/max-age=604800/);
   });
 });

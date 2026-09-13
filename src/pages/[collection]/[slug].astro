@@ -7,6 +7,8 @@ import { render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import ArtifactHeader from '@components/ArtifactHeader.astro';
+import MediaBlock from '@components/media/MediaBlock.astro';
+import { mediaForJsonLd } from '@lib/media';
 import TableOfContents from '@components/TableOfContents.astro';
 import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
@@ -28,13 +30,12 @@ const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
 // archived, employer-hidden, or a preview draft is named without one.
 const evidenced = new Set((await evidenceFor('skills')).map((s) => s.slug));
 const related: AnyEntry[] = data.related ? (await allVisible()).filter((e) => data.related.includes(e.data.slug)) : [];
-const date = data.date.toISOString().slice(0, 10);
 const trail = [
   { name: 'Home', path: '/' },
   { name: meta.label, path: meta.route },
   { name: data.title, path },
 ];
-const jsonLd = [creativeWork(entry, path), breadcrumbs(trail)];
+const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcrumbs(trail)];
 ---
 
 <BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
@@ -52,6 +53,8 @@ const jsonLd = [creativeWork(entry, path), breadcrumbs(trail)];
     }
 
     <ArtifactHeader entry={entry} />
+
+    <MediaBlock entry={entry} />
 
     <div class="layout">
       <div class="body measure-reading">

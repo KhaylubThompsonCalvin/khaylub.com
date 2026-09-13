@@ -39,7 +39,8 @@ const types = {
   '.map': 'application/json',
 };
 
-// Render-style glob: "*" matches within a segment, "/*" at the end matches the rest of the path.
+// Render-style glob: "*" is matched here as any run of characters, including "/", so a rule such as
+// /*.glb also covers /climb/wanderer-web.glb; render.yaml names the nested folders explicitly too.
 function matches(pattern, path) {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
   const regex = '^' + escaped.replace(/\*/g, '.*') + '$';

@@ -43,7 +43,9 @@ const typeFor: Record<string, string> = {
   experiments: 'CreativeWork',
 };
 
-export function creativeWork(entry: AnyEntry, path: string) {
+export type MediaFacts = { thumbnailUrl?: string; contentUrl?: string };
+
+export function creativeWork(entry: AnyEntry, path: string, media: MediaFacts = {}) {
   const id = identity();
   const data = entry.data as any;
   const record: Record<string, unknown> = {
@@ -63,6 +65,15 @@ export function creativeWork(entry: AnyEntry, path: string) {
   if (data.updated) record.dateModified = data.updated.toISOString().slice(0, 10);
   if (entry.collection === 'projects' && data.links?.code) record.codeRepository = data.links.code;
   if (entry.collection === 'data' && data.repository) record.isBasedOn = data.repository;
+  // Media records (schema.org): a VideoObject needs thumbnailUrl and uploadDate; a MusicRecording
+  // carries its duration; an ImageObject its content URL. All from frontmatter and the pipeline.
+  if (media.thumbnailUrl) record.thumbnailUrl = media.thumbnailUrl;
+  if (media.contentUrl) record.contentUrl = media.contentUrl;
+  if (entry.collection === 'video' || entry.collection === 'experiments') record.uploadDate = record.datePublished;
+  if (entry.collection === 'music' && data.duration) {
+    const [m, s] = String(data.duration).split(':').map(Number);
+    record.duration = `PT${m}M${s}S`;
+  }
   return record;
 }
 

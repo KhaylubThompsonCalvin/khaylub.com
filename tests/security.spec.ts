@@ -16,6 +16,9 @@ test.describe('security regression', () => {
   });
 
   test('no CSP violations reported under Report-Only', async ({ page }) => {
+    // The loop below opens the ported climb on /, which software-rendered WebGL on a CI runner can
+    // take well over the default 30 s to load; the climb suite carries the same budget.
+    test.setTimeout(150_000);
     await page.addInitScript(() => {
       (window as any).__csp = [];
       document.addEventListener('securitypolicyviolation', (e: any) => (window as any).__csp.push(`${e.violatedDirective} ${e.blockedURI}`));
@@ -26,6 +29,10 @@ test.describe('security regression', () => {
       if (path === '/') {
         await page.getByRole('button', { name: 'Enter the climb' }).click();
         await page.getByRole('button', { name: 'Skip the climb' }).waitFor();
+        // The ported scene: models, meshopt WebAssembly, webp textures through blob: URLs.
+        await page.locator('.climb canvas').waitFor({ timeout: 60_000 });
+        await page.locator('.climb-status').filter({ hasText: /^$/ }).waitFor({ state: 'attached', timeout: 60_000 });
+        await page.waitForTimeout(1000);
       }
       expect(await page.evaluate(() => (window as any).__csp), path).toEqual([]);
     }

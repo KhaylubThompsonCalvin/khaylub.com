@@ -1,0 +1,82 @@
+---
+// A video artifact (ADR-007, FR-F2, P2-FE-23): a native player behind its poster with
+// preload="none", never autoplay, a captions track when the recording has speech, in a 16:9
+// frame. Long-form or externally hosted video is a poster plus an outbound link that names the
+// host: no iframe is ever created (CSP frame-src 'none', zero third-party requests).
+import { Picture } from 'astro:assets';
+import { resolveRaster, mediaUrl, mimeFor, webpAt } from '@lib/media';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const data = entry.data as { poster: string; files?: string[]; external_url?: string; captions?: string; speech?: boolean; summary: string; type: string; title: string };
+const files = data.files ?? [];
+const poster = resolveRaster(entry, data.poster);
+const posterImg = poster ? await webpAt(poster, 1280) : { src: data.poster, width: 1280, height: 720 };
+const external = files.length === 0 && data.external_url ? new URL(data.external_url) : undefined;
+const host = external ? external.hostname.replace(/^www\./, '') : '';
+---
+
+<figure class="media-video">
+  {
+    files.length > 0 ? (
+      <div class="frame">
+        <video controls preload="none" poster={posterImg.src} width={posterImg.width} height={posterImg.height} playsinline aria-label={data.title}>
+          {files.map((f) => (
+            <source src={mediaUrl(entry, f)} type={mimeFor(f)} />
+          ))}
+          {data.captions && <track kind="captions" src={mediaUrl(entry, data.captions)} srclang="en" label="English" default />}
+          <p>
+            This browser cannot play the video. <a href={mediaUrl(entry, files[0])}>Download the file</a> instead.
+          </p>
+        </video>
+      </div>
+    ) : external ? (
+      <div class="frame facade">
+        {poster && <Picture src={poster} widths={[640, 1280]} sizes="(min-width: 1024px) 65ch, 100vw" formats={['avif', 'webp']} alt="" loading="eager" fetchpriority="high" decoding="async" />}
+        <a class="btn facade-link" href={external.href} rel="noopener noreferrer">
+          Watch on {host}
+        </a>
+      </div>
+    ) : null
+  }
+  <figcaption class="small muted">
+    {data.type === 'recording' ? 'Screen recording' : data.type === 'concept-film' ? 'Concept film' : 'Film'}
+    {data.speech ? ', with captions' : ', no speech'}. {files.length > 0 ? 'Plays here on request; nothing downloads until you press play.' : `Hosted on ${host}; the link opens in this tab.`}
+  </figcaption>
+</figure>
+
+<style>
+  .media-video {
+    margin: 0 0 var(--space-3);
+  }
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .frame video,
+  .frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .facade {
+    display: grid;
+    place-items: center;
+  }
+  .facade :global(picture),
+  .facade :global(img) {
+    grid-area: 1 / 1;
+  }
+  .facade-link {
+    grid-area: 1 / 1;
+    background: var(--bg);
+  }
+</style>

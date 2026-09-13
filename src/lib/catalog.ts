@@ -159,9 +159,11 @@ export const SORT_ORDERS: { order: SortOrder; label: string }[] = [
 
 export function sortEntries(entries: AnyEntry[], order: SortOrder): AnyEntry[] {
   const copy = [...entries];
-  if (order === 'oldest') return copy.sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
-  if (order === 'title') return copy.sort((a, b) => a.data.title.localeCompare(b.data.title));
-  return copy.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  // Same-day items are ordered by title so indexes and feeds never depend on file order.
+  const byTitle = (a: AnyEntry, b: AnyEntry) => a.data.title.localeCompare(b.data.title);
+  if (order === 'oldest') return copy.sort((a, b) => a.data.date.getTime() - b.data.date.getTime() || byTitle(a, b));
+  if (order === 'title') return copy.sort(byTitle);
+  return copy.sort((a, b) => b.data.date.getTime() - a.data.date.getTime() || byTitle(a, b));
 }
 
 const TYPE_LABELS: Record<string, string> = {

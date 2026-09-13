@@ -1,0 +1,46 @@
+---
+// An experiment or exhibit (W12, ADR-008): a still poster and an opt-in entry. The climb's entry
+// is a link to /climb/, the one place its island mounts; nothing 3D loads on this page.
+import { Picture } from 'astro:assets';
+import { resolveRaster } from '@lib/media';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const data = entry.data as { poster: string; entry_url: string; payload_mb?: number; title: string; type: string; cover_alt?: string };
+// The frontmatter's cover_alt describes the still; the generic phrase is only the fallback.
+const alt = data.cover_alt ?? `${data.title}: a still from the ${data.type}`;
+const poster = resolveRaster(entry, data.poster);
+const internal = data.entry_url.startsWith('/');
+---
+
+<figure class="experiment">
+  {
+    poster ? (
+      <Picture src={poster} widths={[640, 1280]} sizes="(min-width: 1024px) 65ch, 100vw" formats={['avif', 'webp']} alt={alt} loading="eager" fetchpriority="high" decoding="async" />
+    ) : (
+      <img src={data.poster} alt={alt} width="1280" height="720" loading="eager" fetchpriority="high" decoding="async" />
+    )
+  }
+  <figcaption class="small muted">
+    A still. Nothing from the {data.type} loads on this page.
+    {data.payload_mb != null && ` Opening it downloads about ${data.payload_mb} MB on request.`}
+  </figcaption>
+</figure>
+<p>
+  <a class="btn btn-primary" href={data.entry_url} rel={internal ? undefined : 'noopener noreferrer'}>
+    Open the {data.type}
+  </a>
+</p>
+
+<style>
+  .experiment {
+    margin: 0 0 var(--space-2);
+  }
+  .experiment :global(img) {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+</style>

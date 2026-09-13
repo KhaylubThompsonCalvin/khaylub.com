@@ -1,0 +1,71 @@
+---
+// A gallery set (ADR-007, P2-FE-22, wireframe section 11): a grid where every image goes through
+// the pipeline (AVIF and WebP, srcset, width and height), the first image is the LCP candidate
+// (eager, high priority) and the rest are lazy, every image has alt text, and each opens at full
+// size on its own URL instead of a lightbox.
+import { Picture } from 'astro:assets';
+import { resolveRaster, webpAt } from '@lib/media';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const data = entry.data as { images: { src: string; alt: string; caption?: string }[] };
+const items = await Promise.all(
+  data.images.map(async (img) => {
+    const meta = resolveRaster(entry, img.src);
+    if (!meta) throw new Error(`gallery images must live beside the artifact: ${img.src}`);
+    return { meta, alt: img.alt, caption: img.caption, full: await webpAt(meta, 1600) };
+  })
+);
+---
+
+<ul class="gallery-grid">
+  {
+    items.map((it, i) => (
+      <li>
+        <a href={it.full.src}>
+          <Picture
+            src={it.meta}
+            widths={[400, 800, 1600]}
+            sizes="(min-width: 900px) 30vw, 100vw"
+            formats={['avif', 'webp']}
+            alt={it.alt}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+            decoding="async"
+          />
+          <span class="visually-hidden">(full size)</span>
+        </a>
+        {it.caption && <p class="small muted">{it.caption}</p>}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: var(--space-1);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+  }
+  .gallery-grid a {
+    display: block;
+    aspect-ratio: 16 / 10;
+    background: var(--line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .gallery-grid :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gallery-grid p {
+    margin: var(--space-1) 0 0;
+  }
+</style>

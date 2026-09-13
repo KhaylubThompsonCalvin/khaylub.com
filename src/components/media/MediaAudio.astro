@@ -1,0 +1,48 @@
+---
+// A track (ADR-007, FR-F3, P2-FE-23): the native player with visible controls and preload="none",
+// never autoplay, the duration stated, and the lyrics or description in the artifact body below.
+// An externally hosted track is a link that names the host; nothing is embedded.
+import { mediaUrl, mimeFor } from '@lib/media';
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const data = entry.data as { files?: string[]; external_url?: string; duration: string; title: string };
+const files = data.files ?? [];
+const external = files.length === 0 && data.external_url ? new URL(data.external_url) : undefined;
+---
+
+<figure class="media-audio">
+  {
+    files.length > 0 ? (
+      <audio controls preload="none" aria-label={data.title}>
+        {files.map((f) => (
+          <source src={mediaUrl(entry, f)} type={mimeFor(f)} />
+        ))}
+        <p>
+          This browser cannot play the track. <a href={mediaUrl(entry, files[0])}>Download the file</a> instead.
+        </p>
+      </audio>
+    ) : external ? (
+      <a class="btn" href={external.href} rel="noopener noreferrer">
+        Listen on {external.hostname.replace(/^www\./, '')}
+      </a>
+    ) : null
+  }
+  <figcaption class="small muted">
+    Duration {data.duration}. {files.length > 0 ? 'Plays here on request; nothing downloads until you press play.' : ''} The lyrics or a description follow below.
+  </figcaption>
+</figure>
+
+<style>
+  .media-audio {
+    margin: 0 0 var(--space-3);
+  }
+  .media-audio audio {
+    width: 100%;
+    max-width: 40rem;
+    display: block;
+  }
+</style>

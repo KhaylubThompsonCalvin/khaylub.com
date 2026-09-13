@@ -34,3 +34,6 @@ build-report.json
 # Playwright MCP session snapshots and evidence screenshots (copied to the vault)
 .playwright-mcp/
 p1[0-9]-*.png
+
+# Local captures from scripts/capture-climb.mjs
+captures/
