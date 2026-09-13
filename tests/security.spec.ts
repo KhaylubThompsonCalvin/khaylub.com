@@ -16,6 +16,9 @@ test.describe('security regression', () => {
   });
 
   test('no CSP violations reported under Report-Only', async ({ page }) => {
+    // The loop below opens the ported climb on /, which software-rendered WebGL on a CI runner can
+    // take well over the default 30 s to load; the climb suite carries the same budget.
+    test.setTimeout(150_000);
     await page.addInitScript(() => {
       (window as any).__csp = [];
       document.addEventListener('securitypolicyviolation', (e: any) => (window as any).__csp.push(`${e.violatedDirective} ${e.blockedURI}`));
