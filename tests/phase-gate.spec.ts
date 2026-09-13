@@ -90,9 +90,27 @@ test.describe('owner gate: records and decisions', () => {
     expect(parsed['Next phase'].status).toBe('NOT OPENED');
   });
 
-  test('Phase 13 remains NOT OPENED in the repository pointer', () => {
+  test('the repository pointer names exactly one next gated phase, NOT opened, after a closed previous phase', () => {
+    // The phase numbers are read from the pointer itself, so a normal transition (close N, name
+    // N+1 as next) never needs this test edited. The invariant is what matters: the next phase is
+    // never marked opened, accepted, or built without the owner's own instruction.
     const claude = readFileSync('CLAUDE.md', 'utf8');
-    expect(claude).toMatch(/Phase 13[\s\S]{0,240}opens only on the owner's instruction/);
-    expect(claude).not.toMatch(/Phase 13[\s\S]{0,120}OPENED by the owner/);
+    const pointer = claude.slice(claude.indexOf('## Current phase pointer'));
+    expect(pointer.length, 'CLAUDE.md carries a Current phase pointer section').toBeGreaterThan(40);
+    // Whitespace-tolerant: the pointer is hard-wrapped prose.
+    const nextSentence = /Phase (\d+)\s+\([^)]*\)\s+is\s+the\s+next\s+gated\s+phase\s+and\s+is\s+NOT\s+opened;\s+it\s+opens\s+only\s+on\s+the\s+owner's\s+instruction\s+through\s+`\/phase (\d+)`/g;
+    const matches = [...pointer.matchAll(nextSentence)];
+    expect(matches.length, 'exactly one phase is named as the next gated phase').toBe(1);
+    const next = Number(matches[0][1]);
+    expect(Number(matches[0][2]), 'the /phase command names the same phase').toBe(next);
+    const previous = next - 1;
+    expect(pointer, `Phase ${previous} is recorded as accepted and closed`).toMatch(new RegExp(`Phase ${previous}\\s+\\([^)]*\\)\\s+is\\s+ACCEPTED\\s+and\\s+CLOSED`));
+    // No phase at or beyond the next one may be described as opened, accepted, closed, built, or
+    // merged (case-sensitive: "NOT opened" is the permitted state, "OPENED" the forbidden one).
+    for (const m of pointer.matchAll(/Phase (\d+)\b[^.]*?\b(OPENED|ACCEPTED|CLOSED|merged|built)\b/g)) {
+      expect(Number(m[1]), `"${m[0].slice(0, 80)}" describes a phase that is not open`).toBeLessThan(next);
+    }
+    expect(pointer).not.toMatch(new RegExp(`Phase ${next}[\\s\\S]{0,160}OPENED by the owner`));
+    expect(pointer, 'the cutover phase never moves').toMatch(/Phase 21 owns the production move/);
   });
 });
