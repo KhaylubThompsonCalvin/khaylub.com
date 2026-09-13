@@ -45,6 +45,7 @@ const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
           const p = pos.get(n.slug)!;
           return (
             <a href={n.route} class="node">
+              <rect class="hit" x={p.x - 22} y={p.y - 22} width={COL - 24} height={44} />
               <title>{`${n.title} (${collectionLabel(n.collection)})`}</title>
               <circle cx={p.x} cy={p.y} r={9} />
               <text x={p.x + 16} y={p.y + 4}>{short(n.title)}</text>
@@ -84,6 +85,10 @@ const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+  /* The invisible hit area gives each node link the site's 44 px target. */
+  .node .hit {
+    fill: transparent;
   }
   .node circle {
     fill: var(--card);

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname, sep } from 'node:path';
 import matter from 'gray-matter';
+import AxeBuilder from '@axe-core/playwright';
 import { parseWikilinks, scanTargets, resolveWikilink, stripCode } from '../src/lib/wikilinks.mjs';
 
 // Wiki relationships (Phase 14; ADR-006, FR-E1 to FR-E6, P2-CE-08, P2-FE-13, W15): backlinks match
@@ -114,6 +115,12 @@ test.describe('wiki relationships', () => {
     expect(await nodes.count()).toBe(PUBLISHED.length);
     for (const href of await nodes.evaluateAll((as) => as.map((x) => x.getAttribute('href') ?? ''))) expect(PUBLISHED.map(route)).toContain(href);
     expect(await nodes.first().locator('title').count()).toBe(1);
+    // Every node link meets the 44 px target bar (the invisible hit rect), and axe sees the open map.
+    for (const box of await nodes.evaluateAll((as) => as.map((a) => a.getBoundingClientRect()).map((b) => [b.width, b.height]))) {
+      expect(box[0]).toBeGreaterThanOrEqual(44);
+      expect(box[1]).toBeGreaterThanOrEqual(44);
+    }
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await nodes.first().focus();
     expect(await page.evaluate(() => document.activeElement?.tagName.toLowerCase())).toBe('a');
     expect(await page.locator('script:not([type="application/ld+json"])').evaluateAll((ss) => ss.filter((s) => !/PrimaryNav/.test(s.getAttribute('src') ?? '')).length)).toBe(0);

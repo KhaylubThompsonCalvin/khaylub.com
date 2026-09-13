@@ -219,6 +219,7 @@ const relatedRefs = [];
 for (const file of walk('content', ['.md'])) {
   if (file.split(/[\\/]/).includes('profile')) continue;
   const { data } = matter(readFileSync(file, 'utf8'));
+  if (data.slug && artifactSlugs.has(data.slug)) fail(`duplicate slug "${data.slug}" in ${file}: slugs are unique across collections (wikilink targets)`);
   if (data.slug) artifactSlugs.add(data.slug);
   for (const r of data.related ?? []) relatedRefs.push({ file, slug: r });
 }
@@ -226,7 +227,8 @@ for (const { file, slug } of relatedRefs) {
   if (!artifactSlugs.has(slug)) fail(`related slug "${slug}" in ${file} names no artifact`);
 }
 // 10b. Wikilinks in bodies (ADR-006, FR-E1): every [[slug]] names a visible artifact or page.
-//      Production ignores drafts; a preview build (PUBLIC_SITE_ENV=preview) may link to them.
+//      Production ignores drafts as targets and as sources; a preview build (PUBLIC_SITE_ENV=preview)
+//      renders drafts and may link to them.
 for (const { file, slug } of unresolvedWikilinks()) fail(`unresolved wikilink [[${slug}]] in ${file}`);
 for (const file of walk('content/profile/top8', ['.yaml'])) {
   for (const item of load(readFileSync(file, 'utf8')).items ?? []) {

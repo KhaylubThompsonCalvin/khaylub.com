@@ -109,8 +109,9 @@ export async function relatedRail(slug: string): Promise<{ node: Node; why: stri
     push(c.node, c.why);
   }
   let rail = chosen.slice(0, RAIL_MAX);
-  // At least one other collection when any candidate offers one (ADR-006).
-  if (rail.length && rail.every((r) => r.node.collection === self.collection)) {
+  // At least one other collection when any candidate offers one (ADR-006); never at the cost of
+  // an author-chosen relation.
+  if (rail.length && rail.every((r) => r.node.collection === self.collection) && rail[rail.length - 1].why !== 'Chosen by the author') {
     const other = [...chosen.slice(RAIL_MAX), ...vocab.map((c) => ({ node: c.node, why: c.why }))].find((c) => c.node.collection !== self.collection && !rail.some((r) => r.node.slug === c.node.slug));
     if (other) rail = [...rail.slice(0, RAIL_MAX - 1), other];
   }
@@ -126,7 +127,7 @@ export async function prevNext(slug: string): Promise<Sequence> {
   if (!self) return {};
   const d = self.entry.data as { series?: string; part?: number };
   if (d.series) {
-    const siblings = g.nodes.filter((n) => (n.entry.data as { series?: string }).series === d.series).sort((a, b) => ((a.entry.data as { part?: number }).part ?? 0) - ((b.entry.data as { part?: number }).part ?? 0) || byTitle(a, b));
+    const siblings = g.nodes.filter((n) => n.collection === self.collection && (n.entry.data as { series?: string }).series === d.series).sort((a, b) => ((a.entry.data as { part?: number }).part ?? 0) - ((b.entry.data as { part?: number }).part ?? 0) || byTitle(a, b));
     const i = siblings.findIndex((n) => n.slug === slug);
     return { prev: siblings[i - 1], next: siblings[i + 1], series: { name: d.series, part: d.part ?? i + 1, total: siblings.length } };
   }

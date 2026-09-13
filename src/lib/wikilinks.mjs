@@ -62,6 +62,8 @@ export function scanTargets(root = process.cwd()) {
         else if (extname(p) === '.md') {
           const { data } = matter(readFileSync(p, 'utf8'));
           if (!data.slug) continue;
+          const dup = map.get(data.slug);
+          if (dup) throw new Error(`duplicate slug "${data.slug}" in ${dup.file} and ${relative(root, p).replace(/\\/g, '/')}: a wikilink target must be unique`);
           map.set(data.slug, { slug: data.slug, route: `/${collection}/${data.slug}/`, title: data.title ?? data.slug, status: data.status ?? 'draft', collection, file: relative(root, p).replace(/\\/g, '/') });
         }
       }
@@ -93,8 +95,12 @@ function targetsCached() {
   return cache.targets;
 }
 
-/** Split one mdast text node into text, link, and html nodes. Exported for the tests. */
-export function splitTextNode(value, targets, preview, file) {
+const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/** Split one mdast text node into text, link, and html nodes. Exported for the tests.
+ *  `lenient` is for a source that never ships (a draft in a production build): its unresolved
+ *  links stay as text instead of failing the build. */
+export function splitTextNode(value, targets, preview, file, lenient = false) {
   const out = [];
   let last = 0;
   for (const m of value.matchAll(WIKILINK)) {
@@ -107,7 +113,10 @@ export function splitTextNode(value, targets, preview, file) {
       out.push({ type: 'link', url: target.route, title: null, children: [{ type: 'text', value: label ?? target.title }] });
     } else if (preview) {
       // Flagged, visible, and never a dead anchor: the preview reader sees exactly what is broken.
-      out.push({ type: 'html', value: `<span class="unresolved-link" title="unresolved wikilink">[[${slug}]]</span>` });
+      // The slug is escaped: a body is content, never markup.
+      out.push({ type: 'html', value: `<span class="unresolved-link" title="unresolved wikilink">[[${escapeHtml(slug)}]]</span>` });
+    } else if (lenient) {
+      out.push({ type: 'text', value: m[0] });
     } else {
       throw new Error(`unresolved wikilink [[${slug}]] in ${file ?? 'a Markdown body'}: no published artifact or page has that slug`);
     }
@@ -126,7 +135,12 @@ export const wikilinksPlugin = {
     if (!WIKILINK.test(node.value)) return;
     WIKILINK.lastIndex = 0;
     const path = ctx.fileURL ? relative(process.cwd(), fileURLToPath(ctx.fileURL)).replace(/\\/g, '/') : undefined;
-    ctx.replaceNode(node, splitTextNode(node.value, targetsCached(), isPreviewBuild(), path));
+    const targets = targetsCached();
+    const preview = isPreviewBuild();
+    // Astro renders every entry at load time, drafts included; a draft's links are its own business
+    // until it is published (it never reaches dist/ in production).
+    const source = path ? [...targets.values()].find((t) => t.file === path) : undefined;
+    ctx.replaceNode(node, splitTextNode(node.value, targets, preview, path, !!source && !isVisibleTarget(source, preview)));
   },
 };
 
@@ -135,7 +149,7 @@ export function unresolvedWikilinks(root = process.cwd(), preview = isPreviewBui
   const targets = scanTargets(root);
   const out = [];
   for (const t of targets.values()) {
-    if (!t.file) continue;
+    if (!t.file || !isVisibleTarget(t, preview)) continue;
     const { content } = matter(readFileSync(resolve(root, t.file), 'utf8'));
     for (const link of parseWikilinks(stripCode(content))) {
       if (!resolveWikilink(link.target, targets, preview)) out.push({ file: t.file, slug: link.target });
