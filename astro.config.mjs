@@ -2,6 +2,8 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import { satteri } from '@astrojs/markdown-satteri';
+import { wikilinksPlugin } from './src/lib/wikilinks.mjs';
 
 const isPreview = process.env.PUBLIC_SITE_ENV === 'preview';
 
@@ -17,6 +19,10 @@ export default defineConfig({
     // No inline style attributes anywhere (CSP style-src 'self'; html-validate no-inline-style):
     // code blocks render as plain <pre><code class="language-x"> and take their look from base.css.
     syntaxHighlight: false,
+    // [[slug]] and [[slug|text]] resolve to site links; unresolved links fail production builds
+    // and render flagged in preview (ADR-006). Sätteri is Astro 7's default processor; the plugin
+    // works on its mdast tree.
+    processor: satteri({ mdastPlugins: [wikilinksPlugin] }),
   },
   integrations: [
     // React is used for islands only (the climb, and later the optional graph map and orbit view).

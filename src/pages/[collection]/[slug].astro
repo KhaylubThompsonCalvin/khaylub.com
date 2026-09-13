@@ -1,13 +1,16 @@
 ---
 // One artifact template for every collection (doc 31: ArticleLayout). Breadcrumb, the shared
 // header (badge, dates, facts, proof links), a contents nav on long pages, the body, and a footer
-// with the source, curated related items, and the skill and tag labels. Backlinks, the related
-// rail, and series navigation arrive in Phase 14.
+// with the source, the related rail, backlinks, previous and next, and the skill and tag labels
+// (Phase 14: ADR-006, W15).
 import { render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import ArtifactHeader from '@components/ArtifactHeader.astro';
 import MediaBlock from '@components/media/MediaBlock.astro';
+import RelatedRail from '@components/relations/RelatedRail.astro';
+import Backlinks from '@components/relations/Backlinks.astro';
+import PrevNext from '@components/relations/PrevNext.astro';
 import { mediaForJsonLd } from '@lib/media';
 import TableOfContents from '@components/TableOfContents.astro';
 import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
@@ -29,7 +32,6 @@ const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
 // Only skills with a public evidence row get a link; a skill shown solely by this item while it is
 // archived, employer-hidden, or a preview draft is named without one.
 const evidenced = new Set((await evidenceFor('skills')).map((s) => s.slug));
-const related: AnyEntry[] = data.related ? (await allVisible()).filter((e) => data.related.includes(e.data.slug)) : [];
 const trail = [
   { name: 'Home', path: '/' },
   { name: meta.label, path: meta.route },
@@ -67,20 +69,9 @@ const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcru
 
     <footer class="artifact-footer measure-reading" data-pagefind-ignore>
       <p class="small muted">Source: {data.source}</p>
-      {
-        related.length > 0 && (
-          <section aria-labelledby="related-heading">
-            <h2 id="related-heading">Related</h2>
-            <ul>
-              {related.map((r) => (
-                <li>
-                  <a href={routeFor(r)}>{r.data.title}</a> <span class="small muted">({collectionLabel(r.collection)})</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )
-      }
+      <RelatedRail entry={entry} />
+      <Backlinks entry={entry} />
+      <PrevNext entry={entry} />
       {
         data.skills?.length > 0 && (
           <p class="small muted skills-shown">

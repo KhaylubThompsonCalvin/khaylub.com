@@ -24,7 +24,7 @@ provenance:
 
 ## What the recording shows
 
-One scroll through [the climb](/climb/) as it runs inside this site: the Wanderer at the trailhead
+One scroll through [[climb|the climb]] as it runs inside this site: the Wanderer at the trailhead
 under the night sky, the first light and the Footholds, the Phoenix igniting at the midpoint, the
 Camps, and the summit where the firebird fills the sky over the closing principle and the
 contact links. The scroll is scripted (`scripts/capture-climb.mjs`: a 24 second ease from the top
@@ -44,5 +44,5 @@ play.
 
 The five concept films of the original Camps beat and the summit's far mountain vista are not in
 the ported climb yet, because their provenance is not recorded; the cards and the procedural
-ridges stand in their place. The [exhibit entry](/experiments/the-climb/) lists every difference
+ridges stand in their place. The [[the-climb|exhibit entry]] lists every difference
 from the first version.

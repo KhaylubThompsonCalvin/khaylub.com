@@ -14,6 +14,7 @@ for (const [path, heading] of [
   ['/notes/', 'Field Notes'],
   ['/library/', 'Library'],
   ['/search/', 'Search'],
+  ['/graph/', 'Graph'],
 ] as const) {
   test(`${path} is readable with JavaScript disabled`, async ({ page }) => {
     await page.goto(path);

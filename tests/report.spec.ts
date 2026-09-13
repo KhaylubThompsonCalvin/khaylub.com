@@ -30,6 +30,10 @@ test('the build report counts artifacts, pages, evidence, and integrity from the
   expect(report.evidence.skills['data-analysis']).toBeGreaterThanOrEqual(3);
   expect(report.evidence.technologies['python']).toBeGreaterThanOrEqual(3);
   expect(report.unresolvedRelated).toEqual([]);
+  expect(report.unresolvedWikilinks).toEqual([]);
+  // Phase 14 acceptance: zero orphans among the featured artifacts.
+  for (const slug of ['khaylub-com-v1', 'fuel-economy-regression', 'sql-python-analytics-pipeline']) expect(report.orphans.some((o: string) => o.endsWith(`/${slug}`)), `${slug} is an orphan`).toBe(false);
+  expect(report.relationEdges).toBeGreaterThan(5);
   expect(report.coversWithoutAlt).toEqual([]);
   expect(report.oversizeMedia).toEqual([]);
   expect(Array.isArray(report.orphans)).toBe(true);

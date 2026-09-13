@@ -1,0 +1,111 @@
+---
+// The map (FR-E5, ADR-006 "list-backed, optional"): a build-time SVG of the same nodes and relation
+// edges as the list, nodes in one column per collection, each node a focusable link with its title.
+// No script, no physics, no library; the page's tokens colour it through the stylesheet.
+import { buildGraph, relationEdges } from '@lib/graph';
+import { COLLECTIONS, collectionLabel } from '@lib/catalog';
+
+const g = await buildGraph();
+const edges = await relationEdges();
+const columns = COLLECTIONS.map((c) => ({ name: c.name, label: c.label, nodes: g.nodes.filter((n) => n.collection === c.name).sort((a, b) => a.title.localeCompare(b.title)) })).filter((c) => c.nodes.length > 0);
+const COL = 190;
+const ROW = 64;
+const width = columns.length * COL + 40;
+const height = Math.max(...columns.map((c) => c.nodes.length)) * ROW + 90;
+const pos = new Map<string, { x: number; y: number }>();
+columns.forEach((c, i) => c.nodes.forEach((n, j) => pos.set(n.slug, { x: 40 + i * COL + 16, y: 70 + j * ROW })));
+// One line per unordered pair.
+const pairs = new Map<string, { a: string; b: string }>();
+for (const e of edges) {
+  const key = [e.from, e.to].sort().join('|');
+  if (!pairs.has(key)) pairs.set(key, { a: e.from, b: e.to });
+}
+const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
+---
+
+<figure class="graph-map" tabindex="0" aria-label="Map of the relationships, scrolls sideways on narrow screens">
+  <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="group" aria-label="Map of the relationships between the library's items; every node is a link">
+    {
+      [...pairs.values()].map(({ a, b }) => {
+        const pa = pos.get(a)!;
+        const pb = pos.get(b)!;
+        return <line class="edge" x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y} />;
+      })
+    }
+    {
+      columns.map((c, i) => (
+        <text class="column" x={40 + i * COL} y={36}>
+          {c.label}
+        </text>
+      ))
+    }
+    {
+      columns.flatMap((c) =>
+        c.nodes.map((n) => {
+          const p = pos.get(n.slug)!;
+          return (
+            <a href={n.route} class="node">
+              <rect class="hit" x={p.x - 22} y={p.y - 22} width={COL - 24} height={44} />
+              <title>{`${n.title} (${collectionLabel(n.collection)})`}</title>
+              <circle cx={p.x} cy={p.y} r={9} />
+              <text x={p.x + 16} y={p.y + 4}>{short(n.title)}</text>
+            </a>
+          );
+        })
+      )
+    }
+  </svg>
+  <figcaption class="small muted">Lines are curated relations and wikilinks; columns are collections. The list above carries the same relationships.</figcaption>
+</figure>
+
+<style>
+  .graph-map {
+    margin: var(--space-2) 0 0;
+    overflow-x: auto;
+  }
+  /* The scrolling region is itself focusable so a keyboard can scroll the drawing. */
+  .graph-map:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  /* Natural size inside a horizontally scrolling figure: shrinking the drawing to a phone's width
+     (the site's global svg rule) would make every label unreadable. */
+  .graph-map svg {
+    max-width: none;
+    height: auto;
+    font-family: var(--font-body);
+    font-size: 13px;
+  }
+  .edge {
+    stroke: var(--line);
+    stroke-width: 1.5;
+  }
+  .column {
+    fill: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* The invisible hit area gives each node link the site's 44 px target. */
+  .node .hit {
+    fill: transparent;
+  }
+  .node circle {
+    fill: var(--card);
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+  .node text {
+    fill: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .node:hover circle,
+  .node:focus circle {
+    fill: var(--accent);
+  }
+  .node:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+// Previous and next (FR-E4, W15): within a series by part, otherwise within the collection by date,
+// oldest first; destination titles spelled out.
+import { prevNext } from '@lib/graph';
+import { collectionLabel, seriesLabel, type AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const seq = await prevNext(entry.data.slug);
+const scope = seq.series ? `the series ${seriesLabel(seq.series.name)}` : collectionLabel(entry.collection);
+---
+
+{
+  (seq.prev || seq.next) && (
+    <nav class="prev-next" aria-label="Previous and next">
+      {seq.prev && (
+        <a rel="prev" href={seq.prev.route}>
+          <span class="small muted">Previous in {scope}<span class="visually-hidden">:</span></span>
+          <span class="title">{seq.prev.title}</span>
+        </a>
+      )}
+      {seq.next && (
+        <a rel="next" href={seq.next.route} class="next">
+          <span class="small muted">Next in {scope}<span class="visually-hidden">:</span></span>
+          <span class="title">{seq.next.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .prev-next {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  @media (min-width: 560px) {
+    .prev-next {
+      grid-template-columns: 1fr 1fr;
+    }
+    .next {
+      grid-column: 2;
+      text-align: right;
+    }
+  }
+  .prev-next a {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 44px;
+    padding: var(--space-1) 0;
+    text-decoration: none;
+  }
+  .prev-next .title {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

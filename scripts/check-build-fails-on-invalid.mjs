@@ -49,3 +49,21 @@ if (validate.status === 0 || !/related slug "no-such-artifact"/.test(validateOut
   process.exit(1);
 }
 console.log('PASS: validate rejects a related slug that no artifact carries.');
+
+// Third proof: an unresolved [[wikilink]] in a published body fails `npm run validate` (section 10b).
+// The build throws on the same condition through the Sätteri plugin; tests/wikilinks.spec.ts proves
+// that path on the resolver directly, so no second full build runs here.
+const wikiTarget = 'content/notes/zz-unresolved-wikilink.md';
+cpSync('tests/fixtures/unresolved-wikilink/unresolved.md', wikiTarget);
+let wiki;
+try {
+  wiki = spawnSync('node', ['scripts/validate.mjs'], { encoding: 'utf8', shell: true });
+} finally {
+  rmSync(wikiTarget, { force: true });
+}
+const wikiOutput = `${wiki.stdout}\n${wiki.stderr}`;
+if (wiki.status === 0 || !/unresolved wikilink \[\[no-such-artifact-anywhere\]\]/.test(wikiOutput)) {
+  console.error('FAIL: validate did not reject the unresolved wikilink.\n' + wikiOutput.slice(-1500));
+  process.exit(1);
+}
+console.log('PASS: validate rejects an unresolved wikilink in a body.');

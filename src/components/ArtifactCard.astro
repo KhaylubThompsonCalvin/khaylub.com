@@ -24,4 +24,6 @@ const thumb = ['music', 'video', 'gallery', 'experiments'].includes(entry.collec
 
 <Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb}>
   {detail && <ProjectFacts entry={entry} compact />}
+  {/* Callers may add a line under the summary (the related rail's one-line reason). */}
+  <slot />
 </Card>

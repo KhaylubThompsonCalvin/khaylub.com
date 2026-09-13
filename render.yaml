@@ -29,6 +29,9 @@ services:
       - type: redirect
         source: /resume.pdf
         destination: /resume/Khaylub-Thompson-Calvin-Resume.pdf
+      - type: redirect
+        source: /library/map
+        destination: /graph/
     headers:
       # Security headers on every response
       - path: /*

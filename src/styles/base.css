@@ -281,6 +281,13 @@ small,
 }
 
 /* Utility */
+/* Preview builds flag an unresolved wikilink in place; production fails the build instead. */
+.unresolved-link {
+  outline: 2px dashed var(--focus);
+  outline-offset: 2px;
+  background: var(--card);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

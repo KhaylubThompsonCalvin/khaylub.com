@@ -184,6 +184,13 @@ export function typeOf(entry: AnyEntry): string {
 export const typeLabel = (slug: string) => TYPE_LABELS[slug] ?? slug;
 
 export type FilterOption = { slug: string; label: string; count: number; href: string };
+/** A series has no vocabulary file (its slug is the only source), so its label is the slug as words,
+ *  first letter up: the same words on the series page, the header line, and previous and next. */
+export function seriesLabel(slug: string): string {
+  const words = slug.replace(/-/g, ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export type FilterOptions = { types: FilterOption[]; tags: FilterOption[]; series: FilterOption[] };
 
 /** Filter links for a collection index, counted from its visible entries. Only values that occur become links. */
@@ -196,7 +203,7 @@ export function filterOptions(name: ArtifactCollection, entries: AnyEntry[]): Fi
   const types = [...count(entries.map(typeOf))].map(([slug, n]) => ({ slug, label: typeLabel(slug), count: n, href: `/${name}/type/${slug}/` }));
   const tags = [...count(entries.flatMap((e) => e.data.tags))].map(([slug, n]) => ({ slug, label: labelFor('tags', slug), count: n, href: `/${name}/tag/${slug}/` }));
   // Series pages exist for Field Notes only (P2-FE-13); other collections get no series bar until a route exists.
-  const series = name === 'notes' ? [...count(entries.map((e) => (e.data as Record<string, any>).series))].map(([slug, n]) => ({ slug, label: slug.replace(/-/g, ' '), count: n, href: `/${name}/series/${slug}/` })) : [];
+  const series = name === 'notes' ? [...count(entries.map((e) => (e.data as Record<string, any>).series))].map(([slug, n]) => ({ slug, label: seriesLabel(slug), count: n, href: `/${name}/series/${slug}/` })) : [];
   const byCount = (a: FilterOption, b: FilterOption) => b.count - a.count || a.label.localeCompare(b.label);
   return { types: types.sort(byCount), tags: tags.sort(byCount), series: series.sort(byCount) };
 }

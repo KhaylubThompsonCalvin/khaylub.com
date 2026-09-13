@@ -45,6 +45,7 @@ content/
 | `source` | yes | where the claims come from (a URL or a short statement) |
 | `cover`, `cover_alt` | no | a cover requires alt text and a provenance record |
 | `related` | no | slugs of existing artifacts; `npm run validate` fails on a slug no artifact carries |
+| `[[slug]]` in the body | no | a wikilink to another artifact or a page (`home`, `work`, `about`, `now`, `resume`, `contact`, `library`, `timeline`, `search`, `climb`, `graph`, `top8`, `colophon`, or a collection name); `[[slug\|the words]]` sets the link text. Slugs are unique across collections. An unresolved link fails `validate` and the production build; a preview build flags it in place. A draft may link to a draft; a published body may not. Code spans and fences are left alone |
 | `series`, `part` | no | for multi-part notes |
 | `ai_assisted` | no | rendered as a sentence when `true` |
 | `license` | no | SPDX id or "All rights reserved" |

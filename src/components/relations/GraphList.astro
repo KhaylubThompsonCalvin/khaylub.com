@@ -1,0 +1,74 @@
+---
+// The graph as a list (FR-E5, P2-CE-08): every visible artifact by collection, with what it links to
+// and what references it. This list is the primary path; the map is a drawing of the same edges.
+import { buildGraph, relationEdges, orphans } from '@lib/graph';
+import { COLLECTIONS, collectionLabel } from '@lib/catalog';
+
+const g = await buildGraph();
+const edges = await relationEdges();
+const unlinked = await orphans();
+const outOf = (slug: string) => [...new Set(edges.filter((e) => e.from === slug).map((e) => e.to))].map((s) => g.bySlug.get(s)!).filter(Boolean);
+const into = (slug: string) => [...new Set(edges.filter((e) => e.to === slug).map((e) => e.from))].map((s) => g.bySlug.get(s)!).filter(Boolean);
+const groups = COLLECTIONS.map((c) => ({ ...c, nodes: g.nodes.filter((n) => n.collection === c.name).sort((a, b) => a.title.localeCompare(b.title)) })).filter((c) => c.nodes.length > 0);
+---
+
+<div class="graph-list">
+  {
+    groups.map((c) => (
+      <section aria-labelledby={`graph-${c.name}`}>
+        <h2 id={`graph-${c.name}`}>{c.label}</h2>
+        <ul>
+          {c.nodes.map((n) => {
+            const out = outOf(n.slug);
+            const inn = into(n.slug);
+            return (
+              <li>
+                <a href={n.route}>{n.title}</a>
+                {out.length > 0 && (
+                  <span class="small muted">
+                    {' '}
+                    links to{' '}
+                    {out.map((t, i) => (
+                      <>
+                        <a href={t.route}>{t.title}</a>
+                        {i < out.length - 1 ? ', ' : ''}
+                      </>
+                    ))}
+                    .
+                  </span>
+                )}
+                {inn.length > 0 && (
+                  <span class="small muted">
+                    {' '}
+                    Referenced by{' '}
+                    {inn.map((t, i) => (
+                      <>
+                        <a href={t.route}>{t.title}</a>
+                        {i < inn.length - 1 ? ', ' : ''}
+                      </>
+                    ))}
+                    .
+                  </span>
+                )}
+                {out.length === 0 && inn.length === 0 && <span class="small muted"> Not yet connected.</span>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+  <p class="small muted">
+    {g.nodes.length} items, {new Set(edges.map((e) => [e.from, e.to].sort().join('|'))).size} relations (curated and wikilinks, counted once per pair), {unlinked.length} not yet connected.
+    Shared skills and tags also count on each page's "Related work" rail but are not drawn here.
+  </p>
+</div>
+
+<style>
+  .graph-list li {
+    margin-bottom: var(--space-1);
+  }
+  .graph-list h2 {
+    margin-top: var(--space-3);
+  }
+</style>
