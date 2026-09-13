@@ -9,63 +9,67 @@
         "http://localhost:4173/projects/khaylub-com-v1/",
         "http://localhost:4173/data/fuel-economy-regression/",
         "http://localhost:4173/notes/preserving-v1/",
+        "http://localhost:4173/library/",
+        "http://localhost:4173/climb/",
+        "http://localhost:4173/search/",
+        "http://localhost:4173/about/",
+        "http://localhost:4173/contact/",
+        "http://localhost:4173/resume/",
+        "http://localhost:4173/timeline/",
+        "http://localhost:4173/notes/sort/title/",
+        "http://localhost:4173/projects/type/live/",
+        "http://localhost:4173/skills/data-analysis/",
+        "http://localhost:4173/technologies/python/",
+        "http://localhost:4173/tags/python/",
+        "http://localhost:4173/timeline/data/",
+        "http://localhost:4173/top8/2026-09/",
+        "http://localhost:4173/data/tableau-salary-story/",
+        "http://localhost:4173/gallery/",
         "http://localhost:4173/gallery/the-climb-beat-by-beat/",
+        "http://localhost:4173/gallery/wanderer-hero/",
         "http://localhost:4173/video/the-climb-recording/",
-        "http://localhost:4173/experiments/the-climb/"
+        "http://localhost:4173/experiments/the-climb/",
+        "http://localhost:4173/graph/"
       ],
-      "numberOfRuns": 3,
-      "settings": {
-        "budgetPath": "./budget.json",
-        "preset": "desktop"
-      }
+      "numberOfRuns": 5,
+      "settings": {}
     },
     "assert": {
-      "assertions": {
-        "categories:performance": [
-          "error",
-          {
-            "minScore": 0.9
+      "assertMatrix": [
+        {
+          "matchingUrlPattern": ".*",
+          "aggregationMethod": "median",
+          "assertions": {
+            "categories:performance": ["error", { "minScore": 0.9 }],
+            "categories:accessibility": ["error", { "minScore": 1 }],
+            "categories:best-practices": ["error", { "minScore": 0.95 }],
+            "categories:seo": ["error", { "minScore": 1 }],
+            "largest-contentful-paint": ["error", { "maxNumericValue": 2000 }],
+            "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+            "total-blocking-time": ["error", { "maxNumericValue": 150 }],
+            "first-contentful-paint": ["warn", { "maxNumericValue": 1500 }],
+            "speed-index": ["warn", { "maxNumericValue": 3000 }],
+            "dom-size": ["warn", { "maxNumericValue": 800 }],
+            "bootup-time": ["warn", { "maxNumericValue": 1000 }],
+            "uses-long-cache-ttl": "warn",
+            "is-crawlable": ["error", { "minScore": 1 }],
+            "resource-summary:total:size": ["error", { "maxNumericValue": 921600 }],
+            "resource-summary:script:size": ["error", { "maxNumericValue": 61440 }],
+            "resource-summary:stylesheet:size": ["error", { "maxNumericValue": 30720 }],
+            "resource-summary:font:size": ["error", { "maxNumericValue": 102400 }],
+            "resource-summary:image:size": ["error", { "maxNumericValue": 307200 }],
+            "resource-summary:total:count": ["error", { "maxNumericValue": 40 }],
+            "resource-summary:third-party:count": ["error", { "maxNumericValue": 0 }]
           }
-        ],
-        "categories:accessibility": [
-          "error",
-          {
-            "minScore": 1
+        },
+        {
+          "matchingUrlPattern": "^https?://[^/]+/(?!$|work/$)",
+          "aggregationMethod": "median",
+          "assertions": {
+            "resource-summary:total:size": ["error", { "maxNumericValue": 512000 }]
           }
-        ],
-        "categories:best-practices": [
-          "error",
-          {
-            "minScore": 0.95
-          }
-        ],
-        "categories:seo": [
-          "error",
-          {
-            "minScore": 1
-          }
-        ],
-        "largest-contentful-paint": [
-          "error",
-          {
-            "maxNumericValue": 2000
-          }
-        ],
-        "cumulative-layout-shift": [
-          "error",
-          {
-            "maxNumericValue": 0.05
-          }
-        ],
-        "total-blocking-time": [
-          "error",
-          {
-            "maxNumericValue": 150
-          }
-        ],
-        "uses-long-cache-ttl": "off",
-        "is-crawlable": "off"
-      }
+        }
+      ]
     },
     "upload": {
       "target": "filesystem",

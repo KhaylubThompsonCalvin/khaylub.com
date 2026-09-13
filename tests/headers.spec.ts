@@ -33,6 +33,9 @@ test.describe('headers from render.yaml', () => {
     expect((await request.get(css!)).headers()['cache-control']).toMatch(/max-age=31536000, immutable/);
     expect((await request.get('/')).headers()['cache-control']).toBe('no-cache');
     expect((await request.get('/work/')).headers()['cache-control']).toBe('no-cache');
+    expect((await request.get('/notes/preserving-v1/')).headers()['cache-control']).toBe('no-cache');
+    // Self-hosted media under /media/: one week (budget line 22), the tier Lighthouse's cache audit sees.
+    expect((await request.get('/media/fuel-economy-regression/residuals.webp')).headers()['cache-control']).toMatch(/max-age=604800/);
     expect((await request.get('/resume/Khaylub-Thompson-Calvin-Resume.pdf')).headers()['cache-control']).toMatch(/max-age=86400/);
     expect((await request.get('/robots.txt')).headers()['cache-control']).toMatch(/max-age=3600/);
     expect((await request.get('/og-default.png')).headers()['cache-control']).toMatch(/max-age=604800/);

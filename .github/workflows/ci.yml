@@ -48,10 +48,6 @@ jobs:
         run: npx playwright test
         env:
           CI: 'true'
-      - name: Lighthouse CI
-        # Run through npx so the Lighthouse toolchain (which carries unfixed transitive advisories)
-        # never enters this repository's dependency tree or the audit gate.
-        run: npx --yes @lhci/cli@0.15.1 autorun
       - name: Dependency audit
         run: npm audit --audit-level=high
       - name: Secret scan
@@ -65,8 +61,36 @@ jobs:
           name: reports
           path: |
             playwright-report
-            .lighthouseci
             build-report.json
+          if-no-files-found: ignore
+
+  # Every template on the throttled mobile profile, five runs each (vault document 13): about 130
+  # Lighthouse runs, split three ways so the wall time stays near the build job's. Each shard
+  # takes its share of lighthouserc.json's list; the assertions are the same file.
+  lighthouse:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Lighthouse CI (shard ${{ matrix.shard }} of 3)
+        # Run through npx so the Lighthouse toolchain (which carries unfixed transitive advisories)
+        # never enters this repository's dependency tree or the audit gate.
+        run: node scripts/lhci-shard.mjs ${{ matrix.shard }} 3
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-${{ matrix.shard }}
+          path: .lighthouseci
           if-no-files-found: ignore
 
   build-preview:
