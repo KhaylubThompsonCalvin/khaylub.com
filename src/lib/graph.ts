@@ -90,8 +90,8 @@ export async function relatedRail(slug: string): Promise<{ node: Node; why: stri
       chosen.push({ node, why });
     }
   };
-  for (const n of await curatedFor(slug)) push(n, 'curated');
-  for (const n of await backlinksFor(slug)) push(n, 'references this');
+  for (const n of await curatedFor(slug)) push(n, 'Chosen by the author');
+  for (const n of await backlinksFor(slug)) push(n, 'References this page');
   // Vocabulary neighbours: score = shared skills (weight 2) + shared tags (weight 1).
   const score = new Map<string, { skills: string[]; tags: string[] }>();
   for (const e of g.edges) {
@@ -101,7 +101,7 @@ export async function relatedRail(slug: string): Promise<{ node: Node; why: stri
     score.set(e.to, s);
   }
   const vocab = [...score]
-    .map(([to, s]) => ({ node: g.bySlug.get(to)!, score: s.skills.length * 2 + s.tags.length, why: s.skills.length ? `shares ${s.skills.length === 1 ? 'a skill' : `${s.skills.length} skills`}` : `shares ${s.tags.length === 1 ? 'a tag' : `${s.tags.length} tags`}` }))
+    .map(([to, s]) => ({ node: g.bySlug.get(to)!, score: s.skills.length * 2 + s.tags.length, why: s.skills.length ? `Shares ${s.skills.length === 1 ? 'a skill' : `${s.skills.length} skills`}` : `Shares ${s.tags.length === 1 ? 'a tag' : `${s.tags.length} tags`}` }))
     .filter((c) => c.node && !have.has(c.node.slug))
     .sort((a, b) => b.score - a.score || byTitle(a.node, b.node));
   for (const c of vocab) {

@@ -85,7 +85,7 @@ test.describe('wiki relationships', () => {
 
   test('previous and next follow the series by part, and the collection by date elsewhere', async ({ page }) => {
     await page.goto('/notes/preserving-v1/');
-    await expect(page.locator('.series-line')).toContainText('Part 1 of 2 in the series rebuilding khaylub com');
+    await expect(page.locator('.series-line')).toContainText('Part 1 of 2 in the series Rebuilding khaylub com');
     await expect(page.locator('.prev-next a[rel="next"]')).toHaveAttribute('href', '/notes/the-16-mb-front-door/');
     await expect(page.locator('.prev-next a[rel="prev"]')).toHaveCount(0);
     await page.goto('/notes/the-16-mb-front-door/');

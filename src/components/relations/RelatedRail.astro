@@ -20,7 +20,10 @@ const rail = await relatedRail(entry.data.slug);
         {rail.map((r) => (
           <li>
             <ArtifactCard entry={r.node.entry} showCollection>
-              <span class="small muted why">{r.why}</span>
+              <span class="small muted why">
+                <span class="visually-hidden">Why related: </span>
+                {r.why}
+              </span>
             </ArtifactCard>
           </li>
         ))}

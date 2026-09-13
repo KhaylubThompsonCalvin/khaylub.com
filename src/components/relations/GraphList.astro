@@ -59,7 +59,7 @@ const groups = COLLECTIONS.map((c) => ({ ...c, nodes: g.nodes.filter((n) => n.co
     ))
   }
   <p class="small muted">
-    {g.nodes.length} items, {edges.length} relations (curated and wikilinks), {unlinked.length} not yet connected.
+    {g.nodes.length} items, {new Set(edges.map((e) => `${e.from}>${e.to}`)).size} relations (curated and wikilinks, counted once per pair), {unlinked.length} not yet connected.
     Shared skills and tags also count on each page's "Related work" rail but are not drawn here.
   </p>
 </div>

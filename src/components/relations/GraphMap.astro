@@ -23,7 +23,7 @@ for (const e of edges) {
 const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
 ---
 
-<figure class="graph-map">
+<figure class="graph-map" tabindex="0" aria-label="Map of the relationships, scrolls sideways on narrow screens">
   <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="group" aria-label="Map of the relationships between the library's items; every node is a link">
     {
       [...pairs.values()].map(({ a, b }) => {
@@ -62,8 +62,15 @@ const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
     margin: var(--space-2) 0 0;
     overflow-x: auto;
   }
+  /* The scrolling region is itself focusable so a keyboard can scroll the drawing. */
+  .graph-map:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  /* Natural size inside a horizontally scrolling figure: shrinking the drawing to a phone's width
+     (the site's global svg rule) would make every label unreadable. */
   .graph-map svg {
-    max-width: 100%;
+    max-width: none;
     height: auto;
     font-family: var(--font-body);
     font-size: 13px;

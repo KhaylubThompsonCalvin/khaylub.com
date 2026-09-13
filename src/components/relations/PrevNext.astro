@@ -2,14 +2,14 @@
 // Previous and next (FR-E4, W15): within a series by part, otherwise within the collection by date,
 // oldest first; destination titles spelled out.
 import { prevNext } from '@lib/graph';
-import { collectionLabel, type AnyEntry } from '@lib/catalog';
+import { collectionLabel, seriesLabel, type AnyEntry } from '@lib/catalog';
 
 interface Props {
   entry: AnyEntry;
 }
 const { entry } = Astro.props;
 const seq = await prevNext(entry.data.slug);
-const scope = seq.series ? `the series ${seq.series.name.replace(/-/g, ' ')}` : collectionLabel(entry.collection);
+const scope = seq.series ? `the series ${seriesLabel(seq.series.name)}` : collectionLabel(entry.collection);
 ---
 
 {
@@ -17,13 +17,13 @@ const scope = seq.series ? `the series ${seq.series.name.replace(/-/g, ' ')}` : 
     <nav class="prev-next" aria-label="Previous and next">
       {seq.prev && (
         <a rel="prev" href={seq.prev.route}>
-          <span class="small muted">Previous in {scope}</span>
+          <span class="small muted">Previous in {scope}<span class="visually-hidden">:</span></span>
           <span class="title">{seq.prev.title}</span>
         </a>
       )}
       {seq.next && (
         <a rel="next" href={seq.next.route} class="next">
-          <span class="small muted">Next in {scope}</span>
+          <span class="small muted">Next in {scope}<span class="visually-hidden">:</span></span>
           <span class="title">{seq.next.title}</span>
         </a>
       )}

@@ -3,7 +3,7 @@
 // sentence when declared, the facts (outcome, technologies, proof links), and the data facts list.
 import Badge from './Badge.astro';
 import ProjectFacts from './ProjectFacts.astro';
-import { badgeFor, collectionLabel, type AnyEntry } from '@lib/catalog';
+import { badgeFor, collectionLabel, seriesLabel, type AnyEntry } from '@lib/catalog';
 import { prevNext } from '@lib/graph';
 
 interface Props {
@@ -27,7 +27,7 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   {
     seq.series && (
       <p class="series-line small muted">
-        Part {seq.series.part} of {seq.series.total} in the series {seriesRoute ? <a href={seriesRoute}>{seq.series.name.replace(/-/g, ' ')}</a> : seq.series.name.replace(/-/g, ' ')}
+        Part {seq.series.part} of {seq.series.total} in the series {seriesRoute ? <a href={seriesRoute}>{seriesLabel(seq.series.name)}</a> : seriesLabel(seq.series.name)}
       </p>
     )
   }
