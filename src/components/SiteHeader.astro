@@ -36,11 +36,12 @@ const id = identity();
     font-size: 1.125rem;
     text-decoration: none;
     padding: 0.5rem 0;
-    white-space: nowrap;
+    line-height: 1.2;
     min-width: 0;
     flex: 1 1 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* The name wraps rather than truncates: no content is lost at any width or text spacing
+       (WCAG 1.4.12); at 390 px it still fits on one line. */
+    overflow-wrap: anywhere;
   }
   .navbar > :global(nav) {
     flex: 0 0 auto;

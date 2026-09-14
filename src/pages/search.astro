@@ -51,7 +51,8 @@ const tags = await termPages('tags');
     font: inherit;
     color: var(--ink);
     background: var(--card);
-    border: 1px solid var(--line);
+    /* The border is the field's only boundary, so it needs 3:1 (WCAG 1.4.11); --line is decorative. */
+    border: 1px solid var(--muted);
     border-radius: var(--radius-sm);
   }
   #search-status {
