@@ -41,6 +41,7 @@ test.describe('SEO and metadata', () => {
   }
 
   test('every artifact page carries its own Open Graph card and og:type article', async ({ request }) => {
+    let artifacts = 0;
     for (const route of builtRoutes()) {
       const html = await (await request.get(route)).text();
       const isArtifact = /"@type":"BreadcrumbList"/.test(html) && /<article class="artifact"/.test(html);
@@ -48,7 +49,9 @@ test.describe('SEO and metadata', () => {
       const image = html.match(/property="og:image" content="([^"]+)"/)?.[1] ?? '';
       expect(image, route).toMatch(/^https:\/\/khaylub\.com\/og\/[a-z]+\/[a-z0-9-]+\.png$/);
       expect(html, route).toMatch(/property="og:type" content="article"/);
+      artifacts++;
     }
+    expect(artifacts, 'artifact pages found').toBeGreaterThan(5);
   });
 
   test('the validation script over dist reports zero errors', ({}, testInfo) => {

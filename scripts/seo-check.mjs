@@ -16,8 +16,10 @@ const OG_HEIGHT = 630;
 const OG_MAX_BYTES = 300 * 1024;
 const TITLE_MAX = 60;
 
-// Properties a record must carry, by type: Google's required fields where a rich result exists
-// (Article, Dataset, VideoObject, BreadcrumbList), schema.org basics elsewhere.
+// Properties a record must carry, by type. This is the site's own rule and it is stricter than
+// Google's required sets (Dataset: name, description; VideoObject: name, thumbnailUrl, uploadDate;
+// Article: none required, headline and dates recommended): every work names, describes, dates,
+// and attributes itself, and an article carries its headline.
 const REQUIRED = {
   Person: ['name', 'url'],
   WebSite: ['name', 'url'],
@@ -25,8 +27,8 @@ const REQUIRED = {
   BreadcrumbList: ['itemListElement'],
   SoftwareSourceCode: ['name', 'description', 'url', 'datePublished', 'author'],
   Dataset: ['name', 'description', 'url', 'datePublished'],
-  Article: ['name', 'description', 'url', 'datePublished', 'author'],
-  BlogPosting: ['name', 'description', 'url', 'datePublished', 'author'],
+  Article: ['name', 'headline', 'description', 'url', 'datePublished', 'author'],
+  BlogPosting: ['name', 'headline', 'description', 'url', 'datePublished', 'author'],
   MusicRecording: ['name', 'url', 'datePublished'],
   VideoObject: ['name', 'description', 'url', 'thumbnailUrl', 'uploadDate'],
   ImageObject: ['name', 'url', 'contentUrl'],
@@ -79,7 +81,7 @@ export function checkDist(root = 'dist') {
     for (const key of ['og:type', 'og:site_name', 'og:url', 'og:title', 'og:description', 'og:image', 'og:image:width', 'og:image:height', 'og:image:alt']) {
       if (meta(html, 'property', key) === undefined) err(`${key} missing`);
     }
-    for (const key of ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image']) {
+    for (const key of ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image', 'twitter:image:alt']) {
       if (meta(html, 'name', key) === undefined) err(`${key} missing`);
     }
     if (!notFound && meta(html, 'property', 'og:url') !== expectedCanonical) err('og:url differs from the canonical');

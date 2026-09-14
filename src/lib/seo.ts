@@ -62,6 +62,8 @@ export function creativeWork(entry: AnyEntry, path: string, media: MediaFacts = 
       ...termLabels('technologies', data.technologies),
     ].join(', '),
   };
+  // Article and BlogPosting name their headline (schema.org's property for the title of an article).
+  if (record['@type'] === 'Article' || record['@type'] === 'BlogPosting') record.headline = data.title;
   if (data.updated) record.dateModified = data.updated.toISOString().slice(0, 10);
   if (entry.collection === 'projects' && data.links?.code) record.codeRepository = data.links.code;
   if (entry.collection === 'data' && data.repository) record.isBasedOn = data.repository;

@@ -32,7 +32,8 @@ export function wrapTitle(title: string, perLine: number, max: number): string[]
   if (line) lines.push(line);
   if (lines.length > max) {
     const kept = lines.slice(0, max);
-    kept[max - 1] = kept[max - 1].replace(/\s+\S*$/, '') + ' ...';
+    const last = kept[max - 1];
+    kept[max - 1] = (last.includes(' ') ? last.replace(/\s+\S*$/, '') : last.slice(0, Math.max(1, perLine - 4))) + ' ...';
     return kept;
   }
   return lines;
@@ -40,8 +41,10 @@ export function wrapTitle(title: string, perLine: number, max: number): string[]
 
 /** The title card: kicker (collection and site), the title wrapped, an accent rule. */
 export async function ogCard(opts: { title: string; kicker: string; site: string }): Promise<Buffer> {
-  const lines = wrapTitle(opts.title, 30, 3);
-  const size = lines.length > 2 ? 60 : 68;
+  // 24 characters per line: at 64 px a fallback serif about a fifth wider than Georgia (the CI
+  // runner has no Georgia) still fits the 1040 px of text width, so no line runs off the card.
+  const lines = wrapTitle(opts.title, 24, 3);
+  const size = lines.length > 2 ? 56 : 64;
   const lineHeight = size * 1.15;
   const top = 250 - ((lines.length - 1) * lineHeight) / 2;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}">
