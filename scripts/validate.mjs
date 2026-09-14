@@ -30,7 +30,7 @@ function walk(dir, exts) {
 }
 
 const textExts = ['.md', '.mdx', '.yaml', '.yml', '.astro', '.ts', '.tsx', '.mjs', '.js', '.css', '.html', '.json', '.txt', '.xml'];
-const sources = [...walk('content', textExts), ...walk('src', textExts), ...walk('public', ['.txt', '.html', '.svg', '.json'])];
+const sources = [...walk('content', textExts), ...walk('src', textExts), ...walk('public', ['.txt', '.html', '.svg', '.json']), ...(existsSync('docs') ? walk('docs', ['.md']) : [])];
 const built = hasDist ? walk('dist', ['.html', '.txt', '.xml', '.json']) : [];
 const everything = [...sources, ...built];
 
