@@ -9,7 +9,7 @@ import { TEMPLATES } from './helpers';
 // the screen-reader pass) is the manual checklist in the phase checkpoint.
 
 const NAV = ['Work', 'Projects', 'Data', 'Field Notes', 'Library', 'About', 'Contact', 'Résumé', 'Search'];
-const FOCUSABLE = 'a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'a[href], button, input, select, textarea, summary, video[controls], audio[controls], [tabindex]:not([tabindex="-1"])';
 // WCAG 1.4.12 text spacing, as the common bookmarklet applies it.
 const SPACING = 'body, body * { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
 
@@ -20,15 +20,22 @@ test.describe('keyboard and focus', () => {
       await page.keyboard.press('Tab');
       await expect(page.locator(':focus')).toHaveText('Skip to main content');
       // A real Tab walk through the whole page: every stop shows an indicator and is not covered by
-      // the sticky header; the walk ends when focus leaves the document (no trap) or the budget of
-      // presses is spent (a trap would spin on the same few elements).
-      const budget = (await page.locator(FOCUSABLE).count()) + 10;
-      const stops: { text: string; noRing: boolean; covered: boolean }[] = [];
+      // the sticky header; the walk must leave the document before the budget of presses is spent
+      // (a trap would spin on the same few elements) and must have visited every visible focusable
+      // element on the way. Native players consume several presses inside their own controls.
+      const expected = await page.evaluate((sel) => {
+        const els = [...document.querySelectorAll<HTMLElement>(sel)].filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('details:not([open]) :not(summary)'));
+        els.forEach((e, n) => e.setAttribute('data-walk', String(n)));
+        return els.length;
+      }, FOCUSABLE);
+      const budget = expected + 40;
+      const stops: { text: string; noRing: boolean; covered: boolean; walk: string | null }[] = [];
       const seen = new Set<string>();
+      let finished = false;
       for (let i = 0; i < budget; i++) {
         const stop = await page.evaluate((i) => {
           const e = document.activeElement as HTMLElement | null;
-          if (!e || e === document.body) return null;
+          if (!e || e === document.body || e === document.documentElement) return null;
           const cs = getComputedStyle(e);
           const ring = (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== 'none';
           const headerEl = document.querySelector('header.site-header') as HTMLElement;
@@ -39,13 +46,19 @@ test.describe('keyboard and focus', () => {
           const overlay = cs.position === 'fixed' || cs.position === 'absolute';
           const underHeader = stuck && !overlay && !headerEl.contains(e) && r.top < header.bottom && r.bottom > header.top && r.top >= 0;
           const key = `${e.tagName}:${(e as HTMLAnchorElement).href ?? ''}:${e.textContent?.trim().slice(0, 30)}:${i}`;
-          return { key, text: (e.textContent ?? e.getAttribute('aria-label') ?? e.tagName).trim().slice(0, 40), noRing: !ring, covered: underHeader };
+          return { key, text: (e.textContent ?? e.getAttribute('aria-label') ?? e.tagName).trim().slice(0, 40), noRing: !ring, covered: underHeader, walk: e.getAttribute('data-walk') };
         }, i);
-        if (!stop) break;
+        if (!stop) {
+          finished = i > 0;
+          break;
+        }
         stops.push(stop);
         seen.add(stop.key.replace(/:\d+$/, ''));
         await page.keyboard.press('Tab');
       }
+      expect(finished, 'the walk leaves the document: no focus trap').toBe(true);
+      const visited = new Set(stops.map((s) => s.walk).filter((w) => w !== null));
+      expect(visited.size, `every visible focusable element is reached by Tab (${expected} expected)`).toBe(expected);
       expect(seen.size, 'the walk reaches more than the skip link and the nav').toBeGreaterThan(5);
       expect(stops.filter((s) => s.noRing).map((s) => s.text), 'focus indicator on every stop').toEqual([]);
       expect(stops.filter((s) => s.covered).map((s) => s.text), 'no focused element under the sticky header').toEqual([]);
@@ -83,6 +96,8 @@ test.describe('reduced motion and text spacing', () => {
       await page.goto(path);
       await page.addStyleTag({ content: SPACING });
       await page.waitForTimeout(100);
+      // The injection must have taken effect (an enforced CSP would block it and make the test vacuous).
+      expect(await page.evaluate(() => parseFloat(getComputedStyle(document.body).letterSpacing)), 'spacing applied').toBeGreaterThan(1.5);
       const [scrollWidth, inner] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
       expect(scrollWidth, 'no horizontal scroll with spacing applied').toBeLessThanOrEqual(inner);
       // Text clipped by a box that hides overflow (fixed-height labels, badges, buttons).

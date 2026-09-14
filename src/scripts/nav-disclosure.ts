@@ -5,6 +5,8 @@ function setup(): void {
   const button = document.getElementById('primary-nav-button');
   const list = document.getElementById('primary-nav-list');
   if (!button || !list) return;
+  // Only now does the list become a disclosure; without this script it stays a visible list.
+  button.closest('nav')?.setAttribute('data-js', 'true');
 
   const setOpen = (open: boolean): void => {
     button.setAttribute('aria-expanded', String(open));

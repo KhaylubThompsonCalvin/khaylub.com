@@ -12,7 +12,7 @@ import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
 import { mediaForJsonLd } from '@lib/media';
-import TableOfContents from '@components/TableOfContents.astro';
+import TableOfContents, { TOC_MIN_HEADINGS } from '@components/TableOfContents.astro';
 import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
@@ -59,9 +59,13 @@ const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcru
     <MediaBlock entry={entry} />
 
     <div class="layout">
-      <aside class="side" data-pagefind-ignore>
-        <TableOfContents headings={headings} />
-      </aside>
+      {
+        headings.filter((h) => h.depth === 2).length >= TOC_MIN_HEADINGS && (
+          <aside class="side" data-pagefind-ignore>
+            <TableOfContents headings={headings} />
+          </aside>
+        )
+      }
       <div class="body measure-reading">
         <Content />
       </div>

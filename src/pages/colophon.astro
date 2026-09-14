@@ -20,20 +20,21 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     <h2 id="accessibility">Accessibility statement</h2>
     <p>
       The target is <strong>WCAG 2.2 level AA</strong> on every page of this site, in the light and
-      the dark palette, from 320 pixels wide upward. Every page has a skip link, one heading per
-      page in order, landmarks, a visible focus ring, targets of at least 24 pixels (44 on primary
-      actions), text that reflows and can be spaced or zoomed to 200 percent without loss, reduced
-      motion honored, and no content that moves or plays on its own.
+      the dark palette, from 320 pixels wide upward. Every page has a skip link, one level-one
+      heading with the rest in order, landmarks, a visible focus ring, targets of at least 24 pixels
+      (44 on primary actions), text that reflows down to 320 pixels (a laptop at 200 percent zoom)
+      and can be spaced without loss, reduced motion honored, and no content that moves or plays on
+      its own outside the climb, which you open yourself and can leave with its skip control.
     </p>
     <h3>How it is checked</h3>
     <ul>
       <li>axe-core (WCAG 2.2 A and AA rules and best practices) on every template in both palettes, and Lighthouse accessibility, on every change; zero violations is the gate.</li>
       <li>A keyboard walk of every template on every change: focus order, focus visibility, nothing under the sticky header, no traps, the disclosure menu and the players.</li>
-      <li>A manual pass per template (keyboard, zoom, text spacing, reading order with styles off, the accessibility tree) recorded in the project's checkpoint, and a screen-reader pass with NVDA on Windows signed by the site owner.</li>
+      <li>Before each accessibility phase closes, a manual pass per template (keyboard, zoom, text spacing, reading order with styles off, the accessibility tree) and a screen-reader pass with NVDA on Windows, recorded in the project's planning notes and signed by the site owner.</li>
     </ul>
     <h3>Known limitations</h3>
     <ul>
-      <li>The climb, the original 3D experience, needs WebGL and loads only when you ask for it. It has a skip control that returns you to the page, honors reduced motion, and carries its content in text as well, but the scene itself is visual.</li>
+      <li>The climb, the original 3D experience, needs WebGL and loads only when you ask for it. Once open, the scene animates and its silent background plates loop until you skip it; it has a skip control that returns you to the page, honors reduced motion (plates paused, text solid), and carries its content in text as well, but the scene itself is visual.</li>
       <li>Video and audio are native players with the browser's own controls; the one published recording has no speech and therefore no captions.</li>
       <li>The relationship map on the graph page is an optional drawing behind a disclosure; the list above it carries the same information.</li>
     </ul>

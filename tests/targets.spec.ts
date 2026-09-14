@@ -41,7 +41,7 @@ test.describe('targets and overflow', () => {
       await page.goto(path);
       // Inline links inside running text are exempt (the inline exception); everything else counts.
       const short = await page
-        .locator('a:visible:not(p a):not(dd a):not(li p a):not(figcaption a), button:visible, input:visible, summary:visible')
+        .locator('a:visible:not(p a):not(dd a):not(figcaption a), button:visible, input:visible, summary:visible')
         .evaluateAll((els) => els.filter((e) => e.getClientRects().length && Math.min(e.getBoundingClientRect().height, e.getBoundingClientRect().width) < 24).map((e) => e.textContent?.trim().slice(0, 40)));
       expect(short, path).toEqual([]);
     }
