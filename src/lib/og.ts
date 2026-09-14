@@ -46,7 +46,9 @@ export async function ogCard(opts: { title: string; kicker: string; site: string
   const lines = wrapTitle(opts.title, 24, 3);
   const size = lines.length > 2 ? 56 : 64;
   const lineHeight = size * 1.15;
-  const top = 250 - ((lines.length - 1) * lineHeight) / 2;
+  // The first baseline sits below the kicker (baseline 170) whatever the line count; three lines
+  // at 56 px end near 400, well above the site name at 560.
+  const top = 262;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}">
   <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${BG}"/>
   <rect x="80" y="112" width="120" height="6" fill="${ACCENT}"/>
