@@ -83,7 +83,7 @@ try {
   rmSync(dashTarget, { force: true });
 }
 const dashOutput = `${dash.stdout}\n${dash.stderr}`;
-if (dash.status === 0 || !/em dash \(U\+2014\) in content\/notes\/zz-em-dash\.md/.test(dashOutput)) {
+if (dash.status === 0 || !/em dash \(U\+2014\) in content[\\/]notes[\\/]zz-em-dash\.md/.test(dashOutput)) {
   console.error('FAIL: validate did not reject the em dash.\n' + dashOutput.slice(-1500));
   process.exit(1);
 }
