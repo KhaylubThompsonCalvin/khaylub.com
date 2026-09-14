@@ -42,6 +42,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 | `scripts/` | `validate.mjs`, `banned-terms.txt`, the header server, the invalid-fixture check |
 | `tests/` | Playwright suites: a11y, headers, security, seo, js-off, nav, home, resume, targets, content |
 | `.claude/` | project settings and the verification guard hook |
+| `docs/` | `RUNBOOK.md`: staging, the V1 exhibit, the timed rehearsal, cutover (Phase 21), rollback; owner-executed |
 
 ## Design authority
 

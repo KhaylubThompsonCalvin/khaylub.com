@@ -15,6 +15,7 @@
     "check": "astro check",
     "validate": "node scripts/validate.mjs",
     "serve:headers": "node scripts/serve-with-headers.mjs",
+    "headers:scan": "node scripts/headers-scan.mjs",
     "test": "playwright test",
     "test:report": "playwright show-report",
     "lhci": "npx --yes @lhci/cli@0.15.1 autorun",
