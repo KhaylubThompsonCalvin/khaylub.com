@@ -123,3 +123,5 @@ jobs:
         with:
           args: --no-progress --root-dir "${{ github.workspace }}/dist" "dist/**/*.html"
           fail: false
+      - name: Dependency audit (weekly repeat of the per-push gate)
+        run: npm audit --audit-level=high
