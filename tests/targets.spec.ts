@@ -35,6 +35,18 @@ test.describe('targets and overflow', () => {
     }
   });
 
+  test('every control on every template meets the 24 px floor at 390 px (WCAG 2.5.8)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const path of TEMPLATES) {
+      await page.goto(path);
+      // Inline links inside running text are exempt (the inline exception); everything else counts.
+      const short = await page
+        .locator('a:visible:not(p a):not(dd a):not(li p a):not(figcaption a), button:visible, input:visible, summary:visible')
+        .evaluateAll((els) => els.filter((e) => e.getClientRects().length && Math.min(e.getBoundingClientRect().height, e.getBoundingClientRect().width) < 24).map((e) => e.textContent?.trim().slice(0, 40)));
+      expect(short, path).toEqual([]);
+    }
+  });
+
   test('body text is at least 16 px', async ({ page }) => {
     await page.goto('/');
     const size = await page.locator('main p:not(.eyebrow):not(.small)').first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize));

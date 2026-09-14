@@ -23,6 +23,19 @@ test.describe('structure', () => {
     expect(await page.evaluate(() => location.hash)).toBe('#main');
   });
 
+  test('the colophon carries the accessibility statement: target, checks, limitations, feedback, review date', async ({ page }) => {
+    await page.goto('/colophon/');
+    const section = page.locator('#accessibility');
+    await expect(section).toHaveText('Accessibility statement');
+    const article = page.locator('article');
+    await expect(article).toContainText('WCAG 2.2 level AA');
+    for (const h of ['How it is checked', 'Known limitations', 'Feedback']) await expect(article.getByRole('heading', { name: h })).toHaveCount(1);
+    await expect(article.locator('a[href="/contact/"]')).toHaveCount(1);
+    expect(await article.locator('time[datetime]').getAttribute('datetime')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    // The footer names the statement on every page.
+    await expect(page.locator('footer a[href="/colophon/"]')).toHaveText(/accessibility/i);
+  });
+
   test('every built route has a unique title and a description', async ({ request }) => {
     const titles = new Map<string, string>();
     for (const route of builtRoutes()) {
