@@ -38,6 +38,17 @@ const links = [
       ))
     }
   </ul>
+  <noscript>
+    <ul class="nav-list-static">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </noscript>
 </nav>
 
 <script src="../scripts/nav-disclosure.ts"></script>
@@ -46,12 +57,7 @@ const links = [
   .primary-nav {
     position: relative;
   }
-  /* Without JavaScript the list is a plain, visible list and the button is absent; the script marks
-     the nav with data-js and the disclosure takes over (progressive enhancement, no dead menu). */
   .menu-btn {
-    display: none;
-  }
-  .primary-nav[data-js] .menu-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -70,11 +76,6 @@ const links = [
     border-color: var(--ink);
   }
   .nav-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .primary-nav[data-js] .nav-list {
     display: none;
     position: absolute;
     right: 0;
@@ -89,8 +90,23 @@ const links = [
     box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
     z-index: 50;
   }
-  .primary-nav[data-js] .nav-list[data-open='true'] {
+  .nav-list[data-open='true'] {
     display: block;
+  }
+  /* Without JavaScript the disclosure cannot open, so a plain list of the same links renders in
+     its place (inside noscript, so it never reaches a browser that runs the script). */
+  .nav-list-static {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-list-static a {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.75rem 0.25rem;
   }
   .nav-list a {
     display: block;
@@ -116,12 +132,11 @@ const links = [
   }
   @media (min-width: 1024px) {
     .menu-btn,
-    .primary-nav[data-js] .menu-btn {
+    .nav-list-static {
       display: none;
     }
     .nav-list,
-    .primary-nav[data-js] .nav-list,
-    .primary-nav[data-js] .nav-list[data-open='true'] {
+    .nav-list[data-open='true'] {
       display: flex;
       position: static;
       min-width: 0;
