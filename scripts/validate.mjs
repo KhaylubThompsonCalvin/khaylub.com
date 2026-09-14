@@ -8,6 +8,7 @@ import { join, extname, relative } from 'node:path';
 import { load } from 'js-yaml';
 import matter from 'gray-matter';
 import { unresolvedWikilinks } from '../src/lib/wikilinks.mjs';
+import { checkDist } from './seo-check.mjs';
 
 const failures = [];
 const warnings = [];
@@ -226,6 +227,13 @@ for (const file of walk('content', ['.md'])) {
 for (const { file, slug } of relatedRefs) {
   if (!artifactSlugs.has(slug)) fail(`related slug "${slug}" in ${file} names no artifact`);
 }
+// 10c. SEO and metadata over the built output (T13, SEO-1 to SEO-8): scripts/seo-check.mjs.
+if (hasDist) {
+  const seo = checkDist('dist');
+  for (const e of seo.errors) fail(`seo: ${e}`);
+  for (const w of seo.warnings) warnings.push(`seo: ${w}`);
+}
+
 // 10b. Wikilinks in bodies (ADR-006, FR-E1): every [[slug]] names a visible artifact or page.
 //      Production ignores drafts as targets and as sources; a preview build (PUBLIC_SITE_ENV=preview)
 //      renders drafts and may link to them.

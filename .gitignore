@@ -30,6 +30,7 @@ Thumbs.db
 .claude/verify-stamp.json
 CLAUDE.local.md
 build-report.json
+seo-report.json
 
 # Playwright MCP session snapshots and evidence screenshots (copied to the vault)
 .playwright-mcp/
