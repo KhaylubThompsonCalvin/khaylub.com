@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname, normalize } from 'node:path';
 import { load } from 'js-yaml';
+import { headersFor as declaredHeaders } from './render-paths.mjs';
 
 const port = Number(process.argv[2] || process.env.PORT || 4173);
 const preview = process.argv.includes('--preview') || process.env.PUBLIC_SITE_ENV === 'preview';
@@ -39,19 +40,10 @@ const types = {
   '.map': 'application/json',
 };
 
-// Render-style glob: "*" is matched here as any run of characters, including "/", so a rule such as
-// /*.glb also covers /climb/wanderer-web.glb; render.yaml names the nested folders explicitly too.
-function matches(pattern, path) {
-  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-  const regex = '^' + escaped.replace(/\*/g, '.*') + '$';
-  return new RegExp(regex).test(path);
-}
-
+// Path matching as Render documents it (scripts/render-paths.mjs): a single "*" never crosses a
+// slash, "**" does, a trailing "/*" covers the subtree. Later rules win when two name one header.
 function headersFor(path) {
-  const out = {};
-  for (const rule of headerRules) {
-    if (matches(rule.path, path)) out[rule.name] = rule.value; // later, more specific rules win
-  }
+  const out = declaredHeaders(headerRules, path);
   if (preview) out['X-Robots-Tag'] = 'noindex, nofollow';
   return out;
 }

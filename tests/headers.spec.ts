@@ -42,5 +42,11 @@ test.describe('headers from render.yaml', () => {
     // The climb's models and plates are media: one week, like every other media file.
     expect((await request.get('/climb/wanderer-web.glb')).headers()['cache-control']).toMatch(/max-age=604800/);
     expect((await request.get('/climb/dawn-grass.mp4')).headers()['cache-control']).toMatch(/max-age=604800/);
+    // The climb page itself is HTML, not media.
+    expect((await request.get('/climb/')).headers()['cache-control']).toBe('no-cache');
+    // The generated Open Graph cards live three levels deep, where a top-level /*.png rule never reaches.
+    expect((await request.get('/og/projects/khaylub-com-v1.png')).headers()['cache-control']).toMatch(/max-age=604800/);
+    expect((await request.get('/sitemap-index.xml')).headers()['cache-control']).toMatch(/max-age=3600/);
+    expect((await request.get('/.well-known/security.txt')).headers()['cache-control']).toMatch(/max-age=3600/);
   });
 });
