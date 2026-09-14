@@ -4,7 +4,10 @@
 // same rules. Only the headers render.yaml declares are compared; extra headers a host adds are
 // ignored. Redirects are never followed, so a run never leaves the origin it was given.
 // Usage: node scripts/headers-scan.mjs <base-url> [--preview]
-//   --preview also expects X-Robots-Tag: noindex, nofollow (what a preview build must carry).
+//   --preview also expects X-Robots-Tag: noindex, nofollow. That header is what the local header
+//   server adds in preview mode; render.yaml declares no such rule (a host cannot vary headers by
+//   build), so against a host the flag is not used: a preview build proves itself by its robots.txt
+//   (Disallow: /) and its meta noindex, which the build-preview CI job checks.
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { load } from 'js-yaml';
@@ -54,7 +57,7 @@ export async function scan(base, { preview = false, rules } = {}) {
   const origin = new URL(base);
   const headerRules = rules ?? load(readFileSync('render.yaml', 'utf8')).services[0].headers;
   const paths = [...PATHS];
-  const home = await fetch(new URL('/', origin), { redirect: 'manual' }).then((r) => r.text()).catch(() => '');
+  const home = await fetch(new URL('/', origin), { redirect: 'manual', signal: AbortSignal.timeout(15_000) }).then((r) => r.text()).catch(() => '');
   const css = home.match(/href="(\/_astro\/[^"]+\.css)"/);
   if (css) paths.splice(1, 0, css[1]);
   const lines = [];

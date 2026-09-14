@@ -28,18 +28,20 @@ the security requirements (document 23, P2-SEC-01 to P2-SEC-04), the V1 audit (d
 Facts the repository already fixes (`render.yaml`, the Blueprint): service `khaylub-com-v2`, static
 site, build `npm ci && npm run build`, publish `dist`, Node `22.14.0`, pull-request previews
 enabled, four redirects, the security headers, the CSP Report-Only policy with the climb and search
-exceptions, the cache tiers. Render keeps dashboard rules not listed in the Blueprint; do not add
-any so the repository stays the only source of truth.
+exceptions, the cache tiers. Render keeps dashboard rules not listed in the Blueprint (document 15
+section 3, from Render's Blueprint documentation as read on 2026-09-07); do not add any so the
+repository stays the only source of truth.
 
 1. **Owner:** in the Render dashboard, New, Blueprint, connect the `khaylub.com` repository
    (GitHub), branch `main`. Render reads `render.yaml` and proposes the service; confirm the fields
    above match. Approve the creation. (CLAUDE.md: creating a Render service is the owner's action.)
 2. **Owner:** wait for the first deploy; open the default URL Render assigns
    (`<service>.onrender.com`). HTTPS is automatic. This URL is the staging host per ADR-005 and
-   decision D-14. A branded `v2.khaylub.com` is optional at $0.25 per month (Render's third custom
-   domain on the free workspace; the two free ones are reserved for `khaylub.com` and `www` at
-   Phase 21). If chosen, add it under Custom Domains and create the CNAME at Namecheap as Render
-   instructs; record it below.
+   decision D-14. A branded `v2.khaylub.com` is optional: the free workspace includes two custom
+   domains, reserved for `khaylub.com` and `www` at Phase 21, and each further domain is $0.25 per
+   month (document 15 section 3, from Render's static-sites pricing page as read on 2026-09-07;
+   re-check the page before choosing). If chosen, add it under Custom Domains and create the
+   CNAME at Namecheap as Render instructs; record it below.
 3. **Owner:** open a throwaway pull request (any docs-only change) and record the preview URL
    Render creates and its pattern; close the pull request and confirm Render deletes the preview.
 4. **Owner:** read the workspace billing page (bandwidth and pipeline minutes) and record the
@@ -53,6 +55,7 @@ any so the repository stays the only source of truth.
 | First deploy id and date | |
 | Preview URL pattern (from step 3) | |
 | Preview deleted on close (yes/no) | |
+| Preview response carries `X-Robots-Tag` (document 15 section 4 expects noindex on preview hosts; unverified until read here) | |
 | Billing allowances read (bandwidth, pipeline minutes) | |
 | Dashboard rules present beyond the Blueprint (must be none) | |
 
@@ -60,7 +63,10 @@ Staging indexing: the default `onrender.com` staging serves the production build
 allows). Search engines can find it. Two options, record the choice: (a) accept it until cutover
 (the canonical tags point at `https://khaylub.com`, so duplicates resolve to production), or (b)
 set `PUBLIC_SITE_ENV=preview` on the service so staging serves the preview build (`Disallow: /`,
-`noindex`, no sitemap) and switch it off at Phase 21. Option (b) is the safer default.
+`noindex`, no sitemap) and switch it off at Phase 21. Know what a preview build also does: it
+renders draft artifacts and tolerates unresolved wikilinks (flagged in place) where the production
+build refuses them, so staging under option (b) is not byte-for-byte the production build; section
+6 step 3 switches it off and rescans before cutover. Option (b) is the safer default for indexing.
 
 | Staging indexing choice | |
 |---|---|
@@ -74,15 +80,19 @@ set `PUBLIC_SITE_ENV=preview` on the service so staging serves the preview build
    npm run headers:scan -- https://<staging-url>
    ```
 
-   Expected: `scanned 13 paths, 0 mismatches, 0 errors`. With option (b) above add `--preview`
-   (expects `X-Robots-Tag: noindex, nofollow`). A mismatch means Render applied a rule
-   differently from the local header server; record the line and fix `render.yaml` by pull
-   request, never in the dashboard.
+   Expected: `scanned 13 paths, 0 mismatches, 0 errors`, with or without option (b): the headers
+   come from `render.yaml` and do not vary by build. (The scan's `--preview` flag expects the
+   `X-Robots-Tag` header that only the local header server adds; do not use it against a host.)
+   With option (b), also confirm `https://<staging-url>/robots.txt` reads `Disallow: /` and the
+   home page's source carries `<meta name="robots" content="noindex, nofollow">`. A mismatch
+   means Render applied a rule differently from the local header server; record the line and fix
+   `render.yaml` by pull request, never in the dashboard.
 2. Report-Only log: in a browser with the console open, visit Home, press "Enter the climb",
    visit `/climb/` and `/search/` and run a search. Expected: no `Content-Security-Policy-Report-Only`
    violation in the console. Any violation is a defect in the policy or the page; record it.
-3. `https://securityheaders.com/?q=<staging-url>` (document 23 names it for Phase 19). Record the
-   grade and any header it flags.
+3. `https://securityheaders.com/?q=<staging-url>` (document 23 names it for Phase 19). This sends
+   the staging URL to a third-party scanner; the site itself still makes zero third-party
+   requests. Record the grade and any header it flags.
 4. Lighthouse on the public URL (the throttled reports are archived from Phase 15; this is the
    public-URL run) and WebPageTest (the Phase 15 archive item deferred to this phase): record the
    result URLs.
