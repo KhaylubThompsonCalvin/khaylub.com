@@ -95,19 +95,20 @@ if (existsSync('dist/index.html')) {
   // Sweep copies an interrupted run left behind, then make a fresh one.
   for (const name of readdirSync(tmpdir())) if (name.startsWith('khaylub-seo-proof-')) rmSync(join(tmpdir(), name), { recursive: true, force: true });
   const copy = mkdtempSync(join(tmpdir(), 'khaylub-seo-proof-'));
+  let seo;
   try {
     cpSync('dist', copy, { recursive: true });
     const home = join(copy, 'index.html');
     writeFileSync(home, readFileSync(home, 'utf8').replace(/<meta property="og:image:alt" content="[^"]*"\s*\/?>/, ''));
-    const seo = checkDist(copy);
-    if (!seo.errors.some((e) => /^\/: og:image:alt missing/.test(e))) {
-      console.error('FAIL: the SEO check did not reject a page without og:image:alt.\n' + seo.errors.slice(0, 5).join('\n'));
-      process.exit(1);
-    }
-    console.log('PASS: the SEO check rejects a page without og:image:alt.');
+    seo = checkDist(copy);
   } finally {
-    rmSync(copy, { recursive: true, force: true });
+    rmSync(copy, { recursive: true, force: true }); // process.exit skips finally, so the verdict comes after the cleanup
   }
+  if (!seo.errors.some((e) => /^\/: og:image:alt missing/.test(e))) {
+    console.error('FAIL: the SEO check did not reject a page without og:image:alt.\n' + seo.errors.slice(0, 5).join('\n'));
+    process.exit(1);
+  }
+  console.log('PASS: the SEO check rejects a page without og:image:alt.');
 } else {
   console.log('SKIP: dist/ absent, the SEO proof runs after the build.');
 }
