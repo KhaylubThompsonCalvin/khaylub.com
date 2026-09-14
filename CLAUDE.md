@@ -171,6 +171,13 @@ line is an assertion in `lighthouserc.json` pinned to `budget.json` by `tests/bu
 Lighthouse in a three-shard job (`scripts/lhci-shard.mjs`); every template scores 100 with every line
 green. Two facts to keep in mind: the full local guard now carries about 24 minutes of Lighthouse (26
 templates, five runs, sequential), and the WebPageTest public-URL archive is deferred to Phase 19 by the
-owner's decision because V2 has no public URL yet. Phase 16 (Accessibility) is the next gated phase and
-is NOT opened; it opens only on the owner's instruction through `/phase 16`.
+owner's decision because V2 has no public URL yet. Phase 16 (Accessibility) is ACCEPTED and CLOSED: the
+owner recorded "Phase 16 PASS" on 2026-09-14 after reviewing and merging PR #29, completing the seven NVDA
+journeys, and deciding that the remaining template rows are accepted on their automated and manual
+browser-walk evidence. The WCAG 2.2 AA checklist runs as tests on every template (`tests/keyboard.spec.ts`,
+`tests/a11y.spec.ts` at every impact in both palettes, `tests/targets.spec.ts`), the accessibility statement
+is on `/colophon/`, and the primary nav has a `noscript` list. Non-blocking notes for the owner: the
+contents nav sits on the left (W5), the climb's contact-link hover colour is about 4.4:1, and vault
+document 29 states `--line` at 3.1:1 where it measures 1.40:1. Phase 17 (SEO and metadata) is the next
+gated phase and is NOT opened; it opens only on the owner's instruction through `/phase 17`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
