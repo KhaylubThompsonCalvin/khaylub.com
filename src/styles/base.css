@@ -93,6 +93,21 @@ a:hover {
   outline-offset: 3px;
 }
 
+/* A link that stands alone in a list item is its own target (WCAG 2.5.8): 24 px tall wherever
+   it appears, from the search fallback lists to the graph. Links inside running text are exempt. */
+li > a {
+  display: inline-block;
+  min-height: 24px;
+  padding: 0.125rem 0;
+}
+
+/* Native players keep focus inside their own controls; the ring still shows around the player. */
+video:focus-within,
+audio:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
 small,
 .small {
   font-size: var(--size-sm);

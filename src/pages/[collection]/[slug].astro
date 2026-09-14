@@ -12,7 +12,7 @@ import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
 import { mediaForJsonLd } from '@lib/media';
-import TableOfContents from '@components/TableOfContents.astro';
+import TableOfContents, { TOC_MIN_HEADINGS } from '@components/TableOfContents.astro';
 import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
@@ -59,12 +59,16 @@ const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcru
     <MediaBlock entry={entry} />
 
     <div class="layout">
+      {
+        headings.filter((h) => h.depth === 2).length >= TOC_MIN_HEADINGS && (
+          <aside class="side" data-pagefind-ignore>
+            <TableOfContents headings={headings} />
+          </aside>
+        )
+      }
       <div class="body measure-reading">
         <Content />
       </div>
-      <aside class="side" data-pagefind-ignore>
-        <TableOfContents headings={headings} />
-      </aside>
     </div>
 
     <footer class="artifact-footer measure-reading" data-pagefind-ignore>
@@ -103,11 +107,11 @@ const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcru
 </BaseLayout>
 
 <style>
-  /* Body column with the contents nav beside it from 1024 px (W5); stacked below, nav first in
-     reading order would push the text down, so the aside follows the body on small screens. */
+  /* The contents nav precedes the body in the DOM, on screen, and in the tab order (W5 draws
+     "On this page" first; WCAG 1.3.2 and 2.4.3): stacked below 1024 px, beside the body above it. */
   .layout {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: var(--space-3);
   }
   @media (min-width: 1024px) {

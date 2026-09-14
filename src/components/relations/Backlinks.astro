@@ -30,4 +30,10 @@ const links = await backlinksFor(entry.data.slug);
   .backlinks {
     margin-top: var(--space-3);
   }
+  /* Each backlink is its own target (WCAG 2.5.8, 24 px). */
+  .backlinks li a {
+    display: inline-block;
+    min-height: 24px;
+    padding: 0.125rem 0;
+  }
 </style>

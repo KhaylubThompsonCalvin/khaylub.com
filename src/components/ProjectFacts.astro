@@ -48,6 +48,7 @@ const outcome: string | undefined = data.outcome ?? (compact && entry.collection
         {links.map((l) => (
           <a class:list={['btn', { 'btn-small': compact }]} href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
             {l.label}
+            <span class="visually-hidden"> for {entry.data.title}</span>
           </a>
         ))}
       </p>
@@ -68,6 +69,11 @@ const outcome: string | undefined = data.outcome ?? (compact && entry.collection
     margin: 0;
   }
   /* Proof links stay clickable above the card's full-surface title link (its ::after overlay). */
+  /* The card's whole-surface link sits under the facts; the technology links must stay clickable. */
+  .tech {
+    position: relative;
+    z-index: 1;
+  }
   .proof {
     display: flex;
     flex-wrap: wrap;

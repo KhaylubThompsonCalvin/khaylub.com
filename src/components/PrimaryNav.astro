@@ -38,6 +38,17 @@ const links = [
       ))
     }
   </ul>
+  <noscript>
+    <ul class="nav-list-static">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </noscript>
 </nav>
 
 <script src="../scripts/nav-disclosure.ts"></script>
@@ -54,7 +65,8 @@ const links = [
     min-height: 44px;
     padding: 0 0.75rem;
     background: transparent;
-    border: 1px solid var(--line);
+    /* The border is the button's boundary: 3:1 (WCAG 1.4.11), like the search field. */
+    border: 1px solid var(--muted);
     border-radius: var(--radius-sm);
     color: var(--ink);
     font: inherit;
@@ -81,6 +93,21 @@ const links = [
   .nav-list[data-open='true'] {
     display: block;
   }
+  /* Without JavaScript the disclosure cannot open, so a plain list of the same links renders in
+     its place (inside noscript, so it never reaches a browser that runs the script). */
+  .nav-list-static {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-list-static a {
+    display: inline-block;
+    min-height: 44px;
+    padding: 0.75rem 0.25rem;
+  }
   .nav-list a {
     display: block;
     padding: 0.75rem 0.75rem;
@@ -93,8 +120,10 @@ const links = [
   .nav-list a:hover {
     background: color-mix(in srgb, var(--ink) 6%, transparent);
   }
+  /* The current page is a state, not decoration: ink underline plus weight (1.4.11, 1.4.1). */
   .nav-list a[aria-current='page'] {
-    border-bottom-color: var(--accent);
+    border-bottom-color: var(--ink);
+    font-weight: 600;
   }
   .utility {
     border-top: 1px solid var(--line);
@@ -102,7 +131,8 @@ const links = [
     padding-top: 0.25rem;
   }
   @media (min-width: 1024px) {
-    .menu-btn {
+    .menu-btn,
+    .nav-list-static {
       display: none;
     }
     .nav-list,

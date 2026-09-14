@@ -49,4 +49,10 @@ const { kind, items, idPrefix } = Astro.props;
     font-weight: 600;
     min-width: 12rem;
   }
+  /* Every link is its own target (WCAG 2.5.8, 24 px): the labels and the comma-separated proofs. */
+  .evidence a {
+    display: inline-block;
+    min-height: 24px;
+    padding: 0.125rem 0;
+  }
 </style>
