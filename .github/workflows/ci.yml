@@ -26,12 +26,12 @@ jobs:
         run: npm run check
       - name: Validation (banned terms, em dashes, paths, provenance, featured set, redirects)
         run: npm run validate
-      - name: Invalid artifact must fail the build
-        run: node scripts/check-build-fails-on-invalid.mjs
       - name: Build (production)
         run: npm run build
       - name: Validation against the built output
         run: npm run validate
+      - name: Deliberate breaks must fail (invalid frontmatter, dangling related, unresolved wikilink, em dash, missing og:image:alt)
+        run: node scripts/check-build-fails-on-invalid.mjs
       - name: Build report (pages, evidence, integrity, index size)
         run: npm run report
       - name: HTML validity
