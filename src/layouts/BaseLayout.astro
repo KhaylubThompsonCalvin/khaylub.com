@@ -17,11 +17,15 @@ interface Props {
   fullBleed?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogImage?: string;
+  /** The image's alt text (og:image:alt); the default card is the site's wordmark. */
+  ogImageAlt?: string;
+  /** website for pages, article for artifacts. */
+  ogType?: 'website' | 'article';
   /** A per-collection feed advertised in addition to the site feeds. */
   feed?: { href: string; title: string };
 }
 
-const { title, description, current, fullBleed = false, jsonLd, ogImage, feed } = Astro.props;
+const { title, description, current, fullBleed = false, jsonLd, ogImage, ogImageAlt, ogType = 'website', feed } = Astro.props;
 const id = identity();
 const site = 'https://khaylub.com';
 const path = Astro.url.pathname;
@@ -29,6 +33,7 @@ const canonical = new URL(path, site).href;
 const fullTitle = path === '/' ? `${id.name} | ${id.site_name}` : `${title} | ${id.site_name}`;
 const preview = isPreview();
 const image = new URL(ogImage ?? '/og-default.png', site).href;
+const imageAlt = ogImageAlt ?? `${id.site_name}, ${id.name}`;
 // Every page carries at least a WebPage record; artifact pages pass richer records.
 const structured = jsonLd ?? {
   '@context': 'https://schema.org',
@@ -50,16 +55,20 @@ const structured = jsonLd ?? {
     <link rel="canonical" href={canonical} />
     {preview && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#e9e1d6" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={id.site_name} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={`${id.site_name} feed`} href="/feed.xml" />

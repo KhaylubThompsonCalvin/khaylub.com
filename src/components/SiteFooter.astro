@@ -10,8 +10,9 @@ const year = new Date().getUTCFullYear();
   <div class="container">
     <ul class="footer-links">
       <li><a href={`mailto:${id.email}`}>Email</a></li>
-      <li><a href={id.github} rel="noopener noreferrer">GitHub</a></li>
-      <li><a href={id.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
+      {/* rel="me" ties the profiles to this site (SEO-6). */}
+      <li><a href={id.github} rel="me noopener noreferrer">GitHub</a></li>
+      <li><a href={id.linkedin} rel="me noopener noreferrer">LinkedIn</a></li>
       <li><a href={resume.pdf}>Résumé (PDF)</a></li>
       <li><a href="/climb/">The climb</a></li>
       <li><a href="/feed.xml">Feed (RSS)</a></li>

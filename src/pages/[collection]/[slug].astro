@@ -12,6 +12,8 @@ import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
 import { mediaForJsonLd } from '@lib/media';
+import { ogAlt } from '@lib/og';
+import { identity } from '@lib/profile';
 import TableOfContents, { TOC_MIN_HEADINGS } from '@components/TableOfContents.astro';
 import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
@@ -38,9 +40,12 @@ const trail = [
   { name: data.title, path },
 ];
 const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcrumbs(trail)];
+// The artifact's own Open Graph card (SEO-3), built by src/pages/og/[collection]/[slug].png.ts.
+const ogImage = `/og/${entry.collection}/${data.slug}.png`;
+const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
 ---
 
-<BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
+<BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} ogImage={ogImage} ogImageAlt={ogImageAlt} ogType="article" feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
   <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}`}>
     <div data-pagefind-ignore>
       <Breadcrumb trail={trail} />
