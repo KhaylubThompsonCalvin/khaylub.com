@@ -187,6 +187,13 @@ every page declares its image dimensions and alt, the footer carries `rel="me"`,
 `scripts/seo-check.mjs` validates the metadata of every built page inside `npm run validate`. Deferred by
 the owner's decision: the public social-card debugger runs (Phase 19, when a public URL exists); the V1
 exhibit's `noindex` (D-09) and Search Console (SEO-10) follow at Phases 19 to 21. Phase 18 (Automated
-testing) is the next gated phase and is NOT opened; it opens only on the owner's instruction through
-`/phase 18`.
+testing) is ACCEPTED and CLOSED: the owner recorded "Phase 18 PASS" on 2026-09-14 after reviewing and
+merging PR #33 and accepting the CI demonstration record. The weekly CI job repeats `npm audit`,
+`scripts/check-build-fails-on-invalid.mjs` proves five refusals in CI after every build (invalid
+frontmatter, a dangling `related` slug, an unresolved wikilink, an em dash, a missing `og:image:alt`), and
+the thirteen deliberate-failure demonstrations (three refused by the commit guard, ten failing CI at the
+targeted step, every demonstration branch deleted, nothing merged) are preserved as verification evidence
+in the vault checkpoint of 2026-09-14. Not applicable yet: the notebook job (no notebook exists) and the
+catalog check (ADR-003 deferred). Phase 19 (Deployment and staging) is the next gated phase and is NOT
+opened; it opens only on the owner's instruction through `/phase 19`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
