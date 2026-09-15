@@ -22,6 +22,11 @@ the security requirements (document 23, P2-SEC-01 to P2-SEC-04), the V1 audit (d
   `legacy/v1-3d-experiment`) stays frozen; the exhibit is built from the tag.
 - The Content Security Policy stays Report-Only until cutover; section 8 is the switch, executed
   only after a clean staging log and the owner's go, by pull request.
+- Automation first (owner decision, 2026-09-15): every check that a script can reproduce is run by
+  the script named in the step, from a clone at the deployed commit, and its output is the record.
+  The owner's own actions are only account authorisation, DNS and domain changes, provider
+  decisions, acceptance, and visual judgement where no script can establish the requirement. Each
+  step below is marked AUTOMATED, OWNER, or EXTERNAL (a third-party service with no key-free API).
 
 ## 1. Staging on Render (Owner)
 
@@ -127,29 +132,65 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
    - `Strict-Transport-Security` never mismatches on Render's own domain: Render serves its
      stronger value (`max-age=315360000; includeSubdomains; preload`; `onrender.com` is on the
      HSTS preload list) and the scan accepts any value at least as strong as the declared floor.
-2. Report-Only log: in a browser with the console open, visit Home, press "Enter the climb",
-   visit `/climb/` and `/search/` and run a search. Expected: no `Content-Security-Policy-Report-Only`
-   violation in the console. Any violation is a defect in the policy or the page; record it.
-3. `https://securityheaders.com/?q=<staging-url>` (document 23 names it for Phase 19). This sends
-   the staging URL to a third-party scanner; the site itself still makes zero third-party
-   requests. Record the grade and any header it flags.
-4. Lighthouse on the public URL (the throttled reports are archived from Phase 15; this is the
-   public-URL run) and WebPageTest (the Phase 15 archive item deferred to this phase): record the
-   result URLs.
-5. Social-card debuggers on five pages (the Phase 17 item deferred to this phase): Home, Work, the
-   V1 case study, the Fuel Economy data page, the Climb recording. Record the render result of
-   each.
-6. Rich Results Test on the public URL for the same five pages (the Phase 17 run used the built
-   HTML; this is the URL run). Record the result.
+2. AUTOMATED. The browser walk in a real Chromium against the deployed origin:
+
+   ```
+   npm run staging:verify -- https://<staging-url> --preview --out staging-verify-desktop.json
+   npm run staging:verify -- https://<staging-url> --preview --mobile --out staging-verify-mobile.json
+   ```
+
+   (drop `--preview` when the host serves the production build). It loads every template route
+   and fails on a non-200 or a console error; collects every Content-Security-Policy report-only
+   violation per page (the `securitypolicyviolation` event and the console) and fails on any,
+   quoting the policy the page was served under; types "climb" into search and requires results
+   (Pagefind's WebAssembly under the `/search/*` policy); presses "Enter the climb" and requires
+   zero scene bytes before the press and a model request after it; checks the indexing state
+   (`Disallow: /`, the noindex meta, the banner, and no sitemap for the preview build) and labels
+   a sitemap the build does not produce but the host still serves as a stale file from a previous
+   deploy; and checks the five Open Graph cards of step 5 (tags present, the image a 1200 by 630
+   PNG). Expected: `... 0 failure(s)`. Any `FAIL` line is the record; a policy violation that
+   quotes the generic policy on `/`, `/climb/`, or `/search/` is the host serving the page without
+   its path rule (the provider defect of the header scan above), not a policy error.
+3. EXTERNAL, owner. `https://securityheaders.com/?q=<staging-url>` (document 23 names it for
+   Phase 19; no key-free API). This sends the staging URL to a third-party scanner; the site itself
+   still makes zero third-party requests. Record the grade and any header it flags. An enforced
+   `Content-Security-Policy` shows as missing until section 8 runs; that is by design.
+4. AUTOMATED (Lighthouse) and EXTERNAL (WebPageTest). Lighthouse on the public URL with exactly the
+   Phase 15 profile and assertions of `lighthouserc.json` (mobile, five runs, the median, every
+   budget line), the raw reports into the evidence folder:
+
+   ```
+   npm run lhci:staging -- https://<staging-url> <evidence-folder>/lighthouse-staging
+   ```
+
+   On the preview build, `categories.seo` and `is-crawlable` fail by design (the page is blocked
+   from indexing); every other assertion must pass. Record the four scores per page and every
+   failing audit by name. WebPageTest (the Phase 15 archive item deferred to this phase) runs
+   non-interactively only with an API key: a keyless request to its API answers "missing API key.
+   If you do not have an API key you can purchase one here: https://product.webpagetest.org/api"
+   (read 2026-09-15). **Owner:** either provide a key as the environment variable `WPT_API_KEY`
+   (never committed; `npx webpagetest test <url> -k $WPT_API_KEY --location <mobile location>`,
+   then record the result URL and the first-view LCP, CLS, TBT, and total bytes), or run the test in
+   the WebPageTest web form and record the same; or decide the Lighthouse public-URL run stands in
+   for it and record that decision.
+5. AUTOMATED (the cards) and EXTERNAL, owner (the debuggers). The five cards of the Phase 17 item
+   (Home, Work, the V1 case study, the Fuel Economy data page, the Climb recording) are checked by
+   step 2's script: tags present and the image served as a 1200 by 630 PNG. The third-party
+   debuggers (the Facebook Sharing Debugger, the LinkedIn Post Inspector) need a signed-in
+   account and show the rendered card; **Owner:** run them if the visual rendering is wanted as
+   evidence, or record that the automated tag and image check stands in for them.
+6. EXTERNAL, owner. Rich Results Test on the public URL for the same five pages (the Phase 17 run
+   used the built HTML; this is the URL run; Google offers no key-free API). Record the result.
+   The preview build's noindex does not stop the tool from testing the page.
 
 | Record | Value |
 |---|---|
 | Scan output (paste the summary line; must read 0 mismatches, 0 errors, 0 inconsistent) | |
-| Report-Only console: violations (must be none) | |
+| `staging:verify` summary lines, desktop and mobile (must read 0 failure(s); a stale-file line is recorded, not accepted) | |
 | securityheaders.com grade | |
-| Lighthouse public-URL report | |
-| WebPageTest result | |
-| Card debugger results (five pages) | |
+| Lighthouse public-URL scores per page and failing audits (`lhci:staging`) | |
+| WebPageTest result URL and first-view LCP, CLS, TBT, bytes (or the owner's stand-in decision) | |
+| Card debugger results (five pages), or the stand-in decision | |
 | Rich Results (five pages) | |
 
 ## 3. The V1 exhibit at v1.khaylub.com (Owner, in the V1 repository)
@@ -202,30 +243,47 @@ a branch, a pull request, a `v1.0.x` tag).
    enforce HTTPS after the certificate is issued.
 4. **Owner:** at Namecheap, add `v1` CNAME to `<github-username>.github.io` (the value GitHub
    shows on the Pages page). TTL 300 for the rehearsal period.
-5. **Owner:** verify the served build is the tagged one: the live `assets/index-*.js` filename and
-   size match the build from the tag (the audit recorded `index-fyrvR9f9.js`, 1,101,249 bytes, for
-   the frozen commit; a `v1.0.1` tag with the meta change rebuilds the same bundle unless the
-   toolchain changed, so record the new name and size too), and `docs/V1_PRESERVATION.md` in the V1
-   repository is updated with them.
-6. Header scan against the exhibit: `npm run headers:scan -- https://v1.khaylub.com` **will report
-   mismatches by design** (GitHub Pages sets no custom headers); run it to record what the exhibit
-   serves, and note in the record that the exhibit's headers are a known, accepted gap (document 15
-   section 3, H3).
+5. AUTOMATED. Verify the served build is the tagged one:
+
+   ```
+   npm run staging:verify -- https://v1.khaylub.com --exhibit
+   ```
+
+   prints the status, the title, the served `assets/index-*.js` bundle name and byte size, whether
+   the noindex meta and the canonical link are present, and the HSTS header. The audit recorded
+   `index-fyrvR9f9.js`, 1,101,249 bytes, for the frozen commit (the live V1 site served exactly
+   that on 2026-09-15); a `v1.0.1` tag with the meta change rebuilds the same bundle unless the
+   toolchain changed, so record the name and size the exhibit serves. **Owner:** update
+   `docs/V1_PRESERVATION.md` in the V1 repository with them.
+6. AUTOMATED. Header scan against the exhibit: `npm run headers:scan -- https://v1.khaylub.com`
+   **will report mismatches by design** (GitHub Pages sets no custom headers); run it to record what
+   the exhibit serves, and note in the record that the exhibit's headers are a known, accepted gap
+   (document 15 section 3, H3).
 
 | Record | Value |
 |---|---|
 | V1 tag that built the exhibit | |
 | Workflow run URL | |
 | `v1.khaylub.com` live (date, HTTPS enforced) | |
-| Bundle name and size served | |
-| `noindex` and canonical present (view source) | |
+| `staging:verify --exhibit` line (bundle name and size, noindex, canonical) | |
 | Scan output against the exhibit (mismatches expected) | |
 
 ## 4. The rollback rehearsal, timed (Owner)
 
 Purpose: prove the two rollback routes of section 7 and capture Render's exact behaviour when a
 domain moves between services (document 15 marks it UNVERIFIED). Use a throwaway subdomain, never
-the apex or `www`.
+the apex or `www`. The DNS and Render domain actions are the owner's; the timing is AUTOMATED:
+before step 1, start the watcher in a terminal and leave it running through step 5:
+
+```
+node scripts/rehearsal-watch.mjs rehearsal.khaylub.com --minutes 60
+```
+
+It polls the hostname every five seconds and prints a timestamped line at every change of the
+answering site (V1, V2 by the headers `render.yaml` declares, a status, or unreachable) with the
+seconds since the previous state; paste its output into the table and the record. Keep your own
+note of the moment each dashboard or DNS action was made, so the table shows action time and
+observed time.
 
 1. **Owner:** at Namecheap, create `rehearsal` CNAME to the V1 service (`khaylub-portfolio.onrender.com`),
    TTL 300. Wait for resolution (`nslookup rehearsal.khaylub.com`).
@@ -239,7 +297,7 @@ the apex or `www`.
    V1, switch the CNAME back. Confirm the V1 site. Stop the clock: this is the rollback.
 5. **Owner:** delete the `rehearsal` record and remove the domain from both services.
 
-| Step | Started (UTC) | Finished (UTC) | Minutes | Notes (exact Render prompt in step 3) |
+| Step | Action made (UTC, owner) | Observed by the watcher (UTC) | Minutes | Notes (exact Render prompt in step 3) |
 |---|---|---|---|---|
 | 2. Domain on V1, certificate issued | | | | |
 | 3. Move to V2 (forward) | | | | |
@@ -252,19 +310,22 @@ Improvisation log (any action not written above; each is a runbook defect to fix
 |---|---|---|
 | | | |
 
-## 5. The uptime check (Owner)
+## 5. The uptime check (AUTOMATED, in this repository)
 
-Per document 15 section 7: email alerts on production and the V1 subdomain. Any free monitor with
-HTTP checks and email alerts is acceptable; it must not be embedded in the site (zero third-party
-requests). Configure two checks now (staging until Phase 21, then production) and one for
-`v1.khaylub.com`; interval 5 minutes; alert on two consecutive failures.
+Per document 15 section 7: alerts on production and the V1 subdomain, from nothing embedded in the
+site (zero third-party requests). `.github/workflows/uptime.yml` fetches each listed site every
+thirty minutes and fails the run if any answer is not 200; a failed run notifies the repository
+owner by email through GitHub's default workflow notifications. It lists staging now; the
+production URL is added at the Phase 21 cutover and `v1.khaylub.com` when the exhibit is live
+(each a docs-and-config pull request). **Owner:** after the workflow merges, run it once from the
+Actions tab ("Run workflow") and record the run; confirm the GitHub notification setting that
+emails failed workflow runs is on for this repository.
 
 | Record | Value |
 |---|---|
-| Monitor service | |
-| Check 1 URL (staging now; `https://khaylub.com` after Phase 21) | |
-| Check 2 URL (`https://v1.khaylub.com`) | |
-| Alert email confirmed (test alert received, date) | |
+| First manual run (URL, result) | |
+| Failure email setting confirmed (date) | |
+| URLs listed (staging; production after Phase 21; the exhibit when live) | |
 
 ## 6. Cutover (Phase 21; carried here, not executed in Phase 19)
 

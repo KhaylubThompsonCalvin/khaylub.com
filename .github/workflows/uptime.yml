@@ -1,0 +1,29 @@
+# Uptime check (runbook section 5): every thirty minutes, fetch each site once and fail the run if
+# any answer is not 200. A failed run notifies the repository owner by email through GitHub's
+# default workflow notifications; no third-party monitor and no request from the site itself.
+# The production URL is added at the Phase 21 cutover; the V1 exhibit when it is live.
+name: Uptime
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Each site answers 200
+        run: |
+          set -u
+          failed=0
+          for url in "https://khaylub-com-v2.onrender.com/"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url")
+            echo "$url -> $code"
+            if [ "$code" != "200" ]; then failed=1; fi
+          done
+          exit $failed
