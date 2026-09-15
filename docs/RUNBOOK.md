@@ -342,7 +342,9 @@ Pre-cutover (Phase 21, before any date is set):
   build, and Render keeps files a new build no longer contains, so a draft page served once there
   would stay served. **Owner:** in the Render dashboard, approve the Blueprint sync if Render asks,
   confirm the new service exists with the Blueprint's fields, and record its `onrender.com` URL.
-  Add nothing by hand.
+  Add nothing by hand. Before merging, confirm in the staging service's Environment tab that
+  `PUBLIC_SITE_ENV` reads exactly `preview`: the Blueprint now declares that value for `khaylub-com-v2`
+  and the sync takes ownership of it; a different dashboard value would be overwritten and redeployed.
 - P2. AUTOMATED. Production readiness on the new service's `onrender.com` URL:
 
   ```
@@ -366,7 +368,7 @@ Pre-cutover (Phase 21, before any date is set):
 1. T-7 days (or as soon as the pre-cutover items are done): verify domain ownership in Google
    Search Console for `khaylub.com` and the V1 subdomain (optional before launch; SEO-10 follows).
 2. T-2 days: **Owner:** at Namecheap, record the current apex and `www` records exactly as shown
-   (the rollback state; on 2026-09-15 DNS resolved the apex to A `216.24.57.1` and `www` to CNAME
+   (the rollback state; an `nslookup` on 2026-09-15, recorded in the Phase 21 checkpoint section 5, resolved the apex to A `216.24.57.1` and `www` to CNAME
    `khaylub-portfolio.onrender.com`), then lower their TTL to 300 seconds.
 3. T-1 day: the rehearsal (section 4, timed by the watcher); confirm `v1.khaylub.com` serves the
    tagged build (P4); rerun P2 on the production service.
