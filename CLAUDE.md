@@ -205,8 +205,13 @@ rules intermittently (three Cache-Control tiers and the `/search/` policy on sta
 unresolved provider risk for Phase 19 only with a support case open; CSP stays Report-Only; the
 `v1.khaylub.com` exhibit and the timed rollback rehearsal are carried to Phase 21 as required before
 cutover, not waived; production must be a fresh Render service from the Blueprint, verified to expose
-no draft content, with the live DNS recorded first and the owner's explicit go. Phase 20 (Acceptance
-testing) is the next gated phase and is NOT opened; it opens only on the owner's instruction through
-`/phase 20`; the owner waived its three-outsider review on 2026-09-15 in favour of owner acceptance over
-the existing evidence.
+no draft content, with the live DNS recorded first and the owner's explicit go.
+Phase 20 (Acceptance testing) is ACCEPTED and CLOSED with documented exceptions: the owner recorded
+"PHASE 20 PASS" on 2026-09-15 over the acceptance report assembled from the existing evidence (67 Must
+requirements: 62 proven; P2-FE-12, P2-FE-14, P2-CE-04, and P2-SEC-07 accepted as post-launch follow-up,
+not completed and not passed; CSP enforcement deferred; the three-outsider review waived; Journeys 1 and 2
+accepted on the existing automated, accessibility, staging, and owner evidence; nothing fabricated; no
+repository change). Phase 21 (Production cutover) is the next gated phase and is NOT opened; it opens only
+on the owner's instruction through `/phase 21`. Its required-before-cutover items stand as recorded under
+Phase 19 above, and the Phase 20 post-launch backlog lives in the vault report.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
