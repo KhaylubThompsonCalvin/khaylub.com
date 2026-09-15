@@ -93,14 +93,34 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
      Render's documented matching is in `scripts/render-paths.mjs`: a single `*` never crosses a
      slash, `**` does, a trailing `/*` covers a subtree, and an exact rule for a non-root directory
      path (`/climb/`) never matched on staging, so section paths are subtree rules.
-   - `INCONSISTENT`: the same path answered differently across the samples. That is the host
-     applying its rules on some requests only, not a rule defect. It was observed on the first
-     staging deploy (2026-09-14: every path-specific rule applied on about half of the requests,
-     the `/*` rules on all). Redeploy once (merge the pending pull request, or "Manual Deploy" of
-     the latest commit) and scan again. If it persists, open the service's Headers tab and check
-     that every rule of `render.yaml` is listed once; then open a Render support ticket with the
-     scan output. The gate stays blocked until the scan is consistent: the cache and policy
-     requirements (documents 23, P2-SEC-01 to P2-SEC-04) hold only if every response carries them.
+   - `INCONSISTENT`, or a `MISMATCH` that no rule in `render.yaml` can produce: the host is not
+     serving the committed rule set, which is not a rule defect. Observed on 2026-09-14: on the
+     first deploy every path-specific rule applied on about half of the requests and the `/*`
+     rules on all; after the next deploy, responses still carried a header pair that only the
+     previous deploy's rules could produce, and the set of rules being applied changed over an
+     hour with no repository change (same result from Node, curl, and a browser over HTTP/2).
+     Do, in order:
+     1. **Owner:** open the service's **Headers** tab and compare it with `render.yaml`, rule by
+        rule (path, name, value, count). Render documents that a Blueprint sync "preserves any
+        existing header rules that are not included in the Blueprint file" (Blueprint
+        specification, read 2026-09-14), so every rule that a pull request removed or renamed
+        (for example `/climb/*` for Cache-Control, or `/climb/` and `/search/` for the policy)
+        is still there next to its replacement. Record the leftovers in the table below.
+     2. **Owner:** delete each leftover in the Headers tab (this is the one dashboard edit the
+        runbook allows: it restores the repository as the only source of truth; add or change
+        nothing). Redeploy once ("Manual Deploy", latest commit) and scan again with samples.
+     3. If the tab already matched the file, or the scan is still inconsistent after step 2,
+        open a Render support ticket with the scan output and the service name, and record the
+        ticket. The gate stays blocked until the scan is consistent: the cache and policy
+        requirements (documents 23, P2-SEC-01 to P2-SEC-04) hold only if every response carries
+        them, and Phase 21 must not move the domain onto a host that serves them intermittently.
+
+     Rule for every later change to `headers` or `routes` in `render.yaml`: after the merge,
+     the owner deletes the removed or renamed rules in the dashboard and scans again; Render does
+     not delete them for you.
+
+   | Headers-tab audit (date; rules listed; leftovers found; deleted; ticket) | |
+   |---|---|
    - `Strict-Transport-Security` never mismatches on Render's own domain: Render serves its
      stronger value (`max-age=315360000; includeSubdomains; preload`; `onrender.com` is on the
      HSTS preload list) and the scan accepts any value at least as strong as the declared floor.
