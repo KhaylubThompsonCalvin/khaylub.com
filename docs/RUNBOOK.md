@@ -77,16 +77,33 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
 
    ```
    npm ci
-   npm run headers:scan -- https://<staging-url>
+   npm run headers:scan -- https://<staging-url> --samples 5
    ```
 
-   Expected: `scanned 13 paths, 0 mismatches, 0 errors`, with or without option (b): the headers
-   come from `render.yaml` and do not vary by build. (The scan's `--preview` flag expects the
-   `X-Robots-Tag` header that only the local header server adds; do not use it against a host.)
-   With option (b), also confirm `https://<staging-url>/robots.txt` reads `Disallow: /` and the
-   home page's source carries `<meta name="robots" content="noindex, nofollow">`. A mismatch
-   means Render applied a rule differently from the local header server; record the line and fix
-   `render.yaml` by pull request, never in the dashboard.
+   Expected: `scanned 13 paths x 5 samples, 0 mismatches, 0 errors, 0 inconsistent`, with or
+   without option (b): the headers come from `render.yaml` and do not vary by build. (The scan's
+   `--preview` flag expects the `X-Robots-Tag` header that only the local header server adds; do
+   not use it against a host.) With option (b), also confirm `https://<staging-url>/robots.txt`
+   reads `Disallow: /` and the home page's source carries
+   `<meta name="robots" content="noindex, nofollow">`.
+
+   How to read a failure:
+   - `MISMATCH` on every sample of a path: Render applied a rule differently from the local
+     header server. Record the line and fix `render.yaml` by pull request, never in the dashboard.
+     Render's documented matching is in `scripts/render-paths.mjs`: a single `*` never crosses a
+     slash, `**` does, a trailing `/*` covers a subtree, and an exact rule for a non-root directory
+     path (`/climb/`) never matched on staging, so section paths are subtree rules.
+   - `INCONSISTENT`: the same path answered differently across the samples. That is the host
+     applying its rules on some requests only, not a rule defect. It was observed on the first
+     staging deploy (2026-09-14: every path-specific rule applied on about half of the requests,
+     the `/*` rules on all). Redeploy once (merge the pending pull request, or "Manual Deploy" of
+     the latest commit) and scan again. If it persists, open the service's Headers tab and check
+     that every rule of `render.yaml` is listed once; then open a Render support ticket with the
+     scan output. The gate stays blocked until the scan is consistent: the cache and policy
+     requirements (documents 23, P2-SEC-01 to P2-SEC-04) hold only if every response carries them.
+   - `Strict-Transport-Security` never mismatches on Render's own domain: Render serves its
+     stronger value (`max-age=315360000; includeSubdomains; preload`; `onrender.com` is on the
+     HSTS preload list) and the scan accepts any value at least as strong as the declared floor.
 2. Report-Only log: in a browser with the console open, visit Home, press "Enter the climb",
    visit `/climb/` and `/search/` and run a search. Expected: no `Content-Security-Policy-Report-Only`
    violation in the console. Any violation is a defect in the policy or the page; record it.
@@ -104,7 +121,7 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
 
 | Record | Value |
 |---|---|
-| Scan output (paste the summary line) | |
+| Scan output (paste the summary line; must read 0 mismatches, 0 errors, 0 inconsistent) | |
 | Report-Only console: violations (must be none) | |
 | securityheaders.com grade | |
 | Lighthouse public-URL report | |

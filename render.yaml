@@ -33,7 +33,9 @@ services:
         source: /library/map
         destination: /graph/
     headers:
-      # Security headers on every response
+      # Security headers on every response. Strict-Transport-Security is the floor: Render serves its
+      # own, stronger value on onrender.com (max-age=315360000; includeSubdomains; preload, observed
+      # 2026-09-14), and the header scan accepts any value at least as strong.
       - path: /*
         name: Strict-Transport-Security
         value: max-age=31536000; includeSubDomains
@@ -59,24 +61,31 @@ services:
         name: Content-Security-Policy-Report-Only
         value: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
       # The climb paths: the ported scene creates blob: URLs and decodes meshopt with WebAssembly.
+      # The root stays an exact rule; the two sections are subtree rules (/climb/*, /search/*) because
+      # on Render an exact rule for a non-root directory path never matched (staging, 2026-09-14).
       - path: /
         name: Content-Security-Policy-Report-Only
         value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
-      - path: /climb/
+      - path: /climb/*
         name: Content-Security-Policy-Report-Only
         value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
       # Search: Pagefind decodes its index with WebAssembly on /search/ (index files under /pagefind/).
-      - path: /search/
+      - path: /search/*
         name: Content-Security-Policy-Report-Only
         value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
-      # Cache tiers
+      # Cache tiers. Path rules follow Render's matching: a single "*" never crosses a slash, "**"
+      # does, a trailing "/*" covers a subtree (scripts/render-paths.mjs). No path matches two
+      # Cache-Control rules, so the result does not depend on the host's precedence.
       - path: /_astro/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
       - path: /*.html
         name: Cache-Control
         value: no-cache
-      - path: /*/
+      - path: /**/*.html
+        name: Cache-Control
+        value: no-cache
+      - path: /**/
         name: Cache-Control
         value: no-cache
       - path: /
@@ -100,12 +109,18 @@ services:
       - path: /*.glb
         name: Cache-Control
         value: public, max-age=604800
-      # The climb island's assets and self-hosted media folders, named explicitly in case the host
-      # matches * within one path segment only.
-      - path: /climb/*
+      # Nested assets need their own rules because /*.ext reaches top-level files only. The climb
+      # assets are named by extension so the /climb/ page itself keeps the HTML rule above.
+      - path: /climb/*.mp4
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /climb/*.glb
         name: Cache-Control
         value: public, max-age=604800
       - path: /media/*
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /og/*
         name: Cache-Control
         value: public, max-age=604800
       - path: /robots.txt
