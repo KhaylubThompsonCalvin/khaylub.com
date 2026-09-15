@@ -23,7 +23,9 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 - No runtime backend. No third-party requests (`budget.json` allows zero). No inline scripts or
   styles; `astro.config.mjs` keeps CSS external so the Content Security Policy stays strict.
 - Production target is a Render static site described by `render.yaml` (headers, cache tiers,
-  redirects). No Render service exists for V2 yet, and none is created from this repository.
+  redirects). Two Render static sites are declared there and created by the Blueprint sync: `khaylub-com`
+  (production, created at Phase 21, never deployed with the preview build) and `khaylub-com-v2` (staging,
+  the preview build, never production). The domain moves only at the Phase 21 gate on the owner's go.
   `scripts/serve-with-headers.mjs` applies the same headers locally so tests can assert them.
   This project is not on Vercel; Vercel skills and agents do not apply.
 

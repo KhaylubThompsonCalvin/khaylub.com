@@ -12,7 +12,8 @@ const preview = process.argv.includes('--preview') || process.env.PUBLIC_SITE_EN
 const root = 'dist';
 
 const blueprint = load(readFileSync('render.yaml', 'utf8'));
-const service = blueprint.services[0];
+// The production service (khaylub-com) is the policy the tests assert; the staging service carries the same rules.
+const service = blueprint.services.find((s) => s.name === 'khaylub-com') ?? blueprint.services[0];
 const headerRules = service.headers ?? [];
 const redirects = (service.routes ?? []).filter((r) => r.type === 'redirect');
 
