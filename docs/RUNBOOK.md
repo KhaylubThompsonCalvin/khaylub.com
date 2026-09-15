@@ -44,8 +44,9 @@ repository stays the only source of truth.
    CNAME at Namecheap as Render instructs; record it below.
 3. **Owner:** open a throwaway pull request (any docs-only change) and record the preview URL
    Render creates and its pattern; close the pull request and confirm Render deletes the preview.
-   Capture the URL before merging: a merged pull request loses its preview at once (the branch
-   `chore/phase-19-preview-proof` was opened for this on 2026-09-15 after PR #37 merged too early).
+   Capture the URL before merging: a merged pull request loses its preview at once (PR #38 proved
+   the automatic creation and the destruction on merge on 2026-09-15; the URL and its
+   `X-Robots-Tag` are captured from the next docs-only pull request, before it is merged).
 4. **Owner:** read the workspace billing page (bandwidth and pipeline minutes) and record the
    allowances; document 15 marks them UNVERIFIED.
 
