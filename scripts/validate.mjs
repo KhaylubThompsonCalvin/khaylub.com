@@ -127,6 +127,11 @@ for (const s of approved) if (!featured.includes(s)) fail(`approved featured slu
 // 6. Redirects in sync with render.yaml.
 const redirects = load(readFileSync('content/redirects.yaml', 'utf8')).redirects;
 const render = load(readFileSync('render.yaml', 'utf8'));
+// Every service in the Blueprint must carry the same redirects and headers (production and staging).
+for (const svc of render.services.slice(1)) {
+  if (JSON.stringify(svc.routes ?? []) !== JSON.stringify(render.services[0].routes ?? [])) fail(`render.yaml: service ${svc.name} routes differ from ${render.services[0].name}`);
+  if (JSON.stringify(svc.headers ?? []) !== JSON.stringify(render.services[0].headers ?? [])) fail(`render.yaml: service ${svc.name} headers differ from ${render.services[0].name}`);
+}
 const routes = (render.services[0].routes ?? []).filter((r) => r.type === 'redirect');
 for (const r of redirects) {
   if (!routes.some((x) => x.source === r.from && x.destination === r.to)) fail(`redirect ${r.from} -> ${r.to} missing from render.yaml`);

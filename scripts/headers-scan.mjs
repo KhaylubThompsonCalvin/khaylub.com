@@ -79,7 +79,8 @@ async function fetchHeaders(url) {
  */
 export async function scan(base, { preview = false, rules, samples = 1 } = {}) {
   const origin = new URL(base);
-  const headerRules = rules ?? load(readFileSync('render.yaml', 'utf8')).services[0].headers;
+  const services = load(readFileSync('render.yaml', 'utf8')).services;
+  const headerRules = rules ?? (services.find((s) => s.name === 'khaylub-com') ?? services[0]).headers;
   const paths = [...PATHS];
   const home = await fetch(new URL('/', origin), { redirect: 'manual', signal: AbortSignal.timeout(15_000) }).then((r) => r.text()).catch(() => '');
   const css = home.match(/href="(\/_astro\/[^"]+\.css)"/);

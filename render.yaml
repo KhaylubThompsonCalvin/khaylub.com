@@ -1,23 +1,37 @@
-# Render Blueprint for Khaylub.com V2. This file is committed as configuration only.
-# No Render service exists for V2 until the owner approves one (Phase 19). Until then the same
-# headers are applied by scripts/serve-with-headers.mjs so Playwright can assert them locally.
+# Render Blueprint for Khaylub.com V2: two static sites from one file, so the repository stays the only
+# source of truth for build, environment, headers, redirects, and previews.
+#
+#   khaylub-com     production: the production build (drafts refused, sitemap emitted, robots allows),
+#                   pull-request previews off. Created fresh by the Blueprint sync at Phase 21 and never
+#                   deployed with the preview build, because Render keeps files a new build no longer
+#                   contains (Phase 19 evidence): a service that once served drafts would keep them.
+#                   khaylub.com and www move here at the Phase 21 cutover, on the owner's go.
+#   khaylub-com-v2  staging: the preview build (PUBLIC_SITE_ENV=preview: drafts rendered, noindex,
+#                   Disallow, the banner), pull-request previews on. Never becomes production.
+#
+# The two services carry identical routes and headers; tests/headers-scan.spec.ts fails if they drift.
+# scripts/serve-with-headers.mjs applies the production service's rules locally so Playwright can assert
+# them; scripts/headers-scan.mjs compares a live host with them.
 #
 # Header policy (Phase 2, documents 23 and 31):
-#   CSP is Report-Only from the first preview and enforced before cutover; never unsafe-inline for
-#   scripts. The climb paths (/ and /climb/) allow blob: media and WebAssembly for the ported scene.
+#   CSP is Report-Only from the first preview and enforced only after the host delivers path rules
+#   reliably (Phase 19 exception) and the owner says go; never unsafe-inline for scripts. The climb paths
+#   (/ and /climb/) allow blob: media and WebAssembly for the ported scene.
 #   Cache tiers: hashed assets one year immutable, HTML no-cache, media one week, PDF one day,
 #   discovery files one hour.
 
 services:
   - type: web
-    name: khaylub-com-v2
+    name: khaylub-com
     runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
-    pullRequestPreviewsEnabled: true
+    pullRequestPreviewsEnabled: false
     envVars:
       - key: NODE_VERSION
         value: 22.14.0
+      - key: PUBLIC_SITE_ENV
+        value: production
     routes:
       # Redirects, kept in sync with content/redirects.yaml by scripts/check-redirects.mjs
       - type: redirect
@@ -54,8 +68,8 @@ services:
       - path: /*
         name: Cross-Origin-Opener-Policy
         value: same-origin
-      # Content Security Policy: Report-Only at Phase 9. Switch the name to Content-Security-Policy
-      # before cutover (Phase 19) once the report log is clean, and add upgrade-insecure-requests
+      # Content Security Policy: Report-Only. The switch to Content-Security-Policy is runbook section 8:
+      # after the host delivers path rules reliably and the report log is clean, add upgrade-insecure-requests
       # at that point (browsers ignore it in a report-only policy and log an error).
       - path: /*
         name: Content-Security-Policy-Report-Only
@@ -135,3 +149,133 @@ services:
       - path: /.well-known/security.txt
         name: Cache-Control
         value: public, max-age=3600
+
+  - type: web
+    name: khaylub-com-v2
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: PUBLIC_SITE_ENV
+        value: preview
+    routes:
+      # Redirects, kept in sync with content/redirects.yaml by scripts/check-redirects.mjs
+      - type: redirect
+        source: /work
+        destination: /work/
+      - type: redirect
+        source: /contact
+        destination: /contact/
+      - type: redirect
+        source: /resume.pdf
+        destination: /resume/Khaylub-Thompson-Calvin-Resume.pdf
+      - type: redirect
+        source: /library/map
+        destination: /graph/
+    headers:
+      # Security headers on every response. Strict-Transport-Security is the floor: Render serves its
+      # own, stronger value on onrender.com (max-age=315360000; includeSubdomains; preload, observed
+      # 2026-09-14), and the header scan accepts any value at least as strong.
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), browsing-topics=(), autoplay=(self)
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Cross-Origin-Opener-Policy
+        value: same-origin
+      # Content Security Policy: Report-Only. The switch to Content-Security-Policy is runbook section 8:
+      # after the host delivers path rules reliably and the report log is clean, add upgrade-insecure-requests
+      # at that point (browsers ignore it in a report-only policy and log an error).
+      - path: /*
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
+      # The climb paths: the ported scene creates blob: URLs and decodes meshopt with WebAssembly.
+      # The root stays an exact rule; the two sections are subtree rules (/climb/*, /search/*) because
+      # on Render an exact rule for a non-root directory path never matched (staging, 2026-09-14).
+      - path: /
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
+      - path: /climb/*
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; font-src 'self'; connect-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
+      # Search: Pagefind decodes its index with WebAssembly on /search/ (index files under /pagefind/).
+      - path: /search/*
+        name: Content-Security-Policy-Report-Only
+        value: "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
+      # Cache tiers. Path rules follow Render's matching: a single "*" never crosses a slash, "**"
+      # does, a trailing "/*" covers a subtree (scripts/render-paths.mjs). No path matches two
+      # Cache-Control rules, so the result does not depend on the host's precedence.
+      - path: /_astro/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*.html
+        name: Cache-Control
+        value: no-cache
+      - path: /**/*.html
+        name: Cache-Control
+        value: no-cache
+      - path: /**/
+        name: Cache-Control
+        value: no-cache
+      - path: /
+        name: Cache-Control
+        value: no-cache
+      - path: /resume/*.pdf
+        name: Cache-Control
+        value: public, max-age=86400
+      - path: /*.png
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.jpg
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.svg
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.mp4
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /*.glb
+        name: Cache-Control
+        value: public, max-age=604800
+      # Nested assets need their own rules because /*.ext reaches top-level files only. The climb
+      # assets are named by extension so the /climb/ page itself keeps the HTML rule above.
+      - path: /climb/*.mp4
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /climb/*.glb
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /media/*
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /og/*
+        name: Cache-Control
+        value: public, max-age=604800
+      - path: /robots.txt
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /sitemap-index.xml
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /sitemap-0.xml
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /.well-known/security.txt
+        name: Cache-Control
+        value: public, max-age=3600
+

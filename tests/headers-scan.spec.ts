@@ -117,3 +117,21 @@ test.describe('the header scan', () => {
     expect(run.stdout).toMatch(/MISMATCH +\/ +x-robots-tag/);
   });
 });
+
+test.describe('the Blueprint services', () => {
+  test('production and staging are declared with identical headers and routes and the intended builds', async () => {
+    const { load } = await import('js-yaml');
+    const { readFileSync } = await import('node:fs');
+    type Svc = { name: string; pullRequestPreviewsEnabled: boolean; envVars: { key: string; value: string }[]; headers: unknown[]; routes: unknown[] };
+    const services = (load(readFileSync('render.yaml', 'utf8')) as { services: Svc[] }).services;
+    const prod = services.find((s) => s.name === 'khaylub-com')!;
+    const staging = services.find((s) => s.name === 'khaylub-com-v2')!;
+    expect(services[0].name, 'the production service is first, so every script that reads services[0] reads production').toBe('khaylub-com');
+    expect(prod.envVars.find((e) => e.key === 'PUBLIC_SITE_ENV')?.value).toBe('production');
+    expect(staging.envVars.find((e) => e.key === 'PUBLIC_SITE_ENV')?.value).toBe('preview');
+    expect(prod.pullRequestPreviewsEnabled).toBe(false);
+    expect(staging.pullRequestPreviewsEnabled).toBe(true);
+    expect(JSON.stringify(staging.headers)).toBe(JSON.stringify(prod.headers));
+    expect(JSON.stringify(staging.routes)).toBe(JSON.stringify(prod.routes));
+  });
+});

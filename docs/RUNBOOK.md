@@ -333,17 +333,50 @@ Rollback state to record before any of this: apex A `216.24.57.1`; `www` CNAME
 `khaylub-portfolio.onrender.com` (document 15 section 6; re-read the live records at T-2 and
 record them again, they are the truth).
 
-1. T-7 days: Phase 20 acceptance signed. Verify domain ownership in Google Search Console for
-   `khaylub.com` and the V1 subdomain.
-2. T-2 days: lower DNS TTL on the apex and `www` records at Namecheap to 300 seconds. Record the
-   current records (the rollback state).
-3. T-1 day: confirm `v1.khaylub.com` serves the tagged V1 build; confirm the V2 service's
-   `onrender.com` URL serves the release candidate; run the header scan (section 2 step 1) and
-   Lighthouse on both. If staging ran the preview build (section 1, option b), switch
-   `PUBLIC_SITE_ENV` off and redeploy; scan again.
-4. T-0: in the V2 Render service add `khaylub.com` and `www.khaylub.com`; Render reports the
-   required records. Remove the domains from the V1 service first if the rehearsal (section 4 step
-   3) showed Render requires it. Update DNS.
+Pre-cutover (Phase 21, before any date is set):
+
+- P1. AUTOMATED by the Blueprint sync, confirmed by the **Owner**: the production service
+  `khaylub-com` is declared in `render.yaml` next to the staging service; merging that declaration
+  makes Render's Blueprint sync create it (production build: `PUBLIC_SITE_ENV=production`,
+  pull-request previews off). Never convert or reuse `khaylub-com-v2`: it has served the preview
+  build, and Render keeps files a new build no longer contains, so a draft page served once there
+  would stay served. **Owner:** in the Render dashboard, approve the Blueprint sync if Render asks,
+  confirm the new service exists with the Blueprint's fields, and record its `onrender.com` URL.
+  Add nothing by hand. Before merging, confirm in the staging service's Environment tab that
+  `PUBLIC_SITE_ENV` reads exactly `preview`: the Blueprint now declares that value for `khaylub-com-v2`
+  and the sync takes ownership of it; a different dashboard value would be overwritten and redeployed.
+- P2. AUTOMATED. Production readiness on the new service's `onrender.com` URL:
+
+  ```
+  npm run staging:verify -- https://<production-onrender-url> --out production-verify.json
+  npm run staging:verify -- https://<production-onrender-url> --mobile --out production-verify-mobile.json
+  npm run headers:scan -- https://<production-onrender-url> --samples 5
+  npm run lhci:staging -- https://<production-onrender-url> <evidence-folder>/lighthouse-production
+  ```
+
+  Expected: the production indexing state (no Disallow, no noindex, no banner, a sitemap); every
+  route, search, the climb, and the five cards ok; the SEO category and `is-crawlable` now pass;
+  the header scan consistent, with the accepted Cache-Control exception recorded as is. Also
+  confirm every draft path returns 404 (the build refuses drafts; today: `/notes/wanderer-pipeline/`).
+- P3. **Owner:** merge the V1 repository's `docs/v1-preservation` branch so the V1 service's
+  dashboard settings are on record; confirm the tag `v1.0.0-3d-experiment`, the locked branch, and
+  the release still exist (read-only). The V1 Render service is never deleted or modified.
+- P4. **Owner** with one AUTOMATED check: `v1.khaylub.com` per section 3 (the fastest route: attach
+  `v1.khaylub.com` as a custom domain on the V1 Render service and add the CNAME at Namecheap; the
+  frozen deployment keeps serving), then `npm run staging:verify -- https://v1.khaylub.com --exhibit`.
+
+1. T-7 days (or as soon as the pre-cutover items are done): verify domain ownership in Google
+   Search Console for `khaylub.com` and the V1 subdomain (optional before launch; SEO-10 follows).
+2. T-2 days: **Owner:** at Namecheap, record the current apex and `www` records exactly as shown
+   (the rollback state; an `nslookup` on 2026-09-15, recorded in the Phase 21 checkpoint section 5, resolved the apex to A `216.24.57.1` and `www` to CNAME
+   `khaylub-portfolio.onrender.com`), then lower their TTL to 300 seconds.
+3. T-1 day: the rehearsal (section 4, timed by the watcher); confirm `v1.khaylub.com` serves the
+   tagged build (P4); rerun P2 on the production service.
+4. T-0, only on the **Owner's** explicit, recorded go: in the production Render service
+   `khaylub-com` (never `khaylub-com-v2`) add `khaylub.com` and `www.khaylub.com`; Render reports
+   the required records. Remove the domains from the V1 service first if the rehearsal (section 4
+   step 3) showed Render requires it. Update the two DNS records at Namecheap to the values Render
+   shows.
 5. T+15 min: `curl -I https://khaylub.com` shows the V2 build and headers (run the scan against
    `https://khaylub.com`); browse Home, Work, one case study, one media page on a phone over
    cellular; confirm the uptime check is green.
