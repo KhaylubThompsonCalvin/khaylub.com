@@ -195,6 +195,18 @@ frontmatter, a dangling `related` slug, an unresolved wikilink, an em dash, a mi
 the thirteen deliberate-failure demonstrations (three refused by the commit guard, ten failing CI at the
 targeted step, every demonstration branch deleted, nothing merged) are preserved as verification evidence
 in the vault checkpoint of 2026-09-14. Not applicable yet: the notebook job (no notebook exists) and the
-catalog check (ADR-003 deferred). Phase 19 (Deployment and staging) is the next gated phase and is NOT
-opened; it opens only on the owner's instruction through `/phase 19`.
+catalog check (ADR-003 deferred). Phase 19 (Deployment and staging) is ACCEPTED and CLOSED with
+documented exceptions: the owner recorded "PHASE 19 PASS" on 2026-09-15 after merging PRs #35 to #40.
+Staging runs at the Render service `khaylub-com-v2` (the preview build, `PUBLIC_SITE_ENV=preview`, never
+to become the production service); `docs/RUNBOOK.md` is automation first (the header scan, the
+deployed-origin verification `npm run staging:verify`, the public-URL Lighthouse runner, the rehearsal
+watcher, the uptime workflow). Owner decisions to keep in mind: Render applies path-specific header
+rules intermittently (three Cache-Control tiers and the `/search/` policy on staging), accepted as an
+unresolved provider risk for Phase 19 only with a support case open; CSP stays Report-Only; the
+`v1.khaylub.com` exhibit and the timed rollback rehearsal are carried to Phase 21 as required before
+cutover, not waived; production must be a fresh Render service from the Blueprint, verified to expose
+no draft content, with the live DNS recorded first and the owner's explicit go. Phase 20 (Acceptance
+testing) is the next gated phase and is NOT opened; it opens only on the owner's instruction through
+`/phase 20`; the owner waived its three-outsider review on 2026-09-15 in favour of owner acceptance over
+the existing evidence.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
