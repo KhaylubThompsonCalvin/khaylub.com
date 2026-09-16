@@ -25,7 +25,9 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 - Production target is a Render static site described by `render.yaml` (headers, cache tiers,
   redirects). Two Render static sites are declared there and created by the Blueprint sync: `khaylub-com`
   (production, created at Phase 21, never deployed with the preview build) and `khaylub-com-v2` (staging,
-  the preview build, never production). The domain moves only at the Phase 21 gate on the owner's go.
+  the preview build, never production). `khaylub.com` and `www.khaylub.com` are attached to `khaylub-com`
+  since the Phase 21 cutover of 2026-09-16; `v1.khaylub.com` is the preserved V1 exhibit on its own service.
+  Production DNS, domains, and Render settings change only at an owner-gated step of an opened phase.
   `scripts/serve-with-headers.mjs` applies the same headers locally so tests can assert them.
   This project is not on Vercel; Vercel skills and agents do not apply.
 
@@ -213,7 +215,19 @@ Phase 20 (Acceptance testing) is ACCEPTED and CLOSED with documented exceptions:
 requirements: 62 proven; P2-FE-12, P2-FE-14, P2-CE-04, and P2-SEC-07 accepted as post-launch follow-up,
 not completed and not passed; CSP enforcement deferred; the three-outsider review waived; Journeys 1 and 2
 accepted on the existing automated, accessibility, staging, and owner evidence; nothing fabricated; no
-repository change). Phase 21 (Production cutover) is the next gated phase and is NOT opened; it opens only
-on the owner's instruction through `/phase 21`. Its required-before-cutover items stand as recorded under
-Phase 19 above, and the Phase 20 post-launch backlog lives in the vault report.
-Phase 21 owns the production move of khaylub.com from V1 to V2.
+repository change). Phase 21 (Production cutover) is ACCEPTED and CLOSED: the owner recorded "PHASE 21 PASS"
+on 2026-09-16 after the cutover of the same day (V2 answering on khaylub.com at 00:48 UTC from the fresh
+Blueprint service, no rollback needed; PR #43 declared the production service, PR #44 the post-cutover uptime
+check and the runbook facts), four green scheduled uptime runs with a continuous local watcher (the 24-hour
+window accepted by the owner on that evidence at about fifteen hours; the remainder recorded in the vault),
+and the sitemap submitted and acknowledged in Search Console (its processing status read "Couldn't fetch"
+at first and is rechecked later). The launch date is 2026-09-16. Open on the owner's side and not gate
+items: the TTL restore at Namecheap after the window, the D-09 `noindex` meta on the V1 exhibit (a `v1.0.1`
+tag), CSP enforcement (runbook section 8, held), the Render support case on path-specific headers, the
+Phase 20 post-launch backlog (P2-FE-12, P2-FE-14, P2-CE-04, P2-SEC-07), and branch protection on `main`.
+Phase 22 (V1 archival case study) is DEFERRED by decision D-26 and is not the next phase. Phase 23
+(Publishing architecture and ADR) is the next gated phase and is NOT opened; it opens only on the owner's
+instruction through `/phase 23`. Its architecture document (vault document 46), ADR-012 (ACCEPTED by the
+owner on 2026-09-16, decision D-27, nine clarifications), the Phase 24 plan (document 47), and its gate
+note are prepared in the vault: the owner publishing system is Keystatic, Git-backed, on a separate Node
+service, never the production static site.
