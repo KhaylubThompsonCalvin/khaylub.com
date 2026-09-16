@@ -383,6 +383,16 @@ Pre-cutover (Phase 21, before any date is set):
 6. T+1 hour: submit the V2 sitemap in Search Console; confirm the V1 subdomain still resolves.
 7. T+24 hours: review uptime and Render logs; restore TTL; record the cutover log in the vault.
 
+Facts from the rehearsal and the cutover of 2026-09-15 to 16 (owner clock, Pacific): Render requires a
+custom domain to be deleted from one service before another can add it ("This domain is already in use
+on khaylub-portfolio. Please delete it from that service and try again."), so the order is release from
+V1, add to V2, then DNS; the apex A record value Render asks for was unchanged (216.24.57.1) and only the
+www CNAME changed (to khaylub-com.onrender.com); www.khaylub.com now answers 301 to https://khaylub.com/
+(Render's redirect); the degraded window from release to the first V2 answer was about 7 minutes; the
+rollback leg in the rehearsal about 4 minutes. The session machine's DNS resolver lagged for the rehearsal
+hostname, so timing and confirmation came from the owner's clock and a phone over cellular; run the
+watcher and the checks from a machine whose resolver follows public DNS, or confirm on a phone.
+
 ## 7. Rollback (any step of section 6; rehearsed in section 4)
 
 Route A (host side): re-add `khaylub.com` and `www` to the V1 Render service (remove them from V2
