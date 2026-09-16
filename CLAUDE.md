@@ -231,3 +231,4 @@ instruction through `/phase 23`. Its architecture document (vault document 46), 
 owner on 2026-09-16, decision D-27, nine clarifications), the Phase 24 plan (document 47), and its gate
 note are prepared in the vault: the owner publishing system is Keystatic, Git-backed, on a separate Node
 service, never the production static site.
+Phase 21 owns the production move of khaylub.com from V1 to V2.

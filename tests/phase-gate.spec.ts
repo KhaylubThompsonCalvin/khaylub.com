@@ -103,8 +103,16 @@ test.describe('owner gate: records and decisions', () => {
     expect(matches.length, 'exactly one phase is named as the next gated phase').toBe(1);
     const next = Number(matches[0][1]);
     expect(Number(matches[0][2]), 'the /phase command names the same phase').toBe(next);
-    const previous = next - 1;
-    expect(pointer, `Phase ${previous} is recorded as accepted and closed`).toMatch(new RegExp(`Phase ${previous}\\s+\\([^)]*\\)\\s+is\\s+ACCEPTED\\s+and\\s+CLOSED`));
+    // The previous gate is the highest phase recorded as accepted and closed. It is normally next - 1;
+    // when the roadmap defers a phase by owner decision (Phase 22, D-26), every phase between the last
+    // closed one and the next one must be named as DEFERRED, never silently skipped.
+    const closed = [...pointer.matchAll(/Phase (\d+)\s+\([^)]*\)\s+is\s+ACCEPTED\s+and\s+CLOSED/g)].map((m) => Number(m[1]));
+    expect(closed.length, 'at least one phase is recorded as accepted and closed').toBeGreaterThan(0);
+    const previous = Math.max(...closed);
+    expect(previous, 'the last closed phase precedes the next gated phase').toBeLessThan(next);
+    for (let n = previous + 1; n < next; n += 1) {
+      expect(pointer, `Phase ${n} between the last closed phase and the next one is recorded as DEFERRED`).toMatch(new RegExp(`Phase ${n}\\s+\\([^)]*\\)\\s+is\\s+DEFERRED`));
+    }
     // No phase at or beyond the next one may be described as opened, accepted, closed, built, or
     // merged (case-sensitive: "NOT opened" is the permitted state, "OPENED" the forbidden one).
     for (const m of pointer.matchAll(/Phase (\d+)\b[^.]*?\b(OPENED|ACCEPTED|CLOSED|merged|built)\b/g)) {
