@@ -55,7 +55,7 @@ Any other key fails the build. That is how private fields stay impossible.
 
 ## Per collection
 
-- **projects**: `type` (`case-study`, `concept`, `exhibit`), `project_status` (`live`, `prototype`, `private-beta`, `concept`, `archived`), `links` (`code`, `live`, `result`), `technologies` (required here: the stack, at least one term), optional `outcome`. A featured project needs at least one proof link.
+- **projects**: `type` (`case-study`, `concept`, `exhibit`), `project_status` (`live`, `prototype`, `private-beta`, `concept`, `archived`), `links` (`code`, `live`, `result`), `technologies` (required here: the stack, at least one term), optional `outcome`, optional `context` (the course, term, or institution line of a school or academic project, 3 to 120 characters; ADR-012). A featured project needs at least one proof link.
 - **data**: `type` (`analysis`, `notebook`, `dataset`, `story`), `question`, `dataset` (`name`, `source`, `license`), `result`, optional `repository`, `story_url`, `sql`, `notebook`, `links`.
 - **notes**: `type` (`field-note`, `retrospective`, `how-to`).
 - **writing**: `type` (`essay`, `poem`, `fiction`, `book-note`). **journal**: `type: entry`.

@@ -420,7 +420,7 @@ violations in CI); the owner says go.
 
 Not done in Phase 19 unless the owner says go after the staging log is clean.
 
-## 10. The owner Studio (Phase 24; ADR-012)
+## 10. The owner Studio (Phases 24 and 25; ADR-012)
 
 The Studio is the app under `studio/`: Keystatic's admin and API on an Astro server build with the
 Node adapter, declared in `render.yaml` as the web service `khaylub-studio` (root directory
@@ -481,6 +481,30 @@ public site never reads it, and its build, headers, budgets, and tests are uncha
 3. Delete the entry (Delete entry, Yes, delete). Delete the branch on GitHub.
 4. Record in section 9: the branch name, the three commits, and that `main` and the public site
    did not change.
+
+### 10.5 The collections and the editor rules (Phase 25)
+
+| Collection | Entry written | Form | Not in the form (and why) |
+|---|---|---|---|
+| notes, writing, journal | `content/<collection>/<slug>.md` | the body first; the shared fields; `series` and `part` | `cover`, `cover_alt`, `provenance` (Phase 27: Keystatic writes a group on every save, so an optional provenance group cannot be expressed); `featured` (Git-only, owner-approved); `problem`, `role` (projects only) |
+| projects | `content/projects/<slug>/index.md` | the fields first; `project_status`, `context` (course, term, institution; ADR-012), `problem`, `role`, `links`, `outcome`; the body description lists the thirteen case-study headings in order | `cover`, `cover_alt`, `provenance`, `featured` (as above) |
+| music, video, gallery | `content/<collection>/<slug>/index.md` with the images beside | the fields first; `provenance` as a required group; images by upload (`poster`, `cover`, gallery `images[].src`); audio and video files by name under `public/media/<slug>/` or an `external_url` (uploads of large media are Phase 27) | `featured`, `problem`, `role`, `series`, `part` |
+
+Rules the editor enforces before a save: required fields, lengths, the slug shape, the duration
+shape (`m:ss`), media file names, URL fields, the enum options, the vocabulary pickers (generated
+from `content/vocabulary/` at build), and no em dash in any free-text field. Rules that stay with
+`validate` and CI on the pull request, named in the field descriptions: at least one tag, alt text
+with a cover, provenance with media, `updated` on or after `date`, a featured project's proof link,
+captions with speech, `related` slugs that exist, and the private-term and em-dash rules on the
+body (the body editor has no pattern hook; the private-term list is deliberately not shipped in
+the Studio's bundle, because `validate` forbids those terms anywhere else in the repository).
+
+Two facts to know when editing an existing entry: Keystatic rewrites the frontmatter in its own
+YAML style (folded long strings, one list item per line) with the same keys and values; and it
+moves the entry's image files to its own layout in the same commit (`cover.webp`,
+`images/0/src.webp` beside `index.md`) and updates the references, which the site reads
+unchanged (proven on `wanderer-hero` on 2026-09-17: validate PASS, the built page identical in
+output format).
 
 ## 9. Record of executions
 

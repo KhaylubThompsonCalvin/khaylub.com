@@ -7,11 +7,11 @@
     "node": ">=22"
   },
   "scripts": {
-    "vocabulary": "node scripts/vocabulary.mjs",
-    "dev": "npm run vocabulary && astro dev",
-    "build": "node scripts/check-storage.mjs && npm run vocabulary && astro build",
+    "dev": "npm run generate && astro dev",
+    "build": "node scripts/check-storage.mjs && npm run generate && astro build",
     "start": "node ./dist/server/entry.mjs",
-    "check": "npm run vocabulary && astro check"
+    "check": "npm run generate && astro check",
+    "generate": "node scripts/vocabulary.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.6",
