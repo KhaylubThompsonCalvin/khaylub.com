@@ -3,8 +3,8 @@
 // Studio edits, every key both ways, the required flags, the enum option lists, the vocabulary
 // pickers, and the nested groups (provenance, links, gallery images). A key a form does not offer
 // must be optional in the schema and listed as deferred with its owning phase. The collections the
-// Studio does not edit are named as Git-only by design. The generated vocabulary and rules JSON the
-// Studio bundles must equal the files the site reads.
+// Studio does not edit are named as Git-only by design. The generated vocabulary JSON the Studio
+// bundles must equal the files the site reads; the editor text rule refuses an em dash.
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -19,10 +19,11 @@ import {
   SLUG_PATTERN,
   SLUG_OR_EMPTY_PATTERN,
   DURATION_PATTERN,
+  MEDIA_FILE_PATTERN,
   CASE_STUDY_HEADINGS,
   type FieldSpec,
 } from '../studio/src/fields';
-import { textRule } from '../studio/src/rules';
+import { textRule, EM_DASH } from '../studio/src/rules';
 
 type Shape = Record<string, z.ZodTypeAny>;
 const shapeOf = (s: unknown): Shape => (s as { shape: Shape }).shape;
@@ -39,6 +40,25 @@ const enumOptions = (s: z.ZodTypeAny): string[] => {
 };
 
 const studioNames = Object.keys(collections);
+
+// The Studio field kinds a Zod type may be mapped to, so a wrong `kind` (a text box where the schema
+// has a boolean, a list, or a date) fails even when the required flag happens to match.
+const kindsFor = (s: z.ZodTypeAny): string[] => {
+  const inner: any = unwrap(s);
+  if (inner instanceof z.ZodBoolean) return ['checkbox'];
+  if (inner instanceof z.ZodDate) return ['date'];
+  if (inner instanceof z.ZodNumber) return ['integer'];
+  if (inner instanceof z.ZodEnum || inner instanceof z.ZodLiteral) return ['select'];
+  if (inner instanceof z.ZodObject) return ['object'];
+  if (inner instanceof z.ZodArray) {
+    const el: any = unwrap(inner.element as z.ZodTypeAny);
+    if (el instanceof z.ZodEnum) return ['multiselect'];
+    if (el instanceof z.ZodObject) return ['array-object'];
+    return ['array-text'];
+  }
+  if (inner instanceof z.ZodString) return ['text', 'url', 'image', 'slug'];
+  return [];
+};
 
 test.describe('Studio field tables against the site schemas', () => {
   test('the Studio edits every collection except the Git-only ones, and each Git-only one is a real collection', () => {
@@ -63,6 +83,7 @@ test.describe('Studio field tables against the site schemas', () => {
       for (const [k, f] of Object.entries(spec.fields)) {
         if (f.kind === 'body') continue;
         expect(f.required, `${name}.${k} required`).toBe(!isOptional(shape[k]));
+        expect(kindsFor(shape[k]), `${name}.${k} kind ${f.kind} fits the schema type`).toContain(f.kind);
         if (f.kind === 'select') expect([...f.options], `${name}.${k} options`).toEqual(enumOptions(shape[k]));
         if (f.kind === 'multiselect') {
           const element = (unwrap(shape[k]) as z.ZodArray<any>).element as z.ZodTypeAny;
@@ -74,6 +95,7 @@ test.describe('Studio field tables against the site schemas', () => {
           for (const [ik, is] of Object.entries(f.fields)) {
             if (is.kind === 'body') continue;
             expect(is.required, `${name}.${k}.${ik} required`).toBe(!isOptional(inner[ik]));
+            expect(kindsFor(inner[ik]), `${name}.${k}.${ik} kind`).toContain(is.kind);
           }
         }
         if (f.kind === 'array-object') {
@@ -83,7 +105,9 @@ test.describe('Studio field tables against the site schemas', () => {
           for (const [ik, is] of Object.entries(f.fields)) {
             if (is.kind === 'body') continue;
             expect(is.required, `${name}.${k}[].${ik} required`).toBe(!isOptional(inner[ik]));
+            expect(kindsFor(inner[ik]), `${name}.${k}[].${ik} kind`).toContain(is.kind);
           }
+          if (f.required) expect(f.min ?? 1, `${name}.${k} requires at least one item`).toBeGreaterThanOrEqual(1);
         }
       }
       const status = spec.fields.status as Extract<FieldSpec, { kind: 'select' }>;
@@ -120,6 +144,16 @@ test.describe('Studio field tables against the site schemas', () => {
     }
   });
 
+  test('every collection sits in a sidebar group', () => {
+    for (const [name, spec] of Object.entries(collections)) expect(['Writing', 'Work', 'Media'], `${name} group`).toContain(spec.group);
+  });
+
+  test('the media file name rule accepts the file kinds the content guide serves and nothing else', () => {
+    const re = new RegExp(MEDIA_FILE_PATTERN);
+    for (const ok of ['clip.mp4', 'the-climb-recording.mp4', 'track.mp3', 'captions.vtt', '']) expect(re.test(ok), `"${ok}" accepted`).toBe(true);
+    for (const bad of ['../secret.mp4', 'sub/clip.mp4', 'clip.exe', 'clip', 'poster.webp']) expect(re.test(bad), `"${bad}" rejected`).toBe(false);
+  });
+
   test('the case-study headings offered as the body template are the thirteen the site tests', () => {
     const spec = readFileSync(resolve('tests/casestudy.spec.ts'), 'utf8');
     for (const h of CASE_STUDY_HEADINGS) expect(spec).toContain(`'${h}'`);
@@ -139,7 +173,7 @@ test.describe('Studio field tables against the site schemas', () => {
     const rule = textRule();
     expect(rule.test('A plain sentence, with a comma; and a colon: fine.')).toBe(true);
     expect(rule.test('two lines\nof text')).toBe(true);
-    expect(rule.test('an em dash ' + String.fromCharCode(0x2014) + ' here')).toBe(false);
+    expect(rule.test('an em dash ' + EM_DASH + ' here')).toBe(false);
   });
 
   test('a note in the exact shape the Studio writes passes the schema', () => {

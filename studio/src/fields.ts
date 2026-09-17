@@ -25,7 +25,9 @@ export const SLUG_PATTERN = '^[a-z0-9]+(?:-[a-z0-9]+)*$';
 export const SLUG_OR_EMPTY_PATTERN = '^(?:[a-z0-9]+(?:-[a-z0-9]+)*)?$';
 // A music duration, minutes and two-digit seconds.
 export const DURATION_PATTERN = '^\\d+:\\d{2}$';
-// A file name the site serves from public/media/<slug>/ (audio, video, captions), or empty.
+// A file name the site serves from public/media/<slug>/ (audio, video, captions), or empty (for the
+// single optional `captions` field; list items are always required, so the empty case never applies
+// to `files`).
 export const MEDIA_FILE_PATTERN = '^(?:[A-Za-z0-9._-]+\\.(?:mp4|webm|mp3|ogg|vtt))?$';
 
 // The thirteen headings a case study carries in order (tests/casestudy.spec.ts); offered as the
@@ -38,6 +40,10 @@ export const CASE_STUDY_HEADINGS = [
 export type FieldSpec =
   // The entry name: stored under this key in the frontmatter and used as the file or folder name.
   | { kind: 'slug'; required: true; description: string }
+  // `min` only on a required field: Keystatic treats a minimum length as "required" (the empty value
+  // fails it), while the site's schema applies its minimum only when the key is present. An optional
+  // text field therefore carries its maximum here and states its minimum in the description; the
+  // minimum is enforced at validate and CI (context, problem, role, cover_alt).
   | { kind: 'text'; required: boolean; multiline?: boolean; min?: number; max?: number; pattern?: string; description?: string }
   | { kind: 'url'; required: boolean; description?: string }
   | { kind: 'select'; required: true; options: readonly string[]; defaultValue: string; description?: string }
@@ -45,13 +51,14 @@ export type FieldSpec =
   | { kind: 'multiselect'; required: boolean; vocabulary: Vocabulary; description?: string }
   | { kind: 'date'; required: boolean; description?: string }
   | { kind: 'checkbox'; required: boolean; defaultValue: boolean; description?: string }
-  | { kind: 'integer'; required: boolean; description?: string }
+  | { kind: 'integer'; required: boolean; min?: number; max?: number; description?: string }
   | { kind: 'array-text'; required: boolean; pattern?: string; description?: string }
   // An image file stored beside the entry; the frontmatter carries its file name.
   | { kind: 'image'; required: boolean; description?: string }
   // A group written as a nested object on every save, so only for keys the schema requires.
   | { kind: 'object'; required: boolean; fields: Record<string, FieldSpec>; description?: string }
-  // A list of groups; each item written as a nested object.
+  // A list of groups; each item written as a nested object. A required list needs at least one item
+  // (the config derives that minimum from `required` when `min` is unset).
   | { kind: 'array-object'; required: boolean; min?: number; fields: Record<string, FieldSpec>; description?: string }
   // The Markdown body (the file's content below the frontmatter), not a frontmatter key.
   | { kind: 'body'; description?: string };
@@ -60,6 +67,8 @@ export const BODY_KEY = 'body';
 
 export type CollectionSpec = {
   label: string;
+  // The navigation group in the Studio's sidebar; the config builds the navigation from these.
+  group: 'Writing' | 'Work' | 'Media';
   // The site's loader: single files (content/<name>/<slug>.md) or folders (content/<name>/<slug>/index.md).
   layout: 'file' | 'folder';
   // Keystatic's entry layout: the body first ('content') or the fields first ('form').
@@ -99,13 +108,15 @@ const common = (type: FieldSpec): Record<string, FieldSpec> => ({
 
 const SERIES: Record<string, FieldSpec> = {
   series: { kind: 'text', required: false, pattern: SLUG_OR_EMPTY_PATTERN, description: 'A series slug (lowercase letters, digits, single hyphens) when the entry belongs to one.' },
-  part: { kind: 'integer', required: false, description: 'The position in the series, from 1.' },
+  part: { kind: 'integer', required: false, min: 1, description: 'The position in the series, from 1.' },
 };
 
 // Optional media on the prose collections waits for the media and provenance phase (27): Keystatic
 // writes an object field on every save, so an optional provenance group cannot be expressed as one,
 // and a cover without provenance is refused by the site. `featured` stays Git-only because the
-// featured set is owner-approved and checked by validate.
+// featured set is owner-approved and checked by validate. `problem` and `role` are the case-study
+// card (CONTENT.md) and are offered on projects only, a Phase 25 decision: the Phase 24 notes form
+// offered them, and nothing on the site reads them for a note.
 const PROSE_DEFERRED = ['cover', 'cover_alt', 'provenance', 'featured', 'problem', 'role'] as const;
 // Projects offer the case-study card fields (problem, role); the media collections offer neither
 // them nor the series fields, which belong to prose.
@@ -117,6 +128,7 @@ const bodyProse: FieldSpec = { kind: 'body', description: 'Markdown. Link other 
 export const collections: Record<string, CollectionSpec> = {
   notes: {
     label: 'Field notes',
+    group: 'Writing',
     layout: 'file',
     editor: 'content',
     description: 'Short working notes: field notes, retrospectives, how-tos.',
@@ -129,6 +141,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   writing: {
     label: 'Writing',
+    group: 'Writing',
     layout: 'file',
     editor: 'content',
     description: 'Essays, poems, fiction, book notes.',
@@ -141,6 +154,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   journal: {
     label: 'Journal',
+    group: 'Writing',
     layout: 'file',
     editor: 'content',
     description: 'Dated short entries shown on the profile and the timeline.',
@@ -153,6 +167,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   projects: {
     label: 'Projects',
+    group: 'Work',
     layout: 'folder',
     editor: 'form',
     description: 'School, academic, and technical projects and case studies. The featured set, covers, and figures stay in Git.',
@@ -183,6 +198,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   music: {
     label: 'Audio-visual stories',
+    group: 'Media',
     layout: 'folder',
     editor: 'form',
     description: 'A track or spoken piece with its writing in the body; the audio file lives under public/media/<slug>/ or at an external URL.',
@@ -200,6 +216,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   video: {
     label: 'Video',
+    group: 'Media',
     layout: 'folder',
     editor: 'form',
     description: 'Films, recordings, concept films; the video file lives under public/media/<slug>/ or at an external URL.',
@@ -219,6 +236,7 @@ export const collections: Record<string, CollectionSpec> = {
   },
   gallery: {
     label: 'Gallery',
+    group: 'Media',
     layout: 'folder',
     editor: 'form',
     description: 'Stills, sets, and renders; the images live beside the entry.',

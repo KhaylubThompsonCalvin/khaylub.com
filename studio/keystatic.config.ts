@@ -6,7 +6,7 @@
 // content/<collection>/<slug>/index.md with their images beside, the shapes the site's glob loaders
 // and schemas expect: YAML frontmatter and a Markdown body.
 import { config, fields, collection, type ComponentSchema } from '@keystatic/core';
-import { collections, BODY_KEY, type FieldSpec, type CollectionSpec } from './src/fields';
+import { collections, BODY_KEY, SLUG_PATTERN, type FieldSpec, type CollectionSpec } from './src/fields';
 import { textRule, TEXT_RULE_MESSAGE } from './src/rules';
 import vocabulary from './src/vocabulary.generated.json';
 
@@ -20,7 +20,7 @@ function field(key: string, spec: FieldSpec): ComponentSchema {
         name: {
           label: label(key),
           description: spec.description,
-          validation: { pattern: { regex: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, message: 'lowercase letters, digits, and single hyphens' } },
+          validation: { pattern: { regex: new RegExp(SLUG_PATTERN), message: 'lowercase letters, digits, and single hyphens' } },
         },
         slug: { label: 'file name', description: 'Derived from the slug; keep them equal.' },
       });
@@ -55,7 +55,7 @@ function field(key: string, spec: FieldSpec): ComponentSchema {
     case 'checkbox':
       return fields.checkbox({ label: label(key), description: spec.description, defaultValue: spec.defaultValue });
     case 'integer':
-      return fields.integer({ label: label(key), description: spec.description, validation: { isRequired: spec.required, min: 1 } });
+      return fields.integer({ label: label(key), description: spec.description, validation: { isRequired: spec.required, min: spec.min, max: spec.max } });
     case 'array-text':
       return fields.array(
         fields.text({
@@ -81,7 +81,7 @@ function field(key: string, spec: FieldSpec): ComponentSchema {
         {
           label: label(key),
           description: spec.description,
-          validation: spec.min ? { length: { min: spec.min } } : undefined,
+          validation: { length: { min: spec.min ?? (spec.required ? 1 : undefined) } },
           itemLabel: (props) => {
             const alt = (props.fields as Record<string, { value?: unknown }>).alt?.value;
             return typeof alt === 'string' && alt ? alt.slice(0, 60) : 'image';
@@ -145,11 +145,10 @@ export default config({
   ...(storage.kind === 'cloud' ? { cloud: { project: cloudProject as string } } : {}),
   ui: {
     brand: { name: 'Khaylub.com Studio' },
-    navigation: {
-      Writing: ['writing', 'notes', 'journal'],
-      Work: ['projects'],
-      Media: ['gallery', 'video', 'music'],
-    },
+    // Built from the tables' groups, so every collection has a place in the sidebar.
+    navigation: Object.fromEntries(
+      (['Writing', 'Work', 'Media'] as const).map((group) => [group, Object.entries(collections).filter(([, c]) => c.group === group).map(([name]) => name)])
+    ),
   },
   collections: Object.fromEntries(Object.entries(collections).map(([name, spec]) => [name, build(name, spec)])),
 });

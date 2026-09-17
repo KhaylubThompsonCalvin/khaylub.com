@@ -490,13 +490,14 @@ public site never reads it, and its build, headers, budgets, and tests are uncha
 | projects | `content/projects/<slug>/index.md` | the fields first; `project_status`, `context` (course, term, institution; ADR-012), `problem`, `role`, `links`, `outcome`; the body description lists the thirteen case-study headings in order | `cover`, `cover_alt`, `provenance`, `featured` (as above) |
 | music, video, gallery | `content/<collection>/<slug>/index.md` with the images beside | the fields first; `provenance` as a required group; images by upload (`poster`, `cover`, gallery `images[].src`); audio and video files by name under `public/media/<slug>/` or an `external_url` (uploads of large media are Phase 27) | `featured`, `problem`, `role`, `series`, `part` |
 
-Rules the editor enforces before a save: required fields, lengths, the slug shape, the duration
-shape (`m:ss`), media file names, URL fields, the enum options, the vocabulary pickers (generated
-from `content/vocabulary/` at build), and no em dash in any free-text field. Rules that stay with
-`validate` and CI on the pull request, named in the field descriptions: at least one tag, alt text
-with a cover, provenance with media, `updated` on or after `date`, a featured project's proof link,
-captions with speech, `related` slugs that exist, and the private-term and em-dash rules on the
-body (the body editor has no pattern hook; the private-term list is deliberately not shipped in
+Rules the editor enforces before a save: required fields, maximum lengths and the minimums of
+required fields, the slug shape, the duration shape (`m:ss`), media file names, URL fields, the
+enum options, the vocabulary pickers (generated from `content/vocabulary/` at build), and no em
+dash in any free-text field. Rules that stay with `validate` and CI on the pull request, named in
+the field descriptions: the minimum length of an optional text field (`context`, `problem`, `role`,
+`cover_alt`; Keystatic treats a minimum as "required"), at least one tag, alt text with a cover,
+provenance with media, `updated` on or after `date`, a featured project's proof link, captions with
+speech, `related` slugs that exist, and the private-term and em-dash rules on the body (the body editor has no pattern hook; the private-term list is deliberately not shipped in
 the Studio's bundle, because `validate` forbids those terms anywhere else in the repository).
 
 Two facts to know when editing an existing entry: Keystatic rewrites the frontmatter in its own
