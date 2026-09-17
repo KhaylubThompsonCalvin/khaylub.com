@@ -134,4 +134,25 @@ test.describe('the Blueprint services', () => {
     expect(JSON.stringify(staging.headers)).toBe(JSON.stringify(prod.headers));
     expect(JSON.stringify(staging.routes)).toBe(JSON.stringify(prod.routes));
   });
+
+  test('the owner Studio is a separate Node service with no public header rules, no previews, and no secret value', async () => {
+    const { load } = await import('js-yaml');
+    const { readFileSync } = await import('node:fs');
+    type Svc = { name: string; runtime: string; rootDir?: string; plan?: string; healthCheckPath?: string; pullRequestPreviewsEnabled: boolean; buildFilter?: { paths: string[] }; envVars: { key: string; value?: string; sync?: boolean }[]; headers?: unknown[]; routes?: unknown[] };
+    const services = (load(readFileSync('render.yaml', 'utf8')) as { services: Svc[] }).services;
+    const studio = services.find((s) => s.name === 'khaylub-studio')!;
+    expect(studio, 'the Studio service is declared').toBeDefined();
+    expect(studio.runtime).toBe('node');
+    expect(studio.rootDir, 'built from studio/, never from the site root').toBe('studio');
+    expect(studio.headers, 'no public header rules: the Studio sets its own in middleware').toBeUndefined();
+    expect(studio.routes).toBeUndefined();
+    expect(studio.pullRequestPreviewsEnabled).toBe(false);
+    expect(studio.buildFilter?.paths, 'redeploys only when the Studio or the Blueprint changes').toEqual(['studio/**', 'render.yaml']);
+    expect(studio.envVars.find((e) => e.key === 'PUBLIC_KEYSTATIC_STORAGE')?.value, 'cloud mode: no secret anywhere').toBe('cloud');
+    for (const v of studio.envVars) {
+      if (/SECRET|TOKEN|PASSWORD|PRIVATE/i.test(v.key)) expect(v.value, `${v.key} has no value in the Blueprint`).toBeUndefined();
+    }
+    // Every static site is production or staging; the identical-rules test above covers them both.
+    expect(services.filter((s) => s.runtime === 'static').map((s) => s.name)).toEqual(['khaylub-com', 'khaylub-com-v2']);
+  });
 });

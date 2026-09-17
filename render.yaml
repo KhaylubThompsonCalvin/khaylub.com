@@ -1,5 +1,5 @@
-# Render Blueprint for Khaylub.com V2: two static sites from one file, so the repository stays the only
-# source of truth for build, environment, headers, redirects, and previews.
+# Render Blueprint for Khaylub.com V2: two static sites and the owner Studio from one file, so the
+# repository stays the only source of truth for build, environment, headers, redirects, and previews.
 #
 #   khaylub-com     production: the production build (drafts refused, sitemap emitted, robots allows),
 #                   pull-request previews off. Created fresh by the Blueprint sync at Phase 21 and never
@@ -9,7 +9,16 @@
 #   khaylub-com-v2  staging: the preview build (PUBLIC_SITE_ENV=preview: drafts rendered, noindex,
 #                   Disallow, the banner), pull-request previews on. Never becomes production.
 #
-# The two services carry identical routes and headers; tests/headers-scan.spec.ts fails if they drift.
+#   khaylub-studio  the owner's private publishing Studio (ADR-012, Phase 24): a Node web service built
+#                   from studio/, Keystatic's admin and API only, no public header rules (its own
+#                   middleware sets noindex, DENY, nosniff), pull-request previews off, redeployed only
+#                   when studio/ or this file changes. Cloud storage mode: no secret anywhere; the owner
+#                   supplies the Keystatic Cloud project name at the Blueprint sync. GitHub mode instead:
+#                   PUBLIC_KEYSTATIC_STORAGE=github, the App slug, and the three secrets set in the
+#                   dashboard, never here.
+#
+# The two static sites carry identical routes and headers; scripts/validate.mjs and
+# tests/headers-scan.spec.ts fail if they drift, and fail if the Studio declares any header or route.
 # scripts/serve-with-headers.mjs applies the production service's rules locally so Playwright can assert
 # them; scripts/headers-scan.mjs compares a live host with them.
 #
@@ -279,3 +288,27 @@ services:
         name: Cache-Control
         value: public, max-age=3600
 
+  - type: web
+    name: khaylub-studio
+    runtime: node
+    plan: free
+    rootDir: studio
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /robots.txt
+    pullRequestPreviewsEnabled: false
+    buildFilter:
+      paths:
+        - studio/**
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: PUBLIC_KEYSTATIC_STORAGE
+        value: cloud
+      # The Keystatic Cloud project, "team/project", entered by the owner in the Render dashboard at
+      # the Blueprint sync. Not a secret, but not known until the owner creates the project.
+      - key: PUBLIC_KEYSTATIC_CLOUD_PROJECT
+        sync: false

@@ -1,0 +1,240 @@
+{
+  "tags": [
+    {
+      "label": "three.js",
+      "value": "three-js"
+    },
+    {
+      "label": "React",
+      "value": "react"
+    },
+    {
+      "label": "Blender",
+      "value": "blender"
+    },
+    {
+      "label": "Performance",
+      "value": "performance"
+    },
+    {
+      "label": "Accessibility",
+      "value": "accessibility"
+    },
+    {
+      "label": "Security",
+      "value": "security"
+    },
+    {
+      "label": "Preservation",
+      "value": "preservation"
+    },
+    {
+      "label": "Git",
+      "value": "git"
+    },
+    {
+      "label": "GitHub",
+      "value": "github"
+    },
+    {
+      "label": "Python",
+      "value": "python"
+    },
+    {
+      "label": "SQL",
+      "value": "sql"
+    },
+    {
+      "label": "Regression",
+      "value": "regression"
+    },
+    {
+      "label": "Reproducibility",
+      "value": "reproducibility"
+    },
+    {
+      "label": "Data storytelling",
+      "value": "data-storytelling"
+    },
+    {
+      "label": "Portfolio",
+      "value": "portfolio"
+    },
+    {
+      "label": "Tableau",
+      "value": "tableau"
+    },
+    {
+      "label": "Estimating",
+      "value": "estimating"
+    }
+  ],
+  "skills": [
+    {
+      "label": "Data analysis",
+      "value": "data-analysis"
+    },
+    {
+      "label": "Data cleaning",
+      "value": "data-cleaning"
+    },
+    {
+      "label": "Regression modeling",
+      "value": "regression-modeling"
+    },
+    {
+      "label": "Visualization",
+      "value": "visualization"
+    },
+    {
+      "label": "SQL querying",
+      "value": "sql-querying"
+    },
+    {
+      "label": "Reproducible research",
+      "value": "reproducible-research"
+    },
+    {
+      "label": "Web development",
+      "value": "web-development"
+    },
+    {
+      "label": "3D pipeline",
+      "value": "3d-pipeline"
+    },
+    {
+      "label": "Performance analysis",
+      "value": "performance-analysis"
+    },
+    {
+      "label": "Security hardening",
+      "value": "security-hardening"
+    },
+    {
+      "label": "Version control",
+      "value": "version-control"
+    },
+    {
+      "label": "Documentation",
+      "value": "documentation"
+    },
+    {
+      "label": "Training",
+      "value": "training"
+    },
+    {
+      "label": "Electronics repair",
+      "value": "electronics-repair"
+    },
+    {
+      "label": "Calibration and testing",
+      "value": "calibration"
+    }
+  ],
+  "technologies": [
+    {
+      "label": "Python",
+      "value": "python"
+    },
+    {
+      "label": "pandas",
+      "value": "pandas"
+    },
+    {
+      "label": "scikit-learn",
+      "value": "scikit-learn"
+    },
+    {
+      "label": "matplotlib",
+      "value": "matplotlib"
+    },
+    {
+      "label": "seaborn",
+      "value": "seaborn"
+    },
+    {
+      "label": "JupyterLab",
+      "value": "jupyterlab"
+    },
+    {
+      "label": "SQL Server",
+      "value": "sql-server"
+    },
+    {
+      "label": "Tableau",
+      "value": "tableau"
+    },
+    {
+      "label": "Microsoft Excel",
+      "value": "excel"
+    },
+    {
+      "label": "Git",
+      "value": "git"
+    },
+    {
+      "label": "GitHub",
+      "value": "github"
+    },
+    {
+      "label": "HTML",
+      "value": "html"
+    },
+    {
+      "label": "CSS",
+      "value": "css"
+    },
+    {
+      "label": "JavaScript",
+      "value": "javascript"
+    },
+    {
+      "label": "TypeScript",
+      "value": "typescript"
+    },
+    {
+      "label": "React",
+      "value": "react"
+    },
+    {
+      "label": "React Three Fiber",
+      "value": "react-three-fiber"
+    },
+    {
+      "label": "three.js",
+      "value": "three-js"
+    },
+    {
+      "label": "Vite",
+      "value": "vite"
+    },
+    {
+      "label": "Astro",
+      "value": "astro"
+    },
+    {
+      "label": "Blender",
+      "value": "blender"
+    },
+    {
+      "label": "Lenis",
+      "value": "lenis"
+    },
+    {
+      "label": "Zustand",
+      "value": "zustand"
+    },
+    {
+      "label": "Render",
+      "value": "render"
+    },
+    {
+      "label": "Windows",
+      "value": "windows"
+    },
+    {
+      "label": "Arena PLM",
+      "value": "arena-plm"
+    }
+  ]
+}

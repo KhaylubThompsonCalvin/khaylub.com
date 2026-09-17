@@ -22,7 +22,7 @@ function walk(dir, exts) {
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) {
-      if (name === 'node_modules' || name === '.git') continue;
+      if (name === 'node_modules' || name === '.git' || name === 'dist' || name === '.astro') continue;
       out.push(...walk(p, exts));
     } else if (!exts || exts.includes(extname(p).toLowerCase())) out.push(p);
   }
@@ -30,7 +30,9 @@ function walk(dir, exts) {
 }
 
 const textExts = ['.md', '.mdx', '.yaml', '.yml', '.astro', '.ts', '.tsx', '.mjs', '.js', '.css', '.html', '.json', '.txt', '.xml'];
-const sources = [...walk('content', textExts), ...walk('src', textExts), ...walk('public', ['.txt', '.html', '.svg', '.json']), ...(existsSync('docs') ? walk('docs', ['.md']) : [])];
+// The owner Studio (studio/, ADR-012) is a separate app; its sources obey the same banned-term,
+// em-dash, path, and credential rules as the site's.
+const sources = [...walk('content', textExts), ...walk('src', textExts), ...walk('public', ['.txt', '.html', '.svg', '.json']), ...(existsSync('docs') ? walk('docs', ['.md']) : []), ...walk('studio', textExts)];
 const built = hasDist ? walk('dist', ['.html', '.txt', '.xml', '.json']) : [];
 const everything = [...sources, ...built];
 
@@ -127,10 +129,22 @@ for (const s of approved) if (!featured.includes(s)) fail(`approved featured slu
 // 6. Redirects in sync with render.yaml.
 const redirects = load(readFileSync('content/redirects.yaml', 'utf8')).redirects;
 const render = load(readFileSync('render.yaml', 'utf8'));
-// Every service in the Blueprint must carry the same redirects and headers (production and staging).
-for (const svc of render.services.slice(1)) {
+// Every static site in the Blueprint (production and staging) carries the same redirects and headers;
+// the first service is production. Any other runtime (the owner Studio, a Node web service) carries no
+// public header or route rule, no pull-request previews, and no secret value: secrets are set in the
+// dashboard (sync: false), never written here.
+const staticSites = render.services.filter((svc) => svc.runtime === 'static');
+if (render.services[0]?.runtime !== 'static') fail('render.yaml: the first service must be the production static site');
+for (const svc of staticSites.slice(1)) {
   if (JSON.stringify(svc.routes ?? []) !== JSON.stringify(render.services[0].routes ?? [])) fail(`render.yaml: service ${svc.name} routes differ from ${render.services[0].name}`);
   if (JSON.stringify(svc.headers ?? []) !== JSON.stringify(render.services[0].headers ?? [])) fail(`render.yaml: service ${svc.name} headers differ from ${render.services[0].name}`);
+}
+for (const svc of render.services.filter((svc) => svc.runtime !== 'static')) {
+  if (svc.headers || svc.routes) fail(`render.yaml: service ${svc.name} is not a static site and must declare no headers or routes`);
+  if (svc.pullRequestPreviewsEnabled !== false) fail(`render.yaml: service ${svc.name} must set pullRequestPreviewsEnabled: false`);
+  for (const v of svc.envVars ?? []) {
+    if (/SECRET|TOKEN|PASSWORD|PRIVATE/i.test(v.key) && v.value !== undefined) fail(`render.yaml: service ${svc.name} writes a value for ${v.key}; secrets are dashboard-only (sync: false)`);
+  }
 }
 const routes = (render.services[0].routes ?? []).filter((r) => r.type === 'redirect');
 for (const r of redirects) {

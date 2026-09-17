@@ -1,0 +1,8 @@
+---
+// The Keystatic admin. Client-only React: nothing renders before the browser loads the app.
+import { Keystatic } from '../../keystatic-page';
+
+export const prerender = false;
+---
+
+<Keystatic client:only="react" />
