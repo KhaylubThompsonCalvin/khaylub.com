@@ -12,13 +12,17 @@ export type Vocabulary = (typeof VOCABULARIES)[number];
 
 // Matches the site's slug rule: lowercase letters, digits, single hyphens.
 export const SLUG_PATTERN = '^[a-z0-9]+(?:-[a-z0-9]+)*$';
+// The same rule for an optional text field: Keystatic validates a pattern against the empty value
+// too, so an optional slug-shaped field must accept empty (Keystatic then omits the key on save).
+export const SLUG_OR_EMPTY_PATTERN = '^(?:[a-z0-9]+(?:-[a-z0-9]+)*)?$';
 
 export type FieldSpec =
   // The entry name: stored under this key in the frontmatter and used as the file name.
   | { kind: 'slug'; required: true; description: string }
   | { kind: 'text'; required: boolean; multiline?: boolean; min?: number; max?: number; pattern?: string; description?: string }
   | { kind: 'select'; required: true; options: readonly string[]; defaultValue: string; description?: string }
-  | { kind: 'multiselect'; required: boolean; vocabulary: Vocabulary; min?: number; description?: string }
+  // Keystatic's multiselect has no minimum; "at least one tag" is the schema's rule, enforced at validate.
+  | { kind: 'multiselect'; required: boolean; vocabulary: Vocabulary; description?: string }
   | { kind: 'date'; required: boolean; description?: string }
   | { kind: 'checkbox'; required: boolean; defaultValue: boolean; description?: string }
   | { kind: 'integer'; required: boolean; description?: string }
@@ -36,7 +40,9 @@ export const BODY_KEY = 'body';
 // `featured` stays Git-only because the featured set is owner-approved and checked by validate.
 export const DEFERRED_KEYS = ['cover', 'cover_alt', 'provenance', 'featured'] as const;
 
-export const notesFields: Record<string, FieldSpec> = {
+// Literal keys (satisfies, not a Record annotation) so keystatic.config.ts can name the slug field
+// by type; the test treats it as a plain table.
+export const notesFields = {
   slug: { kind: 'slug', required: true, description: 'Lowercase letters, digits, and single hyphens; unique across every collection; also the file name.' },
   title: { kind: 'text', required: true, min: 3, max: 90 },
   type: { kind: 'select', required: true, options: NOTE_TYPES, defaultValue: 'field-note' },
@@ -48,15 +54,15 @@ export const notesFields: Record<string, FieldSpec> = {
   // schema applies its minimum only when the key is present. The site's validate step is the judge.
   problem: { kind: 'text', required: false, multiline: true, max: 240, description: 'Only for a featured case study; 20 to 240 characters when set.' },
   role: { kind: 'text', required: false, max: 240, description: 'Only for a featured case study; 3 to 240 characters when set.' },
-  tags: { kind: 'multiselect', required: true, vocabulary: 'tags', min: 1 },
+  tags: { kind: 'multiselect', required: true, vocabulary: 'tags', description: 'At least one; the site refuses a note without a tag.' },
   skills: { kind: 'multiselect', required: false, vocabulary: 'skills' },
   technologies: { kind: 'multiselect', required: false, vocabulary: 'technologies' },
   employer_visible: { kind: 'checkbox', required: true, defaultValue: false, description: 'Show this note on the employer lane.' },
   source: { kind: 'text', required: true, min: 1, description: 'Where the note comes from: a repository, a release, a page.' },
   related: { kind: 'array-text', required: false, pattern: SLUG_PATTERN, description: 'Slugs of other artifacts; each must exist.' },
-  series: { kind: 'text', required: false, description: 'A series slug (lowercase letters, digits, single hyphens) when the note belongs to one.' },
+  series: { kind: 'text', required: false, pattern: SLUG_OR_EMPTY_PATTERN, description: 'A series slug (lowercase letters, digits, single hyphens) when the note belongs to one.' },
   part: { kind: 'integer', required: false },
   ai_assisted: { kind: 'checkbox', required: false, defaultValue: false, description: 'Renders the one-sentence disclosure.' },
   license: { kind: 'text', required: false },
-  [BODY_KEY]: { kind: 'body' },
-};
+  body: { kind: 'body' },
+} satisfies Record<string, FieldSpec>;

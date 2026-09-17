@@ -449,14 +449,21 @@ public site never reads it, and its build, headers, budgets, and tests are uncha
    to the service's `onrender.com` name (Render's free workspace includes two custom domains;
    further ones are billed).
 
-### 10.3 Security checklist (recorded per deploy in section 9)
+### 10.3 Security checklist (AUTOMATED where marked; recorded per deploy in section 9)
 
-- An anonymous visit to `/keystatic` shows only "Log in with Keystatic Cloud" (or the GitHub App
-  login); `/api/keystatic/tree` answers 404 in cloud mode and `POST /api/keystatic/update` 403;
-  repository files are never served (`/content/notes/<slug>.md` 404).
-- Every response carries `X-Robots-Tag: noindex, nofollow, noarchive`, `X-Frame-Options: DENY`,
-  `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
-  `Cache-Control: no-store`; `/robots.txt` disallows everything.
+- AUTOMATED (`studio/scripts/anonymous-check.mjs`, run by the CI job `studio` on every change under
+  `studio/`; by hand against a deploy: `STUDIO_CHECK_BASE=https://<service>.onrender.com node
+  studio/scripts/anonymous-check.mjs`; without that variable it starts the built server locally): an anonymous visit to `/keystatic` shows only the login shell and embeds no repository
+  content; `/api/keystatic/tree` and `/api/keystatic/blob/...` answer 404 in cloud mode and
+  `POST /api/keystatic/update` is refused; repository files are never served (`/content/notes/<slug>.md`,
+  `/keystatic.config.ts`, `/package.json`, `/.env` all 404).
+- AUTOMATED (same script): every response carries `X-Robots-Tag: noindex, nofollow, noarchive`,
+  `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, `Cache-Control: no-store`,
+  `Content-Security-Policy: frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'`,
+  `Strict-Transport-Security: max-age=31536000; includeSubDomains`; `/robots.txt` disallows everything.
+  The source directives of the policy (script, style, connect, img) are added after the deployed
+  Studio's console shows what Keystatic Cloud loads (Phase 25).
 - No public sign-up: Keystatic Cloud membership is the owner's team (three seats, all the owner's);
   in GitHub mode, only collaborators with write access to the repository can publish.
 - The public site is unchanged: the full guard on the merged tree; `npm run headers:scan` against

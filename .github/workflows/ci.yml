@@ -109,6 +109,32 @@ jobs:
           test -f dist/notes/wanderer-pipeline/index.html
           grep -q 'Disallow: /' dist/robots.txt
 
+  # The owner Studio (studio/, ADR-012): its own package, type-checked, built in cloud storage mode
+  # with a placeholder project name (no secret; the real name is a Render environment variable), and
+  # its anonymous surface asserted (runbook section 10.3). The public site's jobs never read studio/.
+  studio:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: studio
+    env:
+      PUBLIC_KEYSTATIC_STORAGE: cloud
+      PUBLIC_KEYSTATIC_CLOUD_PROJECT: ci/placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - run: npm ci
+      - name: Types
+        run: npm run check
+      - name: Build (cloud storage mode; a local-mode build is refused)
+        run: npm run build
+      - name: Anonymous surface (login shell only, private headers, no reads, no writes)
+        run: node scripts/anonymous-check.mjs
+
   weekly-external-links:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest

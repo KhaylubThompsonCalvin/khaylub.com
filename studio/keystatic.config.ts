@@ -4,13 +4,13 @@
 // repository root as its working directory (see package.json), and in cloud or GitHub mode
 // Keystatic addresses the repository itself. Entries are written as content/notes/<slug>.md with
 // YAML frontmatter and a Markdown body, the shape the site's glob loader and schema expect.
-import { config, fields, collection } from '@keystatic/core';
+import { config, fields, collection, type ComponentSchema } from '@keystatic/core';
 import { notesFields, BODY_KEY, SLUG_PATTERN, type FieldSpec } from './src/notes-fields';
 import vocabulary from './src/vocabulary.generated.json';
 
 const slugRegex = new RegExp(SLUG_PATTERN);
 
-function field(key: string, spec: FieldSpec): any {
+function field(key: string, spec: FieldSpec): ComponentSchema {
   const label = key.replace(/_/g, ' ');
   switch (spec.kind) {
     case 'slug':
@@ -45,8 +45,6 @@ function field(key: string, spec: FieldSpec): any {
         label,
         description: spec.description,
         options: vocabulary[spec.vocabulary],
-        // An empty list for a required vocabulary field fails the site's schema at validate time;
-        // Keystatic's multiselect has no minimum, so the rule is stated in the description.
       });
     case 'date':
       return fields.date({ label, description: spec.description, validation: { isRequired: spec.required } });
@@ -60,7 +58,7 @@ function field(key: string, spec: FieldSpec): any {
           label: 'slug',
           validation: spec.pattern ? { pattern: { regex: new RegExp(spec.pattern), message: 'a slug' } } : undefined,
         }),
-        { label, description: spec.description, itemLabel: (props: any) => props.value || 'slug' }
+        { label, description: spec.description, itemLabel: (props) => props.value || 'slug' }
       );
     case 'object':
       return fields.object(
@@ -75,7 +73,8 @@ function field(key: string, spec: FieldSpec): any {
   }
 }
 
-const schema = Object.fromEntries(Object.entries(notesFields).map(([k, s]) => [k, field(k, s)]));
+// The slug key is named for Keystatic's type of `slugField`; every other field is a generic schema entry.
+const schema = Object.fromEntries(Object.entries(notesFields).map(([k, s]) => [k, field(k, s)])) as { [K in keyof typeof notesFields]: ComponentSchema } & { slug: ReturnType<typeof fields.slug> };
 
 // Storage mode by environment (PUBLIC_ variables are inlined at build time, so the browser bundle and
 // the server agree). Local mode is for development only: it writes to the working tree of the
