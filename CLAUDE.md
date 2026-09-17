@@ -238,9 +238,17 @@ clarifications), and the Phases 24 to 28 plan (document 47 and document 46 secti
 repository or production change. The owner publishing system is Keystatic, a Git-backed Studio on a
 separate Node service, never the production static site; Git stays the canonical source of truth; the
 Studio publishes only through branch, pull request, checks, merge; no Sanity without implementation
-evidence. Phase 24 (Owner Studio and authentication) is the next gated phase and is NOT opened; it opens
-only on the owner's instruction through `/phase 24`. Its plan is vault document 47 (Keystatic Cloud free
-tier recommended, GitHub mode the fallback; the notes field mapping in appendix A; the Studio app under
-`studio/` as a third Render service declared in `render.yaml`; the owner's Keystatic Cloud account and the
-GitHub auto-merge and branch-protection settings are the owner actions).
+evidence. Phase 24 (Owner Studio and authentication) is ACCEPTED and CLOSED: the owner recorded "Phase 24
+PASS" on 2026-09-17 after signing in to the live Studio through Keystatic Cloud and completing the smoke
+test on a `studio/` branch (draft, publish, unpublish, delete; four commits verified; `main` untouched).
+The Studio is the Node web service `khaylub-studio` from `render.yaml` (root directory `studio/`, cloud
+storage mode, no secret anywhere), built by PR #48 and repaired for a clean install by PR #49 (Vite pinned
+to the Studio's own tsconfig; the CI job `studio` installs only the Studio's package and runs the
+anonymous-surface check, which is the Render-condition regression check). One collection so far, field
+notes, whose field table `tests/studio-config.spec.ts` holds equal to the Zod schema; `cover`, `cover_alt`,
+`provenance` wait for Phase 27 and `featured` stays Git-only. Follow-ups for Phase 25: the body editor's
+placement on a phone, the Content-Security-Policy source directives from the live console, the other
+collections. Phase 25 (Content schemas and editor experience) is the next gated phase and is NOT opened;
+it opens only on the owner's instruction through `/phase 25`. Phase 26 owns the `studio/*` pull-request
+workflow and auto-merge ("Allow auto-merge" and branch protection on `main` are owner settings).
 Phase 21 owns the production move of khaylub.com from V1 to V2.
