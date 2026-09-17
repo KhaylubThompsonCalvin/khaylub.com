@@ -507,6 +507,21 @@ moves the entry's image files to its own layout in the same commit (`cover.webp`
 unchanged (proven on `wanderer-hero` on 2026-09-17: validate PASS, the built page identical in
 output format).
 
+### 10.6 The owner's authoring test of each type (Phase 25; Owner, on a phone)
+
+1. In the Studio, switch to a new branch named `studio/phase-25-types` (never main).
+2. Create one entry of each type with real or throwaway content, each saved as a draft: Writing,
+   Field notes, Journal, Projects (a school project: fill `context`, pick at least one technology,
+   add one proof link), Gallery (upload one image, write its alt text), Video (upload a poster; an
+   `external_url` is enough for the file), Audio-visual stories (a duration such as `3:42`, an
+   `external_url`, the provenance group). Every save is a commit on the branch.
+3. Open a pull request from that branch on GitHub (the compare URL is
+   `https://github.com/KhaylubThompsonCalvin/khaylub.com/compare/main...studio/phase-25-types`). CI runs
+   validate on the seven documents and the preview build renders them; the pull request page shows
+   the checks. Do not merge unless the entries are meant to be real.
+4. Report which forms felt right on the phone and which did not; close the pull request and delete
+   the branch if the entries were throwaway, or ask for the merge if they are real.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
