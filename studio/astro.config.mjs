@@ -16,6 +16,11 @@ export default defineConfig({
   // Keystatic's admin binds to 127.0.0.1; the public site's dev server uses 4321, the Studio 4322.
   server: { host: '127.0.0.1', port: 4322 },
   vite: {
+    // Pin the TypeScript configuration to this app's own file. Without it, Vite's resolver discovers a
+    // tsconfig by walking up from each file it resolves, reaches the repository root's tsconfig, and
+    // fails on its `extends` wherever the root's dependencies are not installed (a clean install of
+    // studio/ alone, as on Render). The Studio must build from its own package with nothing above it.
+    tsconfig: 'tsconfig.json',
     optimizeDeps: { entries: ['keystatic.config.ts', 'src/keystatic-page.ts'] },
   },
 });

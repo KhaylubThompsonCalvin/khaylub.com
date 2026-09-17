@@ -112,6 +112,7 @@ jobs:
   # The owner Studio (studio/, ADR-012): its own package, type-checked, built in cloud storage mode
   # with a placeholder project name (no secret; the real name is a Render environment variable), and
   # its anonymous surface asserted (runbook section 10.3). The public site's jobs never read studio/.
+  # This job is also the clean-install regression check for the Render build (see the npm ci step).
   studio:
     runs-on: ubuntu-latest
     defaults:
@@ -126,13 +127,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            studio/package-lock.json
-      # The repository root's dependencies too: Vite resolves the closest tsconfig chain, and the root
-      # tsconfig extends astro's, which must be installed at the root as it is on every machine.
-      - run: npm ci
-        working-directory: .
+          cache-dependency-path: studio/package-lock.json
+      # Only the Studio's own package is installed, never the repository root's: this is the condition
+      # Render builds under (root directory studio/), so a build that leans on a parent installation
+      # fails here first. Do not add a root install to this job.
       - run: npm ci
       - name: Types
         run: npm run check
