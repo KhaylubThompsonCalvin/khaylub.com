@@ -226,9 +226,15 @@ items: the TTL restore at Namecheap after the window, the D-09 `noindex` meta on
 tag), CSP enforcement (runbook section 8, held), the Render support case on path-specific headers, the
 Phase 20 post-launch backlog (P2-FE-12, P2-FE-14, P2-CE-04, P2-SEC-07), and branch protection on `main`.
 Phase 22 (V1 archival case study) is DEFERRED by decision D-26 and is not the next phase. Phase 23
-(Publishing architecture and ADR) is the next gated phase and is NOT opened; it opens only on the owner's
-instruction through `/phase 23`. Its architecture document (vault document 46), ADR-012 (ACCEPTED by the
-owner on 2026-09-16, decision D-27, nine clarifications), the Phase 24 plan (document 47), and its gate
-note are prepared in the vault: the owner publishing system is Keystatic, Git-backed, on a separate Node
-service, never the production static site.
+(Publishing architecture and ADR) is ACCEPTED and CLOSED: the owner recorded "Phase 23 PASS" on 2026-09-17
+over the architecture document (vault document 46), ADR-012 (ACCEPTED on 2026-09-16, decision D-27, nine
+clarifications), and the Phases 24 to 28 plan (document 47 and document 46 section 14); the phase made no
+repository or production change. The owner publishing system is Keystatic, a Git-backed Studio on a
+separate Node service, never the production static site; Git stays the canonical source of truth; the
+Studio publishes only through branch, pull request, checks, merge; no Sanity without implementation
+evidence. Phase 24 (Owner Studio and authentication) is the next gated phase and is NOT opened; it opens
+only on the owner's instruction through `/phase 24`. Its plan is vault document 47 (Keystatic Cloud free
+tier recommended, GitHub mode the fallback; the notes field mapping in appendix A; the Studio app under
+`studio/` as a third Render service declared in `render.yaml`; the owner's Keystatic Cloud account and the
+GitHub auto-merge and branch-protection settings are the owner actions).
 Phase 21 owns the production move of khaylub.com from V1 to V2.
