@@ -28,6 +28,11 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
   the preview build, never production). `khaylub.com` and `www.khaylub.com` are attached to `khaylub-com`
   since the Phase 21 cutover of 2026-09-16; `v1.khaylub.com` is the preserved V1 exhibit on its own service.
   Production DNS, domains, and Render settings change only at an owner-gated step of an opened phase.
+  The owner Studio (`studio/`) is the third service in `render.yaml`, `khaylub-studio`, a Node web service
+  with no public header rules; it commits to `studio/*` branches and never writes to `main` or to
+  production directly (ADR-012). No secret is ever written to the repository: storage mode and the
+  Keystatic Cloud project name are environment variables on the service; GitHub-mode secrets live in
+  the Render dashboard.
   `scripts/serve-with-headers.mjs` applies the same headers locally so tests can assert them.
   This project is not on Vercel; Vercel skills and agents do not apply.
 
@@ -46,6 +51,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 | `scripts/` | `validate.mjs`, `banned-terms.txt`, the header server, the invalid-fixture check |
 | `tests/` | Playwright suites: a11y, headers, security, seo, js-off, nav, home, resume, targets, content |
 | `.claude/` | project settings and the verification guard hook |
+| `studio/` | the owner's publishing Studio (Keystatic on Astro, Node adapter; ADR-012): its own package, never part of the site's build; `src/notes-fields.ts` is held equal to the Zod schema by `tests/studio-config.spec.ts` |
 | `docs/` | `RUNBOOK.md`: staging, the V1 exhibit, the timed rehearsal, cutover (Phase 21), rollback; owner-executed |
 
 ## Design authority

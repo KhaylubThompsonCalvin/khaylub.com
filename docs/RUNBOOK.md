@@ -420,6 +420,68 @@ violations in CI); the owner says go.
 
 Not done in Phase 19 unless the owner says go after the staging log is clean.
 
+## 10. The owner Studio (Phase 24; ADR-012)
+
+The Studio is the app under `studio/`: Keystatic's admin and API on an Astro server build with the
+Node adapter, declared in `render.yaml` as the web service `khaylub-studio` (root directory
+`studio`, free plan, pull-request previews off, redeployed only when `studio/` or the Blueprint
+changes). It edits the repository's Markdown through forms and commits to `studio/*` branches; the
+public site never reads it, and its build, headers, budgets, and tests are unchanged by it
+(`tests/studio-config.spec.ts` holds the Studio's field table equal to the Zod schema;
+`scripts/validate.mjs` scans the Studio's sources like the site's).
+
+### 10.1 Storage modes (no secret in the repository, ever)
+
+| Mode | `PUBLIC_KEYSTATIC_STORAGE` | Also needed | Where the owner signs in | Use |
+|---|---|---|---|---|
+| `local` | unset | nothing | nobody: the dev server writes to the checkout | development only; a production build refuses it (`studio/scripts/check-storage.mjs`) |
+| `cloud` (recommended) | `cloud` | `PUBLIC_KEYSTATIC_CLOUD_PROJECT` = `team/project` from Keystatic Cloud | GitHub, through Keystatic Cloud (free up to three users) | the deployed Studio |
+| `github` (fallback) | `github` | `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`; the secrets `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET` set in the Render dashboard, never in this file | GitHub, through the owner's own GitHub App | if Cloud fails any item of ADR-012 clarification 5 |
+
+### 10.2 Deploy (Owner; the Blueprint sync creates the service)
+
+1. Keystatic Cloud: sign in with GitHub at keystatic.cloud, create a team and a project, connect
+   `KhaylubThompsonCalvin/khaylub.com`; note the project name as `team/project`.
+2. Merge the pull request that declares `khaylub-studio`; in the Render Blueprint sync, enter the
+   project name when prompted for `PUBLIC_KEYSTATIC_CLOUD_PROJECT`. Confirm the service builds
+   (`studio build: cloud storage` in the build log) and answers at its `onrender.com` URL.
+3. Optional hostname: `studio.khaylub.com` as a custom domain on the service plus a Namecheap CNAME
+   to the service's `onrender.com` name (Render's free workspace includes two custom domains;
+   further ones are billed).
+
+### 10.3 Security checklist (AUTOMATED where marked; recorded per deploy in section 9)
+
+- AUTOMATED (`studio/scripts/anonymous-check.mjs`, run by the CI job `studio` on every change under
+  `studio/`; by hand against a deploy: `STUDIO_CHECK_BASE=https://<service>.onrender.com node
+  studio/scripts/anonymous-check.mjs`; without that variable it starts the built server locally): an anonymous visit to `/keystatic` shows only the login shell and embeds no repository
+  content; `/api/keystatic/tree` and `/api/keystatic/blob/...` answer 404 in cloud mode and
+  `POST /api/keystatic/update` is refused; repository files are never served (`/content/notes/<slug>.md`,
+  `/keystatic.config.ts`, `/package.json`, `/.env` all 404).
+- AUTOMATED (same script): every response carries `X-Robots-Tag: noindex, nofollow, noarchive`,
+  `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, `Cache-Control: no-store`,
+  `Content-Security-Policy: frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'`,
+  `Strict-Transport-Security: max-age=31536000; includeSubDomains`; `/robots.txt` disallows everything.
+  The source directives of the policy (script, style, connect, img) are added after the deployed
+  Studio's console shows what Keystatic Cloud loads (Phase 25).
+- No public sign-up: Keystatic Cloud membership is the owner's team (three seats, all the owner's);
+  in GitHub mode, only collaborators with write access to the repository can publish.
+- The public site is unchanged: the full guard on the merged tree; `npm run headers:scan` against
+  khaylub.com unchanged; the Studio is not linked from the public site.
+- No secret in the repository: gitleaks in CI; `validate` fails on credential patterns and on a
+  Blueprint secret value.
+
+### 10.4 The smoke test (Owner, on the deployed Studio; the local run is recorded in the vault)
+
+1. Sign in on a phone. Field notes, Add: slug `studio-smoke-test`, title, date, a summary of 40 to
+   240 characters, one tag, a source; body text with a wikilink such as `[[preserving-v1]]`.
+   Create. Keystatic commits the file `content/notes/studio-smoke-test.md` on a new branch under
+   `studio/` (choose "create a new branch" when asked; never commit to `main`).
+2. Publish: set status to `published`, Save. Unpublish: set status back to `draft`, Save.
+3. Delete the entry (Delete entry, Yes, delete). Delete the branch on GitHub.
+4. Record in section 9: the branch name, the three commits, and that `main` and the public site
+   did not change.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
