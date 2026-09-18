@@ -17,7 +17,7 @@ source: phone test
 related: []
 ai_assisted: false
 project_status: concept
-context: Use a real course / term line you are comfortable displaying temporarily
+context: CIS 277A, Summer 2026
 links: {}
 ---
 This is temporary project verifies that content published from the owner Studio reaches every expected Khaylub.com output.
