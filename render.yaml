@@ -158,6 +158,10 @@ services:
       - path: /.well-known/security.txt
         name: Cache-Control
         value: public, max-age=3600
+      # The build stamp the publishing harness polls (scripts/publishing-verify.mjs): never cached.
+      - path: /build.json
+        name: Cache-Control
+        value: no-cache
 
   - type: web
     name: khaylub-com-v2
@@ -287,6 +291,10 @@ services:
       - path: /.well-known/security.txt
         name: Cache-Control
         value: public, max-age=3600
+      # The build stamp the publishing harness polls (scripts/publishing-verify.mjs): never cached.
+      - path: /build.json
+        name: Cache-Control
+        value: no-cache
 
   - type: web
     name: khaylub-studio

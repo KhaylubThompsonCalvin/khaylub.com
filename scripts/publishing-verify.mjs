@@ -40,6 +40,10 @@ if (!branch) {
   process.exit(2);
 }
 let expect = opt('expect', null);
+if (expect && !['published', 'draft', 'removed', 'refused', 'held'].includes(expect)) {
+  console.error(`--expect must be one of published, draft, removed, refused, held (got "${expect}")`);
+  process.exit(2);
+}
 const timeoutMs = parseDuration(opt('timeout', '25m'));
 const staging = opt('staging', STAGING).replace(/\/$/, '');
 const production = opt('production', PRODUCTION).replace(/\/$/, '');
