@@ -543,14 +543,49 @@ output format).
    reopens the pull request on GitHub.
 5. A failed build never reaches production: an invalid file cannot merge (the protection rule), and
    if a production build ever failed on Render the previous deploy would stay live (Render keeps
-   the last successful build).
+   the last successful build). Three facts from the first live runs (2026-09-18): an automatic
+   merge is a workflow-token push and raises no CI run on `main` (the branch commit carried the
+   six checks; the rule is not strict, so two Studio branches merged in sequence were each tested
+   against the `main` they branched from); GitHub's "Automatically delete head branches" does not
+   act on those merges, so the owner deletes Studio branches on GitHub or in the Studio's branch
+   menu now and then; no Render pull-request preview comment appeared on the automatic pull
+   requests, and the staging service (the preview build of `main`, drafts visible, noindex) is the
+   preview surface: a merged draft shows there and nowhere public.
 6. Needs, once: "Allow auto-merge" and the `main` protection rule (both on, verified 2026-09-18 UTC) and the
    Actions setting "Allow GitHub Actions to create and approve pull requests" (Settings, Actions,
    General, Workflow permissions), without which the workflow cannot open pull requests.
+
+### 10.8 Automation-first acceptance (the owner's rule from Phase 27 onward; decision D-28)
+
+Every owner or manual verification step of a phase is classified before the work starts:
+**AUTOMATABLE** when Playwright, an existing deterministic test, a script, or a GitHub API read can
+prove it reliably (Claude runs it, records the output, fixes deterministic failures, and never asks
+the owner to click through it), or **OWNER JUDGMENT REQUIRED** when a human opinion is the point:
+whether a design looks good, typography feels right, a form or mobile editing feels intuitive,
+wording makes sense to the owner, media placement is appropriate, a real artifact is approved for
+publication, and final visual acceptance. The owner is presented with the automated evidence first
+and one clear question at a time.
+
+The harness, reusable rather than one-off, follows this file's script conventions:
+
+| Command | Proves | Phase |
+|---|---|---|
+| `npm test` and CI (existing) | routes load; every published entry on its collection page, in the sitemap, the search index, the feeds when appropriate, the graph, with its card; every draft in none; the context line; links; images; noindex; axe; keyboard; targets; budgets; Lighthouse | in place |
+| `node studio/scripts/anonymous-check.mjs` (existing) | the Studio loads and its anonymous surface is closed, locally and live | in place |
+| `npm run test:publishing` | for a Studio branch or slug: the branch exists, the workflow opened the pull request, the six checks attached, auto-merge is on, the merge came after green, `main` holds the content, staging serves it, production serves it only when published; each step timed. GitHub state is read through the API, never through a browser | Phase 27 |
+| `npm run test:studio` | the local Studio in local storage mode inside a throwaway checkout (no sign-in exists there, so no credential is involved): the sidebar, every collection's form, labels and help text, required-field refusal, the Body editor visible, poster and thumbnail wording present, the mobile viewport hiding no control, a create-and-validate round trip per collection | Phase 28 |
+| `npm run test:visual` | screenshots of the important routes at the three viewports into the evidence folder, and no horizontal overflow; pixel comparison only after the owner agrees a baseline | Phase 28 |
+| `npm run acceptance` | runs the above for a named slug and writes one report: every PASS line and the owner-judgment questions that remain | Phase 28 |
+
+Rules: no GitHub credential, Keystatic credential, secret, or personal token in any Playwright or
+script source; the deployed Studio is tested on its anonymous surface only; authenticated flows run
+against the local Studio in a throwaway checkout; the existing Lighthouse, accessibility, header,
+and CI checks are kept, never weakened. The full record: vault document 52.
 
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | the session (a draft) and the owner (a published project) | 10.7 the publish path: `studio/phase-26-smoke` (a draft note; pull request #57 opened by the workflow, merged by itself in 14 minutes; on staging with noindex; production 404; removed by #58), then the owner's `studio/p26-test` (a published project with a context line; #59 merged by itself; on staging and production; its context corrected by #60) | PASS: every step automatic after the save; the owner verified the project page, the Projects listing, Search, the Graph, the feed, and the card on staging | none in the path; the context field first held its own instruction sentence, corrected through the same path |
 | 2026-09-18 | owner (steps) and the session (verification) | 10.6 the authoring test of each type on a phone on `studio/phase-25-types` (seven commits, one per collection; the pull request #52 for CI: every job green) | PASS: every entry in the site's shape; check, validate, and the preview build green on the seven files locally and in CI; the owner's verdict recorded in the Phase 25 gate note; the Video help text clarified (PR #54) | one: the test pull request was merged by habit and reverted the same hour (PR #53), `main` unchanged in effect; step 3 now says to mark the pull request a draft |
 | 2026-09-17 | owner (steps) and the session (verification) | 10.2 deploy (Keystatic Cloud project `khaylub/khaylub-com`; `khaylub-studio` created by the Blueprint sync; the first build failed on the root tsconfig, fixed by PR #49; the redeploy succeeded); 10.3 checklist (the automated check PASS against https://khaylub-studio.onrender.com at 21:58 UTC; manual items answered in the Phase 24 gate note); 10.4 smoke test on `studio/phase-24-smoke` | PASS: commits `be5dfd0` draft, `023945c` published with the body and its wikilink, `e49c240` draft, `1475cbb` deleted; the branch's tree identical to `main`; the branch deleted; `main` at `8ea4e3d` throughout; khaylub.com unchanged | one: the owner's first body sentence landed in the `problem` field on a phone and was moved to the body at the publish step (a Phase 25 editor item) |
