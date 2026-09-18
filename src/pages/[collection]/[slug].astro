@@ -9,6 +9,7 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import ArtifactHeader from '@components/ArtifactHeader.astro';
 import MediaBlock from '@components/media/MediaBlock.astro';
 import Credits from '@components/Credits.astro';
+import Withdrawn from '@components/Withdrawn.astro';
 import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
@@ -16,22 +17,24 @@ import { mediaForJsonLd } from '@lib/media';
 import { ogAlt } from '@lib/og';
 import { identity } from '@lib/profile';
 import TableOfContents, { TOC_MIN_HEADINGS } from '@components/TableOfContents.astro';
-import { COLLECTIONS, allVisible, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
+import { COLLECTIONS, allVisible, allWithdrawn, collectionLabel, evidenceFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
 import { creativeWork, breadcrumbs } from '@lib/seo';
 
 export async function getStaticPaths() {
   const entries = await allVisible();
-  return entries.map((entry) => ({
-    params: { collection: entry.collection, slug: entry.data.slug },
-    props: { entry },
-  }));
+  // A withdrawn piece keeps its address with a notice in place of the page (Phase 27, runbook 10.9).
+  const withdrawn = await allWithdrawn();
+  return [
+    ...entries.map((entry) => ({ params: { collection: entry.collection, slug: entry.data.slug }, props: { entry, withdrawn: false } })),
+    ...withdrawn.map((entry) => ({ params: { collection: entry.collection, slug: entry.data.slug }, props: { entry, withdrawn: true } })),
+  ];
 }
 
-const { entry } = Astro.props as { entry: AnyEntry };
-const { Content, headings } = await render(entry as any);
+const { entry, withdrawn } = Astro.props as { entry: AnyEntry; withdrawn: boolean };
 const data = entry.data as any;
 const path = routeFor(entry);
 const meta = COLLECTIONS.find((c) => c.name === entry.collection)!;
+const { Content, headings } = withdrawn ? { Content: null as any, headings: [] as { depth: number; slug: string; text: string }[] } : await render(entry as any);
 // Only skills with a public evidence row get a link; a skill shown solely by this item while it is
 // archived, employer-hidden, or a preview draft is named without one.
 const evidenced = new Set((await evidenceFor('skills')).map((s) => s.slug));
@@ -46,6 +49,12 @@ const ogImage = `/og/${entry.collection}/${data.slug}.png`;
 const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
 ---
 
+{
+  withdrawn ? (
+    <BaseLayout title={`Withdrawn: ${data.slug}`} description="This piece has been withdrawn from the site and is no longer available at this address." current={entry.collection} noindex>
+      <Withdrawn collection={entry.collection} />
+    </BaseLayout>
+  ) : (
 <BaseLayout title={data.title} description={data.summary} current={entry.collection} jsonLd={jsonLd} ogImage={ogImage} ogImageAlt={ogImageAlt} ogType="article" feed={{ href: `${meta.route}feed.xml`, title: `${meta.label} feed` }}>
   <article class="artifact" data-pagefind-body={data.status === 'published' ? '' : undefined} data-pagefind-meta={`collection:${collectionLabel(entry.collection)}`}>
     <div data-pagefind-ignore>
@@ -113,6 +122,8 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
     </footer>
   </article>
 </BaseLayout>
+  )
+}
 
 <style>
   /* The contents nav precedes the body in the DOM, on screen, and in the tab order (W5 draws

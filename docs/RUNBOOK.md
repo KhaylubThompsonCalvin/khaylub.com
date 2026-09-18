@@ -536,9 +536,12 @@ output format).
    `main` to production. A `draft` stays invisible on production after the merge; a `published`
    piece goes live. Red checks: nothing merges; GitHub emails the failure; fix it in the Studio (a
    new save on the same branch re-runs everything) or close the pull request.
-4. Unpublish: set `status` back to `draft` in the Studio on a new branch and save (the same path).
-   Undo a merge: revert the merge commit by pull request (the repository's rollback rule; GitHub's
-   Revert button on the merged pull request does it). Hold a piece back: close its pull request
+4. Take back a piece the public has seen: set `status` to `withdrawn` in the Studio on a new
+   branch and save (the same path); its address then serves a short notice and it leaves every
+   listing (10.9 item 5). A draft that was never published stays a draft. Never delete a published
+   piece and never set it back to draft: the host would keep serving its old page. Undo a merge:
+   revert the merge commit by pull request (the repository's rollback rule; GitHub's Revert button
+   on the merged pull request does it); a revert of a publication needs the withdrawal as well. Hold a piece back: close its pull request
    without merging; the workflow then leaves that branch alone on later saves until the owner
    reopens the pull request on GitHub.
 5. A failed build never reaches production: an invalid file cannot merge (the protection rule), and
@@ -654,6 +657,17 @@ and CI checks are kept, never weakened. The full record: vault document 52.
      `render.yaml` (its path to its collection index) by pull request, and a Render support case
      asks whether removed files are purged on deploy. The harness reports this as a FAIL on the
      production step of `--expect draft` and on the staging step of `--expect removed`, on purpose.
+   - **The withdrawal (the owner's decision of 2026-09-18, the smallest mechanism):** the status
+     `withdrawn`. The piece's files stay in Git as the record; the build writes a notice at its
+     address (`src/components/Withdrawn.astro`: "This piece has been withdrawn", `noindex`, nothing
+     from the piece, a link to the collection) and the site's default card at its card address, so
+     the next deploy overwrites what the host kept; it is in no listing, feed, sitemap, graph, or
+     search index (`tests/integration.spec.ts`, `scripts/seo-check.mjs`); a wikilink to it is
+     unresolved, like a link to a draft. Not preventable: the piece's processed images stay at their
+     hashed `/_astro/` addresses, unlinked and unguessable, until the host purges them. The Studio's
+     status picker offers `withdrawn`; `npm run test:publishing <branch> --expect withdrawn` proves
+     the notice on both origins, the derived places clear, and the default card. A Render support
+     case on the retention behaviour is prepared in the vault evidence folder (not a gate).
    - *The owner's test piece through the harness (2026-09-18):* a gallery still with a cover, one
      image, and a complete provenance record, created in the local Studio by the Playwright driver
      (the form filled, the files chosen, Create pressed; the entry written beside the file), pushed

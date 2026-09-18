@@ -3,9 +3,12 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
-import { wikilinksPlugin } from './src/lib/wikilinks.mjs';
+import { wikilinksPlugin, scanTargets } from './src/lib/wikilinks.mjs';
 
 const isPreview = process.env.PUBLIC_SITE_ENV === 'preview';
+// The routes of withdrawn pieces (status withdrawn), read from content/ the way the wikilink
+// resolver reads it, so the sitemap never lists a withdrawal notice.
+const withdrawnRoutes = [...scanTargets().values()].filter((t) => t.status === 'withdrawn').map((t) => t.route);
 
 export default defineConfig({
   site: 'https://khaylub.com',
@@ -28,8 +31,9 @@ export default defineConfig({
     // React is used for islands only (the climb, and later the optional graph map and orbit view).
     react(),
     sitemap({
-      // Preview builds never emit a sitemap that could be indexed by mistake.
-      filter: (page) => !isPreview && !page.includes('/404'),
+      // Preview builds never emit a sitemap that could be indexed by mistake; a withdrawal notice
+      // (Phase 27) is never listed.
+      filter: (page) => !isPreview && !page.includes('/404') && !withdrawnRoutes.some((r) => page.endsWith(r)),
     }),
   ],
   vite: {

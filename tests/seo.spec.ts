@@ -80,10 +80,12 @@ test.describe('SEO and metadata', () => {
     expect(person.knowsAbout.join(' ')).not.toMatch(/\bAI\b/);
   });
 
-  test('the sitemap lists every built route and nothing else', async ({ request }) => {
+  test('the sitemap lists every indexable built route and nothing else', async ({ request }) => {
     const xml = await (await request.get('/sitemap-0.xml')).text();
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).sort();
-    expect(locs).toEqual(builtRoutes());
+    // A withdrawal notice (Phase 27) is built at its address but never listed.
+    const indexable = builtRoutes().filter((r) => !/data-withdrawn="true"/.test(readFileSync(`dist${r}index.html`, 'utf8')));
+    expect(locs).toEqual(indexable);
   });
 
   test('robots.txt allows crawling and names the sitemap', async ({ request }) => {

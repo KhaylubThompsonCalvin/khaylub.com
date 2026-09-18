@@ -7,11 +7,13 @@
 // with its numbers (times from the save, run conclusions, statuses); the exit code is 1 on any FAIL.
 // No secret: gh uses the session's own login (in CI, the workflow token).
 //
-// Usage: node scripts/publishing-verify.mjs <branch> [--expect published|draft|removed|refused|held]
+// Usage: node scripts/publishing-verify.mjs <branch> [--expect published|draft|withdrawn|removed|refused|held]
 //        [--timeout 25m] [--staging <url>] [--production <url>] [--out report.json] [--no-wait]
 //
 //   published  the default when the merged file says so: merged, live on both origins
 //   draft      merged; staging serves it; production answers 404
+//   withdrawn  merged; both origins serve the withdrawal notice at the address, not the piece;
+//              the derived places on production no longer name it (runbook 10.9)
 //   removed    merged (a revert or a delete); both origins answer 404
 //   refused    a failing document: checks red, no merge, main and production unchanged
 //   held       the pull request was closed without merging; nothing reaches main
@@ -40,8 +42,8 @@ if (!branch) {
   process.exit(2);
 }
 let expect = opt('expect', null);
-if (expect && !['published', 'draft', 'removed', 'refused', 'held'].includes(expect)) {
-  console.error(`--expect must be one of published, draft, removed, refused, held (got "${expect}")`);
+if (expect && !['published', 'draft', 'withdrawn', 'removed', 'refused', 'held'].includes(expect)) {
+  console.error(`--expect must be one of published, draft, withdrawn, removed, refused, held (got "${expect}")`);
   process.exit(2);
 }
 const timeoutMs = parseDuration(opt('timeout', '25m'));
@@ -151,6 +153,7 @@ if (!expect) {
   if (pr.state === 'CLOSED' && !pr.mergedAt) expect = 'held';
   else if (!pr.mergedAt && red.length) expect = 'refused';
   else if (pr.mergedAt && !mainFile) expect = 'removed';
+  else if (mainStatus === 'withdrawn') expect = 'withdrawn';
   else expect = mainStatus && HIDDEN.has(mainStatus) ? 'draft' : 'published';
 }
 report.expect = expect;
@@ -177,12 +180,14 @@ for (const e of entries) {
   const file = e === entries[0] ? mainFile : api(`repos/${repo}/contents/${e.path}?ref=main`, true);
   const status = file ? statusOf(Buffer.from(file.content, 'base64').toString('utf8')) : null;
   e.mainStatus = status;
+  e.title = file ? (/^title:s*['"]?(.+?)['"]?s*$/m.exec(Buffer.from(file.content, 'base64').toString('utf8').split(/^---s*$/m)[1] ?? '')?.[1] ?? null) : null;
   if (expect === 'removed') step(`main ${e.path}`, !file, file ? `still on main (status ${status})` : 'absent from main');
   else if (expect === 'refused' || expect === 'held') {
     const base = api(`repos/${repo}/contents/${e.path}?ref=${pr.baseRefOid}`, true);
     const same = (base?.sha ?? null) === (file?.sha ?? null);
     step(`main ${e.path}`, same, same ? `unchanged from the pull request's base (${file ? 'status ' + status : 'absent'})` : 'differs from the base: something reached main');
   } else if (expect === 'draft') step(`main ${e.path}`, !!file && HIDDEN.has(status), file ? `status ${status}` : 'absent from main');
+  else if (expect === 'withdrawn') step(`main ${e.path}`, !!file && status === 'withdrawn', file ? `status ${status}` : 'absent from main');
   else step(`main ${e.path}`, !!file && status === 'published', file ? `status ${status}` : 'absent from main');
 }
 
@@ -209,17 +214,45 @@ for (const [label, origin] of [['staging', staging], ['production', production]]
       res = await fetch(origin + e.url, { redirect: 'manual' });
     }
     const html = res.status === 200 ? await res.text() : '';
-    const ok = want === 200 ? res.status === 200 && html.includes('</main>') : res.status === want;
-    step(`${label} ${e.url}`, ok, `${res.status} (expected ${want}${want === 200 && html ? ', page body served' : ''})${waited ? `, seen ${mmss(secs(saveAt, new Date().toISOString()))} after the save by content` : ''}`);
-    if (res.status === 200 && label === 'production') {
+    let ok = want === 200 ? res.status === 200 && html.includes('</main>') : res.status === want;
+    let note = want === 200 && html ? ', page body served' : '';
+    if (expect === 'withdrawn') {
+      const notice = html.includes('data-withdrawn="true"') && /<meta name="robots" content="noindex/.test(html);
+      const clean = !html.includes('</article') && !(e.title && html.includes(e.title));
+      ok = res.status === 200 && notice && clean;
+      note = notice ? (clean ? ', the withdrawal notice, nothing of the piece' : ', the notice but the piece still shows') : ', NOT the withdrawal notice (the old page)';
+    }
+    step(`${label} ${e.url}`, ok, `${res.status} (expected ${want}${note})${waited ? `, seen ${mmss(secs(saveAt, new Date().toISOString()))} after the save by content` : ''}`);
+    if (res.status === 200 && label === 'production' && expect === 'published') {
       const noindex = /<meta[^>]+name="robots"[^>]+noindex/i.test(html);
       step(`production ${e.url} indexable`, !noindex, noindex ? 'noindex on production' : 'no noindex meta');
+    }
+    // The derived places on production: the collection index, the sitemap, both feeds, the graph,
+    // and the card. A published piece is in all of them; anything else is in none (the card of a
+    // withdrawn piece is the site's default card).
+    if (label === 'production' && live.ok !== false) {
+      const present = expect === 'published';
+      const places = [[`/${e.collection}/`, 'collection index'], ['/sitemap-0.xml', 'sitemap'], ['/feed.json', 'JSON feed'], ['/feed.xml', 'RSS feed'], ['/graph/', 'graph']];
+      const found = [];
+      for (const [path, name] of places) {
+        const text = await (await fetch(origin + path, { cache: 'no-store' })).text();
+        if (text.includes(e.url)) found.push(name);
+      }
+      const okPlaces = present ? found.length === places.length : found.length === 0;
+      step(`production derived places ${e.url}`, okPlaces, present ? `named in ${found.length} of ${places.length}: ${found.join(', ') || 'none'}` : found.length ? `still named in: ${found.join(', ')}` : 'named in none of the collection index, sitemap, feeds, graph');
+      const card = await fetch(`${origin}/og/${e.collection}/${e.slug}.png`, { cache: 'no-store' });
+      if (expect === 'withdrawn') {
+        const bytes = card.status === 200 ? Buffer.from(await card.arrayBuffer()) : Buffer.alloc(0);
+        const def = Buffer.from(await (await fetch(`${origin}/og-default.png`, { cache: 'no-store' })).arrayBuffer());
+        step(`production card ${e.url}`, card.status === 200 && bytes.equals(def), card.status === 200 ? (bytes.equals(def) ? 'the default card' : 'still the old card') : `HTTP ${card.status}`);
+      } else if (present) step(`production card ${e.url}`, card.status === 200, `HTTP ${card.status}`);
     }
   }
 }
 finish();
 
 function wantStatus(label, e) {
+  if (expect === 'withdrawn') return 200;
   if (expect === 'removed') return 404;
   if (expect === 'refused' || expect === 'held') return e.mainStatus ? (label === 'staging' || e.mainStatus === 'published' ? 200 : 404) : 404;
   if (expect === 'draft') return label === 'staging' ? 200 : 404;

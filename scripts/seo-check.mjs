@@ -139,6 +139,10 @@ export function checkDist(root = 'dist') {
     if (row.jsonLd.length === 0) err('no JSON-LD');
     const preview = /<meta name="robots" content="noindex, nofollow"/.test(html);
     row.noindex = preview;
+    // A withdrawal notice (Phase 27) is the one production page that carries noindex, and must.
+    row.withdrawn = /data-withdrawn="true"/.test(html);
+    if (row.withdrawn && !/<meta name="robots" content="noindex/.test(html)) err('withdrawal notice without noindex');
+    if (row.withdrawn && /data-pagefind-body/.test(html)) err('withdrawal notice offered to the search index');
     report.push(row);
   }
   // Sitemap and robots.
@@ -153,7 +157,10 @@ export function checkDist(root = 'dist') {
     if (!existsSync(sitemapFile)) errors.push('sitemap-0.xml missing');
     else {
       const locs = [...readFileSync(sitemapFile, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).sort();
-      const routes = list.filter((p) => !p.notFound).map((p) => p.route).sort();
+      // Every indexable route is in the sitemap; a withdrawal notice (noindex) must not be.
+      const withdrawnRoutes = new Set(report.filter((r) => r.withdrawn).map((r) => r.route));
+      const routes = list.filter((p) => !p.notFound && !withdrawnRoutes.has(p.route)).map((p) => p.route).sort();
+      for (const l of locs) if (withdrawnRoutes.has(l)) errors.push(`sitemap lists the withdrawal notice ${l}`);
       const missing = routes.filter((r) => !locs.includes(r));
       const extra = locs.filter((l) => !routes.includes(l));
       if (missing.length) errors.push(`sitemap misses ${missing.length} route(s): ${missing.slice(0, 5).join(', ')}`);
@@ -161,7 +168,7 @@ export function checkDist(root = 'dist') {
       for (const l of locs) if (!readFileSync(sitemapFile, 'utf8').includes(`<loc>${SITE}${l}</loc>`)) errors.push(`sitemap entry ${l} is not on the production domain`);
     }
     if (!/Allow: \//.test(robots) || !robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) errors.push('robots.txt does not allow crawling and name the sitemap');
-    for (const r of report) if (r.noindex) errors.push(`${r.route}: noindex on a production page`);
+    for (const r of report) if (r.noindex && !r.withdrawn) errors.push(`${r.route}: noindex on a production page`);
   }
   for (const f of ['feed.xml', 'feed.json']) if (!existsSync(join(root, f))) errors.push(`${f} missing`);
   return { errors, warnings, pages: report, previewBuild };

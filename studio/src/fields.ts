@@ -5,7 +5,7 @@
 // options, nested keys), so the two cannot drift silently. No imports: this file is read by the
 // Studio's browser bundle and by the site's test runner alike.
 
-export const STATUS = ['idea', 'draft', 'review', 'published', 'archived'] as const;
+export const STATUS = ['idea', 'draft', 'review', 'published', 'archived', 'withdrawn'] as const;
 export const VOCABULARIES = ['tags', 'skills', 'technologies'] as const;
 export type Vocabulary = (typeof VOCABULARIES)[number];
 
@@ -92,7 +92,7 @@ const common = (type: FieldSpec): Record<string, FieldSpec> => ({
   slug: { kind: 'slug', required: true, description: 'Lowercase letters, digits, and single hyphens; permanent; unique across every collection; also the file name.' },
   title: { kind: 'text', required: true, min: 3, max: 90 },
   type,
-  status: { kind: 'select', required: true, options: STATUS, defaultValue: 'draft', description: 'Only published entries appear on the public site.' },
+  status: { kind: 'select', required: true, options: STATUS, defaultValue: 'draft', description: 'Only published entries appear on the public site. To take back a piece the public has seen, choose withdrawn (its address then shows a short notice); a draft that was never published stays a draft.' },
   date: { kind: 'date', required: true },
   updated: { kind: 'date', required: false, description: 'On or after the date, if set (checked at validate).' },
   summary: { kind: 'text', required: true, multiline: true, min: 40, max: 240, description: 'One or two sentences, 40 to 240 characters; shown on cards, in search, and in feeds.' },

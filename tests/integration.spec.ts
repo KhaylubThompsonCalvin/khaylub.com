@@ -12,7 +12,7 @@ import { gunzipSync } from 'node:zlib';
 import matter from 'gray-matter';
 
 type Provenance = { source?: string; license?: string; generator?: string; date?: string | Date };
-type Front = { slug: string; status: string; title: string; context?: string; collection: string; employer_visible?: boolean; featured?: boolean; provenance?: Provenance; ai_assisted?: boolean };
+type Front = { slug: string; status: string; title: string; summary: string; context?: string; collection: string; employer_visible?: boolean; featured?: boolean; provenance?: Provenance; ai_assisted?: boolean };
 
 function entries(): Front[] {
   const out: Front[] = [];
@@ -33,7 +33,9 @@ function entries(): Front[] {
 const all = entries();
 const isPublic = (e: Front) => e.status === 'published' || e.status === 'archived';
 const published = all.filter(isPublic);
-const hidden = all.filter((e) => !isPublic(e));
+// A withdrawn piece (Phase 27) is neither public nor hidden: its address serves a notice and nothing else.
+const withdrawn = all.filter((e) => e.status === 'withdrawn');
+const hidden = all.filter((e) => !isPublic(e) && e.status !== 'withdrawn');
 const route = (e: Front) => `/${e.collection}/${e.slug}/`;
 
 // Every sitemap chunk (the sitemap integration splits past its entry limit); the index lists them.
@@ -94,6 +96,34 @@ test.describe('every published entry reaches every public output; no hidden entr
       expect(existsSync(`dist/og/${e.collection}/${e.slug}.png`), 'no card').toBe(false);
     });
   }
+});
+
+test.describe('a withdrawn piece (Phase 27): a notice at its address, nothing anywhere else', () => {
+  for (const e of withdrawn) {
+    test(`${route(e)} serves the withdrawal notice and nothing of the piece`, () => {
+      const file = `dist${route(e)}index.html`;
+      expect(existsSync(file), 'the notice is built at the address').toBe(true);
+      const html = readFileSync(file, 'utf8');
+      expect(html).toContain('data-withdrawn="true"');
+      expect(html).toMatch(/<meta name="robots" content="noindex/);
+      expect(html).not.toContain('data-pagefind-body');
+      expect(html, 'the title is not on the notice').not.toContain(e.title);
+      expect(html, 'the summary is not on the notice').not.toContain(e.summary.slice(0, 40));
+      expect(readFileSync(`dist/og/${e.collection}/${e.slug}.png`).equals(readFileSync('public/og-default.png')), 'the card is the default card').toBe(true);
+      expect(sitemap).not.toContain(route(e));
+      expect(feedJson).not.toContain(route(e));
+      expect(feedXml).not.toContain(route(e));
+      expect(graph).not.toContain(`href="${route(e)}"`);
+      const index = existsSync(`dist/${e.collection}/index.html`) ? readFileSync(`dist/${e.collection}/index.html`, 'utf8') : '';
+      expect(index).not.toContain(`href="${route(e)}"`);
+      expect(library).not.toContain(`href="${route(e)}"`);
+      expect(work).not.toContain(`href="${route(e)}"`);
+      expect(pagefind, 'search index').not.toContain(`"url":"${route(e)}"`);
+    });
+  }
+  test('the schema offers withdrawn as a status', () => {
+    expect(readFileSync('src/content/schemas.ts', 'utf8')).toMatch(/'withdrawn'] as const/);
+  });
 });
 
 test.describe('the context line of a project', () => {
