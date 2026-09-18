@@ -1,0 +1,44 @@
+# The Studio branch cleanup (Phase 27, plan 53 task 5): GitHub's "automatically delete head branches"
+# setting does not fire for pull requests merged by auto-merge with the workflow token (a Phase 26
+# fact, runbook 10.7), so every Studio save would leave a studio/* branch behind. This job deletes a
+# studio/* branch only when its pull request to main is MERGED and the branch still points at that
+# pull request's head commit (no save landed after the merge); a branch with an open pull request,
+# a closed-unmerged one (a piece held back), or no pull request at all is left alone. Daily, and on
+# demand from the Actions tab. No secret beyond the job's own token.
+name: Studio branch cleanup
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  delete-merged:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete studio/* branches whose pull request merged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/studio/" --paginate --jq '.[] | "\(.ref | sub("^refs/heads/"; "")) \(.object.sha)"' |
+          while read -r branch sha; do
+            [ -n "$branch" ] || continue
+            merged=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --base main --state merged --json number,headRefOid --jq "[.[] | select(.headRefOid == \"$sha\")] | .[0].number // empty")
+            if [ -z "$merged" ]; then
+              echo "keep   $branch ($sha): no merged pull request at this commit"
+              continue
+            fi
+            open=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --base main --state open --json number --jq '.[0].number // empty')
+            if [ -n "$open" ]; then
+              echo "keep   $branch: pull request #$open still open"
+              continue
+            fi
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch" > /dev/null
+            echo "delete $branch: merged in pull request #$merged"
+          done

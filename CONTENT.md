@@ -100,6 +100,15 @@ The availability statement lives in one place, `profile/availability.yaml`, and 
   is labeled on the page.
 - **Reduced motion.** V2 pages never autoplay or animate media; inside the opted-in climb, V1's
   own rules apply (plates paused and hidden, reveals solid, models still load).
+- **Through the Studio (Phase 27; ADR-007, clarification 8).** Images go in through the Studio's
+  image fields (cover, gallery images, a video poster, an album cover) and are written beside the
+  entry within the 5 MB rule; the Studio's provenance group is the record above (source, license,
+  generator, date), and a cover without a complete record fails `validate`. Audio and video are
+  never uploaded through the Studio: a short clip within the size rules goes under
+  `public/media/<slug>/` by pull request, and anything larger or longer is hosted outside the
+  repository (a Cloudflare R2 bucket if the owner creates one, any host otherwise) and named in
+  `external_url`. The Credits and Process section on the artifact page renders the record; an
+  entry with no media and no record shows no section.
 
 ## Public and private boundary
 

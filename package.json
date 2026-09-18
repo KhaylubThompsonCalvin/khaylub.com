@@ -23,7 +23,8 @@
     "format:check": "prettier --check .",
     "report": "node scripts/build-report.mjs",
     "staging:verify": "node scripts/staging-verify.mjs",
-    "lhci:staging": "node scripts/lhci-staging.mjs"
+    "lhci:staging": "node scripts/lhci-staging.mjs",
+    "test:publishing": "node scripts/publishing-verify.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.1",
