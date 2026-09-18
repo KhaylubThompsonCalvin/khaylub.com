@@ -248,7 +248,15 @@ anonymous-surface check, which is the Render-condition regression check). One co
 notes, whose field table `tests/studio-config.spec.ts` holds equal to the Zod schema; `cover`, `cover_alt`,
 `provenance` wait for Phase 27 and `featured` stays Git-only. Follow-ups for Phase 25: the body editor's
 placement on a phone, the Content-Security-Policy source directives from the live console, the other
-collections. Phase 25 (Content schemas and editor experience) is the next gated phase and is NOT opened;
-it opens only on the owner's instruction through `/phase 25`. Phase 26 owns the `studio/*` pull-request
-workflow and auto-merge ("Allow auto-merge" and branch protection on `main` are owner settings).
+collections. Phase 25 (Content schemas and editor experience) is ACCEPTED and CLOSED: the owner recorded
+"Phase 25 PASS" on 2026-09-18 after authoring one entry of each type on a phone and approving the forms.
+The Studio now carries the forms for notes, writing, journal, projects (with the ADR-012 `context` field,
+accepted by the schema and not yet rendered), music, video, and gallery, each built from a field table in
+`studio/src/fields.ts` that `tests/studio-config.spec.ts` holds equal to the Zod schema; the editor enforces
+the rules Keystatic can carry (required fields, lengths, shapes, options, vocabularies, no em dash) and
+names the rest for `validate` (runbook section 10.5); `data` and `experiments` stay Git-only; `cover`,
+`cover_alt`, and `provenance` on the prose collections wait for Phase 27 (PR #51, PR #54). Phase 26 (Astro
+and CMS integration) is the next gated phase and is NOT opened; it opens only on the owner's instruction
+through `/phase 26`. It owns the `context` rendering and the `studio/*` pull-request workflow with
+auto-merge ("Allow auto-merge" and branch protection on `main` are owner settings, needed before it opens).
 Phase 21 owns the production move of khaylub.com from V1 to V2.
