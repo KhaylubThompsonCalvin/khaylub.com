@@ -29,8 +29,12 @@ type Shape = Record<string, z.ZodTypeAny>;
 const shapeOf = (s: unknown): Shape => (s as { shape: Shape }).shape;
 const unwrap = (s: z.ZodTypeAny): z.ZodTypeAny => {
   let cur: any = s;
-  while (cur && typeof cur.unwrap === 'function' && (cur instanceof z.ZodOptional || cur instanceof z.ZodDefault || cur instanceof z.ZodNullable)) cur = cur.unwrap();
-  return cur;
+  for (;;) {
+    if (cur && typeof cur.unwrap === 'function' && (cur instanceof z.ZodOptional || cur instanceof z.ZodDefault || cur instanceof z.ZodNullable)) { cur = cur.unwrap(); continue; }
+    // z.preprocess builds a pipe whose output side is the real schema (the provenance group).
+    if (cur && cur instanceof z.ZodPipe) { cur = cur.out; continue; }
+    return cur;
+  }
 };
 const isOptional = (s: z.ZodTypeAny) => s.safeParse(undefined).success;
 const enumOptions = (s: z.ZodTypeAny): string[] => {
@@ -94,7 +98,12 @@ test.describe('Studio field tables against the site schemas', () => {
           expect(Object.keys(f.fields).sort(), `${name}.${k} keys`).toEqual(Object.keys(inner).sort());
           for (const [ik, is] of Object.entries(f.fields)) {
             if (is.kind === 'body') continue;
-            expect(is.required, `${name}.${k}.${ik} required`).toBe(!isOptional(inner[ik]));
+            // An optional group (the provenance credits on a prose entry) is written by Keystatic on
+            // every save, so its members stay optional in the form and may all be empty; the site's
+            // schema reads an empty group as absent and validate demands a complete record when media
+            // is referenced. A required group keeps the schema's own required flags.
+            if (f.required) expect(is.required, `${name}.${k}.${ik} required`).toBe(!isOptional(inner[ik]));
+            else expect(is.required, `${name}.${k}.${ik} stays optional inside an optional group`).toBe(false);
             expect(kindsFor(inner[ik]), `${name}.${k}.${ik} kind`).toContain(is.kind);
           }
         }
@@ -196,5 +205,9 @@ test.describe('Studio field tables against the site schemas', () => {
     };
     const result = schemas.notes.safeParse(written);
     expect(result.success, JSON.stringify(result.success ? null : result.error.issues)).toBe(true);
+    // Since Phase 27 the form carries the optional credits group; untouched, Keystatic writes it empty.
+    expect(schemas.notes.safeParse({ ...written, provenance: {} }).success, 'an empty group reads as absent').toBe(true);
+    expect(schemas.notes.safeParse({ ...written, provenance: { source: 'a photo by the author' } }).success, 'a partial record is refused').toBe(false);
+    expect(schemas.notes.safeParse({ ...written, provenance: { source: 'a photo by the author', license: 'All rights reserved', date: '2026-09-18' } }).success, 'a full record is accepted').toBe(true);
   });
 });

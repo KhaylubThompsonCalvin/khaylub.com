@@ -111,19 +111,37 @@ const SERIES: Record<string, FieldSpec> = {
   part: { kind: 'integer', required: false, min: 1, description: 'The position in the series, from 1.' },
 };
 
-// Optional media on the prose collections waits for the media and provenance phase (27): Keystatic
-// writes an object field on every save, so an optional provenance group cannot be expressed as one,
-// and a cover without provenance is refused by the site. `featured` stays Git-only because the
-// featured set is owner-approved and checked by validate. `problem` and `role` are the case-study
-// card (CONTENT.md) and are offered on projects only, a Phase 25 decision: the Phase 24 notes form
-// offered them, and nothing on the site reads them for a note.
-const PROSE_DEFERRED = ['cover', 'cover_alt', 'provenance', 'featured', 'problem', 'role'] as const;
+// Since Phase 27 every collection offers the optional cover, its alt text, and the provenance group:
+// Keystatic writes an untouched optional group as `provenance: {}`, which the site's schema now reads
+// as absent, and validate demands a real record wherever media is referenced. `featured` stays
+// Git-only because the featured set is owner-approved and checked by validate. `problem` and `role`
+// are the case-study card (CONTENT.md) and are offered on projects only, a Phase 25 decision: the
+// Phase 24 notes form offered them, and nothing on the site reads them for a note.
+const PROSE_DEFERRED = ['featured', 'problem', 'role'] as const;
 // Projects offer the case-study card fields (problem, role); the media collections offer neither
 // them nor the series fields, which belong to prose.
-const PROJECT_DEFERRED = ['cover', 'cover_alt', 'provenance', 'featured'] as const;
+const PROJECT_DEFERRED = ['featured'] as const;
 const MEDIA_DEFERRED = ['featured', 'problem', 'role', 'series', 'part'] as const;
 
 const bodyProse: FieldSpec = { kind: 'body', description: 'Markdown. Link other artifacts with [[slug]] or [[slug|the words]].' };
+
+// The optional cover with its alt text and the provenance group (the credits). A cover needs both:
+// the site refuses a cover without alt text or without a real provenance record, at validate.
+const OPTIONAL_COVER: Record<string, FieldSpec> = {
+  cover: { kind: 'image', required: false, description: 'Optional cover image, 1600 px wide; it needs the alt text and the credits below (checked at validate).' },
+  cover_alt: { kind: 'text', required: false, description: 'The cover for those who cannot see it; at least 5 characters when a cover is set.' },
+  provenance: {
+    kind: 'object',
+    required: false,
+    description: 'Credits: fill all of source, license, and date when the entry carries a cover or other media; leave the whole group empty otherwise.',
+    fields: {
+      source: { kind: 'text', required: false, multiline: true, description: 'Where the media comes from and who made it; name the tools if any were generated (3 or more characters).' },
+      license: { kind: 'text', required: false, description: 'An SPDX id or "All rights reserved".' },
+      generator: { kind: 'text', required: false, description: 'The AI tool or service, when part of the media was generated.' },
+      date: { kind: 'date', required: false },
+    },
+  },
+};
 
 export const collections: Record<string, CollectionSpec> = {
   notes: {
@@ -136,6 +154,7 @@ export const collections: Record<string, CollectionSpec> = {
     fields: {
       ...common({ kind: 'select', required: true, options: NOTE_TYPES, defaultValue: 'field-note' }),
       ...SERIES,
+      ...OPTIONAL_COVER,
       [BODY_KEY]: bodyProse,
     },
   },
@@ -149,6 +168,7 @@ export const collections: Record<string, CollectionSpec> = {
     fields: {
       ...common({ kind: 'select', required: true, options: WRITING_TYPES, defaultValue: 'essay' }),
       ...SERIES,
+      ...OPTIONAL_COVER,
       [BODY_KEY]: bodyProse,
     },
   },
@@ -162,6 +182,7 @@ export const collections: Record<string, CollectionSpec> = {
     fields: {
       ...common({ kind: 'select', required: true, options: JOURNAL_TYPES, defaultValue: 'entry' }),
       ...SERIES,
+      ...OPTIONAL_COVER,
       [BODY_KEY]: bodyProse,
     },
   },
@@ -193,6 +214,7 @@ export const collections: Record<string, CollectionSpec> = {
       },
       outcome: { kind: 'text', required: false, max: 200, description: 'One line on the outcome, up to 200 characters.' },
       ...SERIES,
+      ...OPTIONAL_COVER,
       [BODY_KEY]: { kind: 'body', description: `Markdown. A case study uses these headings in order: ${CASE_STUDY_HEADINGS.join('; ')}. Link other artifacts with [[slug]].` },
     },
   },
