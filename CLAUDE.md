@@ -265,6 +265,22 @@ itself when the six required checks of the `main` protection rule are green, in 
 public output and every draft none (PR #56). Three facts to keep in mind: an automatic merge raises no CI
 run on `main` (the branch commit carried the checks; Render's build keeps the previous deploy on failure),
 GitHub does not auto-delete those Studio branches, and the staging service is the preview surface. Phase 27
-(Media, provenance, preview, and publishing automation) is the next gated phase and is NOT opened; it opens
-only on the owner's instruction through `/phase 27`.
+(Media, provenance, preview, and publishing automation) is ACCEPTED and CLOSED: the owner recorded "Phase 27
+PASS" on 2026-09-18 after merging PRs #66, #69, #70, and #72 and recording decision D-29. Every entry with
+media carries a complete provenance record (`validate` fails a cover without one; an empty Studio group is
+treated as absent) rendered as Credits and Process on its page (`src/components/Credits.astro`); cover,
+cover alt, and provenance are optional on every Studio collection, and each collection links its staging
+preview. The publishing harness `npm run test:publishing <studio-branch>` (`scripts/publishing-verify.mjs`)
+reads the branch, the pull request, the six checks, auto-merge, the merge, and `main` through the GitHub API,
+then polls both origins by their `/build.json` stamp and checks the entry and its derived places; the drills
+of 2026-09-18 (refused, draft, revert, and the owner's test piece published, unpublished, and withdrawn) are
+recorded in runbook 10.9. A published piece is taken back with the status `withdrawn` (never deleted, never
+re-drafted): the build writes a noindex notice and the default card at its addresses because the host keeps
+serving pages a deploy merely omits (the retention fact, proven on staging and production; a Render support
+case is prepared, not a gate). `studio-cleanup.yml` deletes merged Studio branches daily. The Studio serves
+its candidate Content Security Policy Report-Only (scripts hashed per response; `'unsafe-inline'` for styles
+only, accepted by D-29; enforcement deferred). Large media stays on external URLs (no R2, by D-29). One UX
+follow-up is carried to the post-Phase-28 visual sprint: the artifact's own "Source:" line below the Credits
+block. Phase 28 (Owner publishing launch and acceptance) is the next gated phase and is NOT opened; it opens
+only on the owner's instruction through `/phase 28`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
