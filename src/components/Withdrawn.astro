@@ -1,8 +1,9 @@
 ---
 // The withdrawal notice (Phase 27, runbook 10.9): what a withdrawn artifact's address serves. The
 // host keeps serving a page that a later deploy merely omits, so the build writes this page at the
-// same path instead; it names nothing from the piece (no title, summary, media, or record), tells
-// search engines not to index it, and points at the collection. Nothing here is a design surface.
+// same path instead; it names nothing from the piece beyond the address itself (the page title
+// carries the slug so titles stay unique; no title text, summary, media, or record), tells search
+// engines not to index it, and points at the collection. Nothing here is a design surface.
 import type { ArtifactCollection } from '@lib/catalog';
 import { COLLECTIONS } from '@lib/catalog';
 

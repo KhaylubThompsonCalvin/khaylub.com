@@ -180,7 +180,7 @@ for (const e of entries) {
   const file = e === entries[0] ? mainFile : api(`repos/${repo}/contents/${e.path}?ref=main`, true);
   const status = file ? statusOf(Buffer.from(file.content, 'base64').toString('utf8')) : null;
   e.mainStatus = status;
-  e.title = file ? (/^title:s*['"]?(.+?)['"]?s*$/m.exec(Buffer.from(file.content, 'base64').toString('utf8').split(/^---s*$/m)[1] ?? '')?.[1] ?? null) : null;
+  e.title = file ? (/^title:\s*['"]?(.+?)['"]?\s*$/m.exec(Buffer.from(file.content, 'base64').toString('utf8').split(/^---\s*$/m)[1] ?? '')?.[1] ?? null) : null;
   if (expect === 'removed') step(`main ${e.path}`, !file, file ? `still on main (status ${status})` : 'absent from main');
   else if (expect === 'refused' || expect === 'held') {
     const base = api(`repos/${repo}/contents/${e.path}?ref=${pr.baseRefOid}`, true);
@@ -231,7 +231,8 @@ for (const [label, origin] of [['staging', staging], ['production', production]]
     // and the card. A published piece is in all of them; anything else is in none (the card of a
     // withdrawn piece is the site's default card).
     if (label === 'production' && live.ok !== false) {
-      const present = expect === 'published';
+      // A refused or held save leaves main as it was: the piece is present exactly when main's file is published.
+      const present = expect === 'published' || ((expect === 'refused' || expect === 'held') && e.mainStatus === 'published');
       const places = [[`/${e.collection}/`, 'collection index'], ['/sitemap-0.xml', 'sitemap'], ['/feed.json', 'JSON feed'], ['/feed.xml', 'RSS feed'], ['/graph/', 'graph']];
       const found = [];
       for (const [path, name] of places) {
