@@ -516,9 +516,10 @@ output format).
    `external_url` is enough for the file), Audio-visual stories (a duration such as `3:42`, an
    `external_url`, the provenance group). Every save is a commit on the branch.
 3. Open a pull request from that branch on GitHub (the compare URL is
-   `https://github.com/KhaylubThompsonCalvin/khaylub.com/compare/main...studio/phase-25-types`). CI runs
-   validate on the seven documents and the preview build renders them; the pull request page shows
-   the checks. Do not merge unless the entries are meant to be real.
+   `https://github.com/KhaylubThompsonCalvin/khaylub.com/compare/main...studio/phase-25-types`) and
+   mark it a draft ("Create draft pull request"), so it cannot be merged by habit. CI runs validate on
+   the seven documents and the preview build renders them; the pull request page shows the checks.
+   Do not merge unless the entries are meant to be real.
 4. Report which forms felt right on the phone and which did not; close the pull request and delete
    the branch if the entries were throwaway, or ask for the merge if they are real.
 
@@ -526,4 +527,5 @@ output format).
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | owner (steps) and the session (verification) | 10.6 the authoring test of each type on a phone on `studio/phase-25-types` (seven commits, one per collection; the pull request #52 for CI: every job green) | PASS: every entry in the site's shape; check, validate, and the preview build green on the seven files locally and in CI; the owner's verdict recorded in the Phase 25 gate note; the Video help text clarified (PR #54) | one: the test pull request was merged by habit and reverted the same hour (PR #53), `main` unchanged in effect; step 3 now says to mark the pull request a draft |
 | 2026-09-17 | owner (steps) and the session (verification) | 10.2 deploy (Keystatic Cloud project `khaylub/khaylub-com`; `khaylub-studio` created by the Blueprint sync; the first build failed on the root tsconfig, fixed by PR #49; the redeploy succeeded); 10.3 checklist (the automated check PASS against https://khaylub-studio.onrender.com at 21:58 UTC; manual items answered in the Phase 24 gate note); 10.4 smoke test on `studio/phase-24-smoke` | PASS: commits `be5dfd0` draft, `023945c` published with the body and its wikilink, `e49c240` draft, `1475cbb` deleted; the branch's tree identical to `main`; the branch deleted; `main` at `8ea4e3d` throughout; khaylub.com unchanged | one: the owner's first body sentence landed in the `problem` field on a phone and was moved to the body at the publish step (a Phase 25 editor item) |
