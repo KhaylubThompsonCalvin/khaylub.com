@@ -1,0 +1,55 @@
+# The Studio's publish path (ADR-012, document 46 section 8, Phase 26): every save in the owner Studio
+# is a commit on a studio/* branch. This workflow opens the pull request to main for that branch (or
+# finds the open one) and turns on auto-merge with a merge commit, so the pull request merges by itself
+# once the six required checks of the main protection rule are green, and waits when they are red.
+# CI runs on the push itself (ci.yml lists studio/** among its push branches): a pull request created
+# with the workflow token raises no pull_request run, but the check runs of the push attach to the
+# same commit and satisfy the rule. Render builds the pull-request preview on the staging service and
+# comments its URL; the merge to main deploys production as it always has. No secret and no token
+# beyond the job's own; the repository setting "Allow GitHub Actions to create and approve pull
+# requests" must be on (an owner click).
+name: Studio pull request
+
+on:
+  push:
+    branches: ['studio/**']
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: studio-pr-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  open-and-automerge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open the pull request for the Studio branch, or find it
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -eu
+          existing=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "number=$existing" >> "$GITHUB_OUTPUT"
+            echo "pull request #$existing already open for $BRANCH"
+            exit 0
+          fi
+          title="studio: ${BRANCH#studio/}"
+          body=$(printf '%s\n\n%s\n\n%s' \
+            "Saved in the owner Studio on branch \`$BRANCH\`. Every commit here is a Keystatic save." \
+            "CI validates the content and builds the site; Render comments the preview URL from the staging service (drafts visible, noindex). When the six required checks are green the pull request merges by itself and production redeploys; a draft stays invisible on production after the merge." \
+            "To hold a piece back, close this pull request; to undo a merge, revert it (the repository's rollback rule).")
+          number=$(gh pr create --base main --head "$BRANCH" --title "$title" --body "$body" | grep -oE '[0-9]+$')
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "opened pull request #$number for $BRANCH"
+      - name: Turn on auto-merge (merge commit) so a green run merges it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --auto --merge

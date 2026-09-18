@@ -1,5 +1,6 @@
 ---
-// Outcome, technologies, and proof links for a project or data entry, from frontmatter only.
+// Context (a school or academic project's course, term, or institution line; ADR-012), outcome,
+// technologies, and proof links for a project or data entry, from frontmatter only.
 // Used inside featured cards (compact) and in the artifact page header.
 import { evidenceFor, labelFor, termRoute, type AnyEntry } from '@lib/catalog';
 
@@ -25,9 +26,12 @@ if (entry.collection === 'data') {
 }
 // On a card a data entry's result stands in for the outcome; on its own page the facts list carries it.
 const outcome: string | undefined = data.outcome ?? (compact && entry.collection === 'data' ? data.result : undefined);
+// The course, term, or institution line of a school or academic project (projects only).
+const context: string | undefined = entry.collection === 'projects' ? data.context : undefined;
 ---
 
 <div class:list={['facts', { compact }]}>
+  {context && <p class="context small muted"><span class="visually-hidden">Context: </span>{context}</p>}
   {outcome && <p class="outcome">{outcome}</p>}
   {
     tech.length > 0 && (
@@ -60,6 +64,9 @@ const outcome: string | undefined = data.outcome ?? (compact && entry.collection
   .facts {
     display: grid;
     gap: var(--space-1);
+  }
+  .context {
+    margin: 0;
   }
   .outcome {
     font-weight: 600;

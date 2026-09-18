@@ -420,7 +420,7 @@ violations in CI); the owner says go.
 
 Not done in Phase 19 unless the owner says go after the staging log is clean.
 
-## 10. The owner Studio (Phases 24 and 25; ADR-012)
+## 10. The owner Studio (Phases 24 to 26; ADR-012)
 
 The Studio is the app under `studio/`: Keystatic's admin and API on an Astro server build with the
 Node adapter, declared in `render.yaml` as the web service `khaylub-studio` (root directory
@@ -522,6 +522,29 @@ output format).
    Do not merge unless the entries are meant to be real.
 4. Report which forms felt right on the phone and which did not; close the pull request and delete
    the branch if the entries were throwaway, or ask for the merge if they are real.
+
+### 10.7 The publish path (Phase 26; AUTOMATED after the owner's Studio save)
+
+1. In the Studio, work on one branch per piece, named `studio/<slug>` (the branch selector; never
+   main). Every save is a commit on that branch.
+2. `.github/workflows/studio-pr.yml` opens the pull request to `main` for the branch on its first
+   push (or finds the open one) and turns on auto-merge with a merge commit. CI runs on the push
+   (`ci.yml` watches `studio/**`), so the six required checks of the `main` protection rule attach
+   to the commit. Render builds the pull-request preview on the staging service and comments the
+   URL on the pull request: the preview build, drafts visible, noindex, the banner.
+3. Green checks: the pull request merges by itself, GitHub deletes the branch, Render deploys
+   `main` to production. A `draft` stays invisible on production after the merge; a `published`
+   piece goes live. Red checks: nothing merges; GitHub emails the failure; fix it in the Studio (a
+   new save on the same branch re-runs everything) or close the pull request.
+4. Unpublish: set `status` back to `draft` in the Studio on a new branch and save (the same path).
+   Undo a merge: revert the merge commit by pull request (the repository's rollback rule; GitHub's
+   Revert button on the merged pull request does it).
+5. A failed build never reaches production: an invalid file cannot merge (the protection rule), and
+   if a production build ever failed on Render the previous deploy would stay live (Render keeps
+   the last successful build).
+6. Needs, once: "Allow auto-merge" and the `main` protection rule (both on since 2026-09-18) and the
+   Actions setting "Allow GitHub Actions to create and approve pull requests" (Settings, Actions,
+   General, Workflow permissions), without which the workflow cannot open pull requests.
 
 ## 9. Record of executions
 
