@@ -113,6 +113,9 @@ export const project = rules(
       // The stack is the `technologies` list from the base schema; a project must name at least one.
       technologies: z.array(term(TECH)).min(1),
       outcome: z.string().max(200).optional(),
+      // The course, term, or institution line of a school or academic project (ADR-012's one schema
+      // change, Phase 25), for example "CIS277A, Fall 2026". Rendered from Phase 26.
+      context: z.string().min(3).max(120).optional(),
     })
     .strict()
     .refine((d) => !d.featured || !!(d.links.code || d.links.live || d.links.result), {
