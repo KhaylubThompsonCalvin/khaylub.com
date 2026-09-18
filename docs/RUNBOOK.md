@@ -543,7 +543,14 @@ output format).
    reopens the pull request on GitHub.
 5. A failed build never reaches production: an invalid file cannot merge (the protection rule), and
    if a production build ever failed on Render the previous deploy would stay live (Render keeps
-   the last successful build).
+   the last successful build). Three facts from the first live runs (2026-09-18): an automatic
+   merge is a workflow-token push and raises no CI run on `main` (the branch commit carried the
+   six checks; the rule is not strict, so two Studio branches merged in sequence were each tested
+   against the `main` they branched from); GitHub's "Automatically delete head branches" does not
+   act on those merges, so the owner deletes Studio branches on GitHub or in the Studio's branch
+   menu now and then; no Render pull-request preview comment appeared on the automatic pull
+   requests, and the staging service (the preview build of `main`, drafts visible, noindex) is the
+   preview surface: a merged draft shows there and nowhere public.
 6. Needs, once: "Allow auto-merge" and the `main` protection rule (both on, verified 2026-09-18 UTC) and the
    Actions setting "Allow GitHub Actions to create and approve pull requests" (Settings, Actions,
    General, Workflow permissions), without which the workflow cannot open pull requests.
@@ -552,5 +559,6 @@ output format).
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | the session (a draft) and the owner (a published project) | 10.7 the publish path: `studio/phase-26-smoke` (a draft note; pull request #57 opened by the workflow, merged by itself in 14 minutes; on staging with noindex; production 404; removed by #58), then the owner's `studio/p26-test` (a published project with a context line; #59 merged by itself; on staging and production; its context corrected by #60) | PASS: every step automatic after the save; the owner verified the project page, the Projects listing, Search, the Graph, the feed, and the card on staging | none in the path; the context field first held its own instruction sentence, corrected through the same path |
 | 2026-09-18 | owner (steps) and the session (verification) | 10.6 the authoring test of each type on a phone on `studio/phase-25-types` (seven commits, one per collection; the pull request #52 for CI: every job green) | PASS: every entry in the site's shape; check, validate, and the preview build green on the seven files locally and in CI; the owner's verdict recorded in the Phase 25 gate note; the Video help text clarified (PR #54) | one: the test pull request was merged by habit and reverted the same hour (PR #53), `main` unchanged in effect; step 3 now says to mark the pull request a draft |
 | 2026-09-17 | owner (steps) and the session (verification) | 10.2 deploy (Keystatic Cloud project `khaylub/khaylub-com`; `khaylub-studio` created by the Blueprint sync; the first build failed on the root tsconfig, fixed by PR #49; the redeploy succeeded); 10.3 checklist (the automated check PASS against https://khaylub-studio.onrender.com at 21:58 UTC; manual items answered in the Phase 24 gate note); 10.4 smoke test on `studio/phase-24-smoke` | PASS: commits `be5dfd0` draft, `023945c` published with the body and its wikilink, `e49c240` draft, `1475cbb` deleted; the branch's tree identical to `main`; the branch deleted; `main` at `8ea4e3d` throughout; khaylub.com unchanged | one: the owner's first body sentence landed in the `problem` field on a phone and was moved to the body at the publish step (a Phase 25 editor item) |

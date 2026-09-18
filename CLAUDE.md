@@ -256,7 +256,15 @@ accepted by the schema and not yet rendered), music, video, and gallery, each bu
 the rules Keystatic can carry (required fields, lengths, shapes, options, vocabularies, no em dash) and
 names the rest for `validate` (runbook section 10.5); `data` and `experiments` stay Git-only; `cover`,
 `cover_alt`, and `provenance` on the prose collections wait for Phase 27 (PR #51, PR #54). Phase 26 (Astro
-and CMS integration) is the next gated phase and is NOT opened; it opens only on the owner's instruction
-through `/phase 26`. It owns the `context` rendering and the `studio/*` pull-request workflow with
-auto-merge ("Allow auto-merge" and branch protection on `main` are owner settings, needed before it opens).
+and CMS integration) is ACCEPTED and CLOSED: the owner recorded "Phase 26 PASS" on 2026-09-18 after seeing a
+project published from the Studio on staging in every place (its page with the `context` line, Projects,
+search, the graph, the feed, its card). The publish path is live (`.github/workflows/studio-pr.yml`,
+runbook section 10.7): a Studio save on a `studio/*` branch opens its pull request by workflow and merges by
+itself when the six required checks of the `main` protection rule are green, in about fifteen minutes;
+`ci.yml` runs on `studio/**` pushes; `tests/integration.spec.ts` proves every published entry reaches every
+public output and every draft none (PR #56). Three facts to keep in mind: an automatic merge raises no CI
+run on `main` (the branch commit carried the checks; Render's build keeps the previous deploy on failure),
+GitHub does not auto-delete those Studio branches, and the staging service is the preview surface. Phase 27
+(Media, provenance, preview, and publishing automation) is the next gated phase and is NOT opened; it opens
+only on the owner's instruction through `/phase 27`.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
