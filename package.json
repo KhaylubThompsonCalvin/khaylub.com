@@ -54,6 +54,6 @@
     "pdf-parse": "^1.1.1",
     "prettier": "^3.6.0",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.8.0"
+    "typescript": "^7.0.2"
   }
 }
