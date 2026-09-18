@@ -644,13 +644,25 @@ and CI checks are kept, never weakened. The full record: vault document 52.
      and `/notes/p27-drill-draft/` all still answered 200 at 19:25 UTC with their original
      `last-modified`, on a cache miss, while the site's other pages carried the 18:53 deploy and the
      indexes, graph, and search no longer named them. Production answered 404 for all of them
-     because they were drafts and were never built there. Whether production keeps a *published*
-     page after it is withdrawn is not yet proven (it needs a published throwaway; an owner
-     decision) and must be assumed until it is. Consequences: a withdrawn piece stays reachable at
-     its exact URL, unlisted, until Render removes it; a piece that must disappear gets a redirect
-     in `render.yaml` (its path to its collection index) by pull request, and a Render support case
+     because they were drafts and were never built there. **Proven on production the same
+     evening:** the test still `/gallery/p27-test-still/` was published by #67 (live at 20:32 UTC)
+     and set back to draft by #68 (merged 20:43 UTC; production's stamp on that deploy at 20:58
+     UTC); at 21:00 UTC production still answered 200 for the page and its card with the 20:32
+     `last-modified` on a cache miss, while the gallery index, the sitemap, both feeds, the graph,
+     and search no longer named it. Consequences: a withdrawn piece stays reachable at its exact
+     URL, unlisted, until Render removes it; a piece that must disappear gets a redirect in
+     `render.yaml` (its path to its collection index) by pull request, and a Render support case
      asks whether removed files are purged on deploy. The harness reports this as a FAIL on the
-     staging step of `--expect removed`, on purpose.
+     production step of `--expect draft` and on the staging step of `--expect removed`, on purpose.
+   - *The owner's test piece through the harness (2026-09-18):* a gallery still with a cover, one
+     image, and a complete provenance record, created in the local Studio by the Playwright driver
+     (the form filled, the files chosen, Create pressed; the entry written beside the file), pushed
+     as `studio/p27-test-piece` (#67: opened 17 s after the save, six checks green at 9m48s, merged
+     at 9m51s, staging at 11m05s, production already on the merge at the first probe; 12 pass,
+     0 fail); on production the gallery index, the sitemap, both feeds, the graph, the card, the
+     image, search, and the Credits and process section all proven live; then set to draft in the
+     Studio's edit form on a phone viewport and pushed as `studio/p27-test-piece-unpublish` (#68:
+     merged at 10m25s; staging still serves it; 11 pass, 1 fail, the retention fact above).
 6. **Branch cleanup.** `.github/workflows/studio-cleanup.yml` runs daily (06:17 UTC) and on demand
    from the Actions tab: it deletes a `studio/*` branch only when a merged pull request's head is the
    branch's current commit and no pull request is open on it; a branch with a closed-unmerged pull
@@ -678,6 +690,7 @@ and CI checks are kept, never weakened. The full record: vault document 52.
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | the session (Playwright and the harness), the owner (judgment) | 10.9 the owner's test piece: created in the local Studio by the driver, published (#67, 9m51s to the merge, every derived place on production), unpublished from the Studio's edit form (#68, 10m25s); the retention fact proven on production; the merged Studio branches deleted | PASS for the path; the retention FAIL kept on purpose; the owner's verdict on the placement and wording in the Phase 27 gate note | none |
 | 2026-09-18 | the session (the harness) | 10.9 the drills under `npm run test:publishing`: the failing document (#63: five checks red, no merge, held back by deleting the branch), the draft (#62: merged by itself at 11m21s, staging at 12m17s, production 404), the revert (#65: merged at 13m58s, `main` clean, production 404, staging still serving the removed page); the Studio candidate policy collected on the anonymous shell (`csp-report.mjs`: fonts and the two inline scripts found, the candidate adjusted, the rerun clean) | PASS for the path (every step automatic, every check read through the API); one FAIL kept on purpose: the retention fact in 10.9 item 5 | one: the first revert push carried a mistaken commit and was deleted within a minute (pull request #64 closed unmerged), so the drill ran under a second branch name |
 | 2026-09-18 | the session (a draft) and the owner (a published project) | 10.7 the publish path: `studio/phase-26-smoke` (a draft note; pull request #57 opened by the workflow, merged by itself in 14 minutes; on staging with noindex; production 404; removed by #58), then the owner's `studio/p26-test` (a published project with a context line; #59 merged by itself; on staging and production; its context corrected by #60) | PASS: every step automatic after the save; the owner verified the project page, the Projects listing, Search, the Graph, the feed, and the card on staging | none in the path; the context field first held its own instruction sentence, corrected through the same path |
 | 2026-09-18 | owner (steps) and the session (verification) | 10.6 the authoring test of each type on a phone on `studio/phase-25-types` (seven commits, one per collection; the pull request #52 for CI: every job green) | PASS: every entry in the site's shape; check, validate, and the preview build green on the seven files locally and in CI; the owner's verdict recorded in the Phase 25 gate note; the Video help text clarified (PR #54) | one: the test pull request was merged by habit and reverted the same hour (PR #53), `main` unchanged in effect; step 3 now says to mark the pull request a draft |
