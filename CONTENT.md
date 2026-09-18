@@ -31,7 +31,7 @@ content/
 | `title` | yes | 3 to 90 characters |
 | `slug` | yes | lowercase letters, digits, single hyphens; permanent; unique |
 | `type` | yes | per collection (below) |
-| `status` | yes | `idea`, `draft`, `review`, `published`, `archived`; only `published` and `archived` reach production |
+| `status` | yes | `idea`, `draft`, `review`, `published`, `archived`, `withdrawn`; only `published` and `archived` reach production. `withdrawn` takes back a piece the public has seen: its files stay as the record and its address shows a short notice (never delete a published piece; the host keeps serving a page a deploy merely omits, runbook 10.9) |
 | `date` | yes | ISO date |
 | `updated` | no | on or after `date` |
 | `summary` | yes | 40 to 240 characters; used on cards, search, and feeds |

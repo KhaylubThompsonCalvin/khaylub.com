@@ -30,7 +30,11 @@ const TECH = vocabulary('technologies');
 
 const term = (list: string[]) => z.enum(list as [string, ...string[]]);
 
-export const STATUS = ['idea', 'draft', 'review', 'published', 'archived'] as const;
+// withdrawn (Phase 27): a piece that was published and is taken back. Its files stay in Git as the
+// record, and the build replaces its page with a notice at the same address, because the host keeps
+// serving a page that a later deploy merely omits (runbook 10.9). A draft that was never published
+// stays a draft; withdrawn is for what the public has already seen.
+export const STATUS = ['idea', 'draft', 'review', 'published', 'archived', 'withdrawn'] as const;
 
 export const provenance = z
   .object({

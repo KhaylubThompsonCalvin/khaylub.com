@@ -37,6 +37,16 @@ export function isVisible(status: string): boolean {
   return isPreview() && (status === 'draft' || status === 'review');
 }
 
+/** Withdrawn: published once, taken back; the build keeps a notice at its address (Phase 27). */
+export function isWithdrawn(status: string): boolean {
+  return status === 'withdrawn';
+}
+
+export async function allWithdrawn(): Promise<AnyEntry[]> {
+  const lists = await Promise.all(COLLECTIONS.map(async (c) => ((await getCollection(c.name as any)) as AnyEntry[]).filter((e) => isWithdrawn(e.data.status))));
+  return lists.flat();
+}
+
 export async function published(name: ArtifactCollection): Promise<AnyEntry[]> {
   const entries = (await getCollection(name as any)) as AnyEntry[];
   return entries

@@ -23,9 +23,11 @@ interface Props {
   ogType?: 'website' | 'article';
   /** A per-collection feed advertised in addition to the site feeds. */
   feed?: { href: string; title: string };
+  /** A page search engines must drop (a withdrawal notice); preview builds carry noindex anyway. */
+  noindex?: boolean;
 }
 
-const { title, description, current, fullBleed = false, jsonLd, ogImage, ogImageAlt, ogType = 'website', feed } = Astro.props;
+const { title, description, current, fullBleed = false, jsonLd, ogImage, ogImageAlt, ogType = 'website', feed, noindex = false } = Astro.props;
 const id = identity();
 const site = 'https://khaylub.com';
 const path = Astro.url.pathname;
@@ -53,7 +55,7 @@ const structured = jsonLd ?? {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {preview && <meta name="robots" content="noindex, nofollow" />}
+    {preview ? <meta name="robots" content="noindex, nofollow" /> : noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#e9e1d6" />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={id.site_name} />
