@@ -538,11 +538,13 @@ output format).
    new save on the same branch re-runs everything) or close the pull request.
 4. Unpublish: set `status` back to `draft` in the Studio on a new branch and save (the same path).
    Undo a merge: revert the merge commit by pull request (the repository's rollback rule; GitHub's
-   Revert button on the merged pull request does it).
+   Revert button on the merged pull request does it). Hold a piece back: close its pull request
+   without merging; the workflow then leaves that branch alone on later saves until the owner
+   reopens the pull request on GitHub.
 5. A failed build never reaches production: an invalid file cannot merge (the protection rule), and
    if a production build ever failed on Render the previous deploy would stay live (Render keeps
    the last successful build).
-6. Needs, once: "Allow auto-merge" and the `main` protection rule (both on since 2026-09-18) and the
+6. Needs, once: "Allow auto-merge" and the `main` protection rule (both on, verified 2026-09-18 UTC) and the
    Actions setting "Allow GitHub Actions to create and approve pull requests" (Settings, Actions,
    General, Workflow permissions), without which the workflow cannot open pull requests.
 

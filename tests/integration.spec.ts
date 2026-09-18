@@ -2,11 +2,13 @@
 // Git-authored one, so the proof that "CMS documents become artifacts with no loss" is a proof over
 // every entry in content/: each published entry appears in every public output (its page, the
 // Library or Work catalog, the sitemap, the search index, the feed, the graph, its card image), and
-// every draft or review entry appears in none of them. The `context` line of a project renders on
-// its page and its cards. Runs against dist/ (the production build) like the other suites.
+// every draft or review entry appears in none of them (an archived entry has its page but stays
+// out of the feeds by design). The `context` line of a project renders on its page and its featured
+// card. Runs against dist/ (the production build) like the other suites.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname, sep } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 import matter from 'gray-matter';
 
 type Front = { slug: string; status: string; title: string; context?: string; collection: string; employer_visible?: boolean; featured?: boolean };
@@ -33,17 +35,19 @@ const published = all.filter(isPublic);
 const hidden = all.filter((e) => !isPublic(e));
 const route = (e: Front) => `/${e.collection}/${e.slug}/`;
 
-const sitemap = readFileSync('dist/sitemap-0.xml', 'utf8');
+// Every sitemap chunk (the sitemap integration splits past its entry limit); the index lists them.
+const sitemap = readdirSync('dist').filter((f) => /^sitemap-\d+\.xml$/.test(f)).map((f) => readFileSync(join('dist', f), 'utf8')).join('\n');
 const feedJson = readFileSync('dist/feed.json', 'utf8');
 const feedXml = readFileSync('dist/feed.xml', 'utf8');
 const graph = readFileSync('dist/graph/index.html', 'utf8');
 const library = readFileSync('dist/library/index.html', 'utf8');
 const work = readFileSync('dist/work/index.html', 'utf8');
-// Pagefind's fragments carry each indexed page's URL; the concatenated store is enough to grep.
+// Pagefind's fragments are gzip-compressed JSON carrying each indexed page's URL; decompressed and
+// concatenated they are enough to grep for a route.
 const pagefind = (() => {
   const dir = 'dist/pagefind/fragment';
   if (!existsSync(dir)) return '';
-  return readdirSync(dir).map((f) => readFileSync(join(dir, f), 'latin1')).join('\n');
+  return readdirSync(dir).map((f) => gunzipSync(readFileSync(join(dir, f))).toString('utf8')).join('\n');
 })();
 
 test.describe('every published entry reaches every public output; no hidden entry reaches any', () => {
@@ -53,11 +57,18 @@ test.describe('every published entry reaches every public output; no hidden entr
   });
 
   for (const e of published) {
-    test(`${route(e)} is built, listed, in the sitemap, the feed, the graph, and has its card`, () => {
+    test(`${route(e)} is built, listed, in the sitemap, the search index, the graph, the feed if published, and has its card`, () => {
       expect(existsSync(`dist${route(e)}index.html`), 'page built').toBe(true);
       expect(sitemap, 'sitemap').toContain(`https://khaylub.com${route(e)}`);
-      expect(feedJson, 'JSON feed').toContain(`"url": "https://khaylub.com${route(e)}"`);
-      expect(feedXml, 'RSS feed').toContain(`https://khaylub.com${route(e)}`);
+      expect(pagefind, 'search index').toContain(`"url":"${route(e)}"`);
+      // Archived items stay out of the feeds by design (src/lib/catalog.ts, document 28).
+      if (e.status === 'published') {
+        expect(feedJson, 'JSON feed').toContain(`"url": "https://khaylub.com${route(e)}"`);
+        expect(feedXml, 'RSS feed').toContain(`https://khaylub.com${route(e)}`);
+      } else {
+        expect(feedJson, 'archived, so not in the JSON feed').not.toContain(`"url": "https://khaylub.com${route(e)}"`);
+        expect(feedXml, 'archived, so not in the RSS feed').not.toContain(`https://khaylub.com${route(e)}`);
+      }
       expect(graph, 'graph').toContain(`href="${route(e)}"`);
       // The catalog: the collection's own index lists every published entry; the Library page shows a
       // recent slice per collection and Work the employer-visible items, so those two are not required.
@@ -78,7 +89,7 @@ test.describe('every published entry reaches every public output; no hidden entr
       expect(index).not.toContain(`href="${route(e)}"`);
       expect(library).not.toContain(`href="${route(e)}"`);
       expect(work).not.toContain(`href="${route(e)}"`);
-      expect(pagefind).not.toContain(route(e));
+      expect(pagefind, 'search index').not.toContain(`"url":"${route(e)}"`);
       expect(existsSync(`dist/og/${e.collection}/${e.slug}.png`), 'no card').toBe(false);
     });
   }
@@ -94,8 +105,9 @@ test.describe('the context line of a project', () => {
       const line = page.locator('.artifact-header .context');
       await expect(line).toHaveCount(1);
       await expect(line).toContainText(e.context!);
-      // Cards carry the facts block only on Work's featured cards (the compact ProjectFacts).
-      if (e.featured) {
+      // Cards carry the facts block only on Work's featured cards (the compact ProjectFacts); the
+      // featured set is the catalog's, so the card is checked only when Work actually lists the project.
+      if (work.includes(`href="${route(e)}"`)) {
         await page.goto('/work/');
         const card = page.locator('article', { has: page.locator(`a[href="${route(e)}"]`) }).first();
         await expect(card.locator('.context')).toContainText(e.context!);
@@ -110,9 +122,9 @@ test.describe('the context line of a project', () => {
     });
   }
 
-  test('the rendering is exercised by at least one built project when any project declares context', () => {
-    // Documents the state: until the owner gives a project a context, the positive case above is
-    // vacuous and this test says so in its title; the schema and the Studio form already carry it.
+  test(`context coverage: ${withContext.length} published project(s) declare context (0 means the positive case above is not exercised by the content yet)`, () => {
+    // The rendering was proven on 2026-09-18 with a temporary published project (the Phase 26
+    // checkpoint); it runs here for real as soon as a published project declares a context.
     test.info().annotations.push({ type: 'projects with context', description: String(withContext.length) });
     expect(withContext.length).toBeGreaterThanOrEqual(0);
   });

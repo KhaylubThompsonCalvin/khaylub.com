@@ -14,6 +14,8 @@ on:
   push:
     branches: ['studio/**']
 
+# contents: write is what GitHub requires for enabling auto-merge with the workflow token (its own
+# documented pattern); the job never writes a file. pull-requests: write opens the pull request.
 permissions:
   contents: write
   pull-requests: write
@@ -27,7 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
       - name: Open the pull request for the Studio branch, or find it
         id: pr
         env:
@@ -35,10 +36,18 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           set -eu
-          existing=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
             echo "number=$existing" >> "$GITHUB_OUTPUT"
             echo "pull request #$existing already open for $BRANCH"
+            exit 0
+          fi
+          # A pull request the owner closed without merging means "hold this piece back": a later save
+          # on the same branch must not reopen the path by itself. The owner reopens it on GitHub.
+          held=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --base main --state closed --json number,mergedAt --jq '[.[] | select(.mergedAt == null)] | .[0].number // empty')
+          if [ -n "$held" ]; then
+            echo "pull request #$held for $BRANCH was closed without merging: held back; nothing opened"
+            echo "number=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           title="studio: ${BRANCH#studio/}"
@@ -46,10 +55,15 @@ jobs:
             "Saved in the owner Studio on branch \`$BRANCH\`. Every commit here is a Keystatic save." \
             "CI validates the content and builds the site; Render comments the preview URL from the staging service (drafts visible, noindex). When the six required checks are green the pull request merges by itself and production redeploys; a draft stays invisible on production after the merge." \
             "To hold a piece back, close this pull request; to undo a merge, revert it (the repository's rollback rule).")
-          number=$(gh pr create --base main --head "$BRANCH" --title "$title" --body "$body" | grep -oE '[0-9]+$')
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" --title "$title" --body "$body" > /dev/null
+          number=$(gh pr view "$BRANCH" --repo "$GITHUB_REPOSITORY" --json number --jq '.number')
+          case "$number" in
+            ''|*[!0-9]*) echo "could not read the pull request number for $BRANCH"; exit 1 ;;
+          esac
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "opened pull request #$number for $BRANCH"
       - name: Turn on auto-merge (merge commit) so a green run merges it
+        if: steps.pr.outputs.number != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr merge "${{ steps.pr.outputs.number }}" --auto --merge
+        run: gh pr merge "${{ steps.pr.outputs.number }}" --repo "$GITHUB_REPOSITORY" --auto --merge

@@ -31,6 +31,7 @@ const context: string | undefined = entry.collection === 'projects' ? data.conte
 ---
 
 <div class:list={['facts', { compact }]}>
+  {/* A bare course-and-term line would be ambiguous read aloud; the hidden label names it. */}
   {context && <p class="context small muted"><span class="visually-hidden">Context: </span>{context}</p>}
   {outcome && <p class="outcome">{outcome}</p>}
   {
