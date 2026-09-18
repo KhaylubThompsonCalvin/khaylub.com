@@ -2,7 +2,7 @@
 slug: p27-test-still
 title: Phase 27 test still
 type: still
-status: published
+status: draft
 date: 2026-09-18
 summary: >-
   A throwaway still created through the local Studio by the Phase 27 harness to
