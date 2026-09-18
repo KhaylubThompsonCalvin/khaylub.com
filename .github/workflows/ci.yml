@@ -3,7 +3,10 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, 'feat/**', 'fix/**']
+    # studio/** are the owner Studio's branches: CI runs on the push so the check runs attach to the
+    # commit and satisfy the main protection rule on the pull request studio-pr.yml opens (a pull
+    # request created with the workflow token raises no pull_request run).
+    branches: [main, 'feat/**', 'fix/**', 'studio/**']
   schedule:
     - cron: '0 9 * * 1' # weekly: external links and dependency audit
 
