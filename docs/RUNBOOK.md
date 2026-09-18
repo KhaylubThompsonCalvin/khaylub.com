@@ -668,6 +668,15 @@ and CI checks are kept, never weakened. The full record: vault document 52.
      status picker offers `withdrawn`; `npm run test:publishing <branch> --expect withdrawn` proves
      the notice on both origins, the derived places clear, and the default card. A Render support
      case on the retention behaviour is prepared in the vault evidence folder (not a gate).
+   - *The withdrawal proven on production (2026-09-18):* `p27-test-still` set to withdrawn in the
+     Studio's edit form on a phone viewport, pushed as `studio/p27-test-piece-withdraw` (#71: opened
+     11 s after the save, six checks green at 13m52s, merged by github-actions at 13m57s as
+     `ea4a3cd`, staging at 15m25s, production on the merge at the first probe); the former URL
+     answers 200 with the notice and nothing of the piece (no title, summary, image, Credits, or
+     article; `noindex`; `last-modified` the new deploy's); the card is the default card; the
+     collection index, the sitemap, both feeds, the graph, the Library, Work, and a live search
+     name it nowhere. `test:publishing --expect withdrawn`: 13 pass, 0 fail (`piece-withdrawn.txt`).
+     The piece's files stay in Git with `status: withdrawn` as the record, by design.
    - *The owner's test piece through the harness (2026-09-18):* a gallery still with a cover, one
      image, and a complete provenance record, created in the local Studio by the Playwright driver
      (the form filled, the files chosen, Create pressed; the entry written beside the file), pushed
@@ -704,6 +713,7 @@ and CI checks are kept, never weakened. The full record: vault document 52.
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | the session (Playwright and the harness) | 10.9 the withdrawal proof: `p27-test-still` withdrawn from the Studio (#71, 13m57s to the merge); the former production URL serves the notice, the derived places clear, the default card; the merged Studio branch deleted | PASS: 13 of 13 through the harness; the retention fact mitigated | none |
 | 2026-09-18 | the session (Playwright and the harness), the owner (judgment) | 10.9 the owner's test piece: created in the local Studio by the driver, published (#67, 9m51s to the merge, every derived place on production), unpublished from the Studio's edit form (#68, 10m25s); the retention fact proven on production; the merged Studio branches deleted | PASS for the path; the retention FAIL kept on purpose; the owner's verdict on the placement and wording in the Phase 27 gate note | none |
 | 2026-09-18 | the session (the harness) | 10.9 the drills under `npm run test:publishing`: the failing document (#63: five checks red, no merge, held back by deleting the branch), the draft (#62: merged by itself at 11m21s, staging at 12m17s, production 404), the revert (#65: merged at 13m58s, `main` clean, production 404, staging still serving the removed page); the Studio candidate policy collected on the anonymous shell (`csp-report.mjs`: fonts and the two inline scripts found, the candidate adjusted, the rerun clean) | PASS for the path (every step automatic, every check read through the API); one FAIL kept on purpose: the retention fact in 10.9 item 5 | one: the first revert push carried a mistaken commit and was deleted within a minute (pull request #64 closed unmerged), so the drill ran under a second branch name |
 | 2026-09-18 | the session (a draft) and the owner (a published project) | 10.7 the publish path: `studio/phase-26-smoke` (a draft note; pull request #57 opened by the workflow, merged by itself in 14 minutes; on staging with noindex; production 404; removed by #58), then the owner's `studio/p26-test` (a published project with a context line; #59 merged by itself; on staging and production; its context corrected by #60) | PASS: every step automatic after the save; the owner verified the project page, the Projects listing, Search, the Graph, the feed, and the card on staging | none in the path; the context field first held its own instruction sentence, corrected through the same path |
