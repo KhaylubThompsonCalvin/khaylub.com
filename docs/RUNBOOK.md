@@ -555,6 +555,33 @@ output format).
    Actions setting "Allow GitHub Actions to create and approve pull requests" (Settings, Actions,
    General, Workflow permissions), without which the workflow cannot open pull requests.
 
+### 10.8 Automation-first acceptance (the owner's rule from Phase 27 onward; decision D-28)
+
+Every owner or manual verification step of a phase is classified before the work starts:
+**AUTOMATABLE** when Playwright, an existing deterministic test, a script, or a GitHub API read can
+prove it reliably (Claude runs it, records the output, fixes deterministic failures, and never asks
+the owner to click through it), or **OWNER JUDGMENT REQUIRED** when a human opinion is the point:
+whether a design looks good, typography feels right, a form or mobile editing feels intuitive,
+wording makes sense to the owner, media placement is appropriate, a real artifact is approved for
+publication, and final visual acceptance. The owner is presented with the automated evidence first
+and one clear question at a time.
+
+The harness, reusable rather than one-off, follows this file's script conventions:
+
+| Command | Proves | Phase |
+|---|---|---|
+| `npm test` and CI (existing) | routes load; every published entry on its collection page, in the sitemap, the search index, the feeds when appropriate, the graph, with its card; every draft in none; the context line; links; images; noindex; axe; keyboard; targets; budgets; Lighthouse | in place |
+| `node studio/scripts/anonymous-check.mjs` (existing) | the Studio loads and its anonymous surface is closed, locally and live | in place |
+| `npm run test:publishing` | for a Studio branch or slug: the branch exists, the workflow opened the pull request, the six checks attached, auto-merge is on, the merge came after green, `main` holds the content, staging serves it, production serves it only when published; each step timed. GitHub state is read through the API, never through a browser | Phase 27 |
+| `npm run test:studio` | the local Studio in local storage mode inside a throwaway checkout (no sign-in exists there, so no credential is involved): the sidebar, every collection's form, labels and help text, required-field refusal, the Body editor visible, poster and thumbnail wording present, the mobile viewport hiding no control, a create-and-validate round trip per collection | Phase 28 |
+| `npm run test:visual` | screenshots of the important routes at the three viewports into the evidence folder, and no horizontal overflow; pixel comparison only after the owner agrees a baseline | Phase 28 |
+| `npm run acceptance` | runs the above for a named slug and writes one report: every PASS line and the owner-judgment questions that remain | Phase 28 |
+
+Rules: no GitHub credential, Keystatic credential, secret, or personal token in any Playwright or
+script source; the deployed Studio is tested on its anonymous surface only; authenticated flows run
+against the local Studio in a throwaway checkout; the existing Lighthouse, accessibility, header,
+and CI checks are kept, never weakened. The full record: vault document 52.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
