@@ -78,7 +78,10 @@ export const base = z
     part: z.number().int().positive().optional(),
     ai_assisted: z.boolean().optional(),
     license: z.string().optional(),
-    provenance: provenance.optional(),
+    // The Studio writes an untouched optional group as `provenance: {}` (Keystatic serialises every
+    // object field); an empty group is no record and reads as absent. validate still demands a real
+    // record wherever media is referenced.
+    provenance: z.preprocess((v) => (v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v as object).length === 0 ? undefined : v), provenance.optional()),
   })
   .strict();
 

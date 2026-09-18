@@ -582,10 +582,103 @@ script source; the deployed Studio is tested on its anonymous surface only; auth
 against the local Studio in a throwaway checkout; the existing Lighthouse, accessibility, header,
 and CI checks are kept, never weakened. The full record: vault document 52.
 
+### 10.9 Media, provenance, preview, and the publishing harness (Phase 27)
+
+1. **Media through the Studio.** Images (a cover, gallery images, a video poster, an album cover)
+   go in through the Studio's image fields and are written beside the entry; the 5 MB rule and the
+   image rules of CONTENT.md apply at `validate`. Audio and video never go through the Studio: a
+   short clip within the size rules goes under `public/media/<slug>/` by pull request; anything
+   larger or longer is hosted outside the repository (a Cloudflare R2 bucket if the owner creates
+   one, any host otherwise) and named in `external_url`. Creating the bucket is an owner decision;
+   nothing in the repository depends on it.
+2. **Provenance and credits.** Every entry with media carries a complete provenance record (source,
+   license, date; `generator` when part of the media was generated); `validate` fails a cover
+   without one. The Studio offers the record as an optional group on every collection; a group the
+   owner never opened is written as empty and the site treats it as absent. The artifact page renders
+   the record as "Credits and process" (`src/components/Credits.astro`) with the AI-assistance
+   sentence when `ai_assisted` is set; an entry without a record shows no section.
+   `tests/integration.spec.ts` asserts the section on every entry with a record and its absence
+   otherwise.
+3. **The preview.** Every Studio collection carries a preview link to the staging service
+   (`https://khaylub-com-v2.onrender.com/<collection>/<slug>/`), the preview build of `main` (drafts
+   visible, noindex). The link answers once the piece's pull request has merged and staging has
+   redeployed (section 10.7); before that, the pull request's checks are the preview of validity.
+4. **The harness: `npm run test:publishing <studio-branch>`** (`scripts/publishing-verify.mjs`). Reads,
+   through the GitHub API with the session's own `gh` login and no secret: the branch, the pull
+   request the workflow opened, the six required checks of the `main` protection rule on the head
+   commit, the auto-merge flag, the merge time against the last check's completion, and the file on
+   `main`; then polls staging and production until their build stamp (`/build.json`, the commit
+   Render built) carries the merge commit and checks the entry's URL: staging serves drafts and
+   published pieces, production serves only what is published. Options: `--expect published|draft|removed|refused|held`
+   (read from the merged file when omitted), `--timeout 25m`, `--out report.json`, `--no-wait` (read
+   the state as it is instead of waiting for the pull request to settle and the origins to catch up).
+   Every step prints PASS, FAIL, or SKIP with its numbers; exit 1 on any FAIL. Start it right after
+   a save to time the whole path.
+5. **The drills (recorded 2026-09-18 in the vault evidence folder; rerun any time on a throwaway
+   `studio/` branch):**
+   - *A failing document* (`studio/p27-drill-refused`, a note with an invalid status value, PR #63):
+     the pull request opened 29 s after the save; five of six required checks red; auto-merge
+     enabled and waiting; nothing merged; `main` unchanged; staging and production 404 for the
+     piece. Closing the pull request by deleting the branch holds the piece back; 9 pass, 0 fail.
+   - *A draft* (`studio/p27-drill-draft`, PR #62): opened 14 s after the save; the six checks green at
+     11m16s; merged by github-actions at 11m21s (5 s after the last check); `main` holds the file with
+     `status: draft`; staging served the page 12m17s after the save; production answered 404
+     throughout. 9 pass, 0 fail (`drill-draft.txt`).
+   - *A revert* (`studio/p27-drill-revert-b`, `git revert -m 1` of the draft drill's merge, PR #65):
+     opened 20 s after the save; the six checks green at 13m55s; merged by github-actions at
+     13m58s; the file absent from `main`; the collection index, the graph, and production 404 as
+     expected; **staging kept serving the removed page** (`/notes/p27-drill-draft/`, the file from the
+     18:37 deploy, 45 minutes after the save and 31 after the merge): 8 pass, 1 fail
+     (`drill-revert.txt`). A first push under the name `studio/p27-drill-revert` carried a mistaken
+     commit and was deleted within a minute; its pull request #64 closed unmerged, and the
+     workflow's held-back rule then applied to that name, which is why the drill ran as `-b`.
+   - *Unpublish:* set `status` to `draft` in the Studio and save on a new branch; the same path
+     merges it and the piece leaves every listing, the sitemap, the search index, the feeds, the
+     graph, and its card on the next deploy (`test:publishing --expect draft`). Not run on a
+     throwaway piece in Phase 27 because it needs a published piece; it runs the first time a real
+     piece is withdrawn, or on the owner's word against the Phase 26 test project. Read the
+     retention fact below first.
+   - **Retention fact (2026-09-18, found by the revert drill).** A Render static site keeps serving
+     a page that a later deploy no longer contains: on staging, `/notes/p26-smoke/` (removed from
+     `main` at 16:16 UTC), `/notes/p25-note/` and `/projects/p25-project/` (reverted at 02:29 UTC),
+     and `/notes/p27-drill-draft/` all still answered 200 at 19:25 UTC with their original
+     `last-modified`, on a cache miss, while the site's other pages carried the 18:53 deploy and the
+     indexes, graph, and search no longer named them. Production answered 404 for all of them
+     because they were drafts and were never built there. Whether production keeps a *published*
+     page after it is withdrawn is not yet proven (it needs a published throwaway; an owner
+     decision) and must be assumed until it is. Consequences: a withdrawn piece stays reachable at
+     its exact URL, unlisted, until Render removes it; a piece that must disappear gets a redirect
+     in `render.yaml` (its path to its collection index) by pull request, and a Render support case
+     asks whether removed files are purged on deploy. The harness reports this as a FAIL on the
+     staging step of `--expect removed`, on purpose.
+6. **Branch cleanup.** `.github/workflows/studio-cleanup.yml` runs daily (06:17 UTC) and on demand
+   from the Actions tab: it deletes a `studio/*` branch only when a merged pull request's head is the
+   branch's current commit and no pull request is open on it; a branch with a closed-unmerged pull
+   request (a piece held back) or with saves after the merge is kept.
+7. **Accepted risk: no CI run on `main` for automatic merges.** An automatic merge is a workflow-token
+   push and raises no CI run on `main`; the protection rule is not strict, so a Studio branch is
+   tested against the `main` it branched from. Mitigation: the branch commit carried the six checks;
+   two Studio branches touching different entries cannot conflict in content; Render keeps the last
+   successful build if a `main` build ever failed; the weekly CI job and every later pull request run
+   the suite on the current `main`. Recorded as accepted at Phase 27; revisit if a merge ever breaks
+   `main` (the fix would be the rule set to strict, which makes every Studio branch require an update
+   before merging).
+8. **The Studio's Content Security Policy.** The middleware serves a candidate policy as
+   `Content-Security-Policy-Report-Only` (the app's bundles with the hash of each inline script
+   computed per response, inline styles for Keystar UI, the Google Fonts hosts it loads Inter from,
+   images from this origin, data and blob URLs and GitHub avatars, connections to this origin,
+   Keystatic Cloud, and GitHub's API; no frames, plugins, or base override). The enforced header
+   stays the Phase 24 set. `node studio/scripts/csp-report.mjs` (from the repository root, after a
+   Studio build; `STUDIO_CHECK_BASE=<url>` for the deployed service) opens the anonymous shell in
+   Chromium and fails on any violation; the signed-in app is observed in the owner's browser console
+   (any line naming Content-Security-Policy is a candidate adjustment) and by the Phase 28 local
+   harness before the candidate is ever enforced.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-18 | the session (the harness) | 10.9 the drills under `npm run test:publishing`: the failing document (#63: five checks red, no merge, held back by deleting the branch), the draft (#62: merged by itself at 11m21s, staging at 12m17s, production 404), the revert (#65: merged at 13m58s, `main` clean, production 404, staging still serving the removed page); the Studio candidate policy collected on the anonymous shell (`csp-report.mjs`: fonts and the two inline scripts found, the candidate adjusted, the rerun clean) | PASS for the path (every step automatic, every check read through the API); one FAIL kept on purpose: the retention fact in 10.9 item 5 | one: the first revert push carried a mistaken commit and was deleted within a minute (pull request #64 closed unmerged), so the drill ran under a second branch name |
 | 2026-09-18 | the session (a draft) and the owner (a published project) | 10.7 the publish path: `studio/phase-26-smoke` (a draft note; pull request #57 opened by the workflow, merged by itself in 14 minutes; on staging with noindex; production 404; removed by #58), then the owner's `studio/p26-test` (a published project with a context line; #59 merged by itself; on staging and production; its context corrected by #60) | PASS: every step automatic after the save; the owner verified the project page, the Projects listing, Search, the Graph, the feed, and the card on staging | none in the path; the context field first held its own instruction sentence, corrected through the same path |
 | 2026-09-18 | owner (steps) and the session (verification) | 10.6 the authoring test of each type on a phone on `studio/phase-25-types` (seven commits, one per collection; the pull request #52 for CI: every job green) | PASS: every entry in the site's shape; check, validate, and the preview build green on the seven files locally and in CI; the owner's verdict recorded in the Phase 25 gate note; the Video help text clarified (PR #54) | one: the test pull request was merged by habit and reverted the same hour (PR #53), `main` unchanged in effect; step 3 now says to mark the pull request a draft |
 | 2026-09-17 | owner (steps) and the session (verification) | 10.2 deploy (Keystatic Cloud project `khaylub/khaylub-com`; `khaylub-studio` created by the Blueprint sync; the first build failed on the root tsconfig, fixed by PR #49; the redeploy succeeded); 10.3 checklist (the automated check PASS against https://khaylub-studio.onrender.com at 21:58 UTC; manual items answered in the Phase 24 gate note); 10.4 smoke test on `studio/phase-24-smoke` | PASS: commits `be5dfd0` draft, `023945c` published with the body and its wikilink, `e49c240` draft, `1475cbb` deleted; the branch's tree identical to `main`; the branch deleted; `main` at `8ea4e3d` throughout; khaylub.com unchanged | one: the owner's first body sentence landed in the `problem` field on a phone and was moved to the body at the publish step (a Phase 25 editor item) |

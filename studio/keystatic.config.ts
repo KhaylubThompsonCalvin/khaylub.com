@@ -11,6 +11,8 @@ import { textRule, TEXT_RULE_MESSAGE } from './src/rules';
 import vocabulary from './src/vocabulary.generated.json';
 
 const label = (key: string) => key.replace(/_/g, ' ');
+// The staging service (render.yaml khaylub-com-v2): the preview surface for every Studio entry.
+const STAGING = 'https://khaylub-com-v2.onrender.com';
 const rule = textRule();
 
 function field(key: string, spec: FieldSpec): ComponentSchema {
@@ -112,6 +114,9 @@ function build(name: string, spec: CollectionSpec) {
     path: spec.layout === 'folder' ? (`content/${name}/*/` as const) : (`content/${name}/*` as const),
     entryLayout: spec.editor,
     format: { contentField: BODY_KEY },
+    // The preview: the staging service builds main in preview mode (drafts visible, noindex), so an
+    // entry is there once its pull request has merged, at the same path production will use.
+    previewUrl: `${STAGING}/${name}/{slug}/`,
     schema,
   });
 }

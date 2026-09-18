@@ -8,6 +8,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import ArtifactHeader from '@components/ArtifactHeader.astro';
 import MediaBlock from '@components/media/MediaBlock.astro';
+import Credits from '@components/Credits.astro';
 import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
@@ -75,6 +76,8 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
         <Content />
       </div>
     </div>
+
+    <Credits entry={entry} />
 
     <footer class="artifact-footer measure-reading" data-pagefind-ignore>
       <p class="small muted">Source: {data.source}</p>

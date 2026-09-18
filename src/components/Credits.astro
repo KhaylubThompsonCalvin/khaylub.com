@@ -1,0 +1,80 @@
+---
+// Credits and Process (Phase 27, ADR-007 and ADR-012): the human-readable rendering of an artifact's
+// provenance record (source, license, generator when part of the media was generated, date) with the
+// AI-assistance sentence when declared. Rendered only when the record is complete; an entry without
+// one has no section. Read from frontmatter only; the site's validate step guarantees a record wherever
+// media is referenced.
+import type { AnyEntry } from '@lib/catalog';
+
+interface Props {
+  entry: AnyEntry;
+}
+const { entry } = Astro.props;
+const data = entry.data as Record<string, any>;
+const p = data.provenance as { source?: string; license?: string; generator?: string; date?: Date } | undefined;
+const complete = !!(p && p.source && p.license && p.date);
+const date = complete ? p!.date!.toISOString().slice(0, 10) : '';
+---
+
+{
+  complete && (
+    <section class="credits measure-reading" aria-labelledby="credits-heading">
+      <h2 id="credits-heading">Credits and process</h2>
+      <dl>
+        <dt>Source</dt>
+        <dd>{p!.source}</dd>
+        {p!.generator && (
+          <>
+            <dt>Generated in part with</dt>
+            <dd>{p!.generator}</dd>
+          </>
+        )}
+        <dt>License</dt>
+        <dd>{p!.license}</dd>
+        <dt>Date</dt>
+        <dd>
+          <time datetime={date}>{date}</time>
+        </dd>
+        {data.ai_assisted && (
+          <>
+            <dt>Process</dt>
+            <dd>Built with AI assistance in the code; the design, decisions, and testing are the author's.</dd>
+          </>
+        )}
+      </dl>
+    </section>
+  )
+}
+
+<style>
+  .credits {
+    margin-block: var(--space-4);
+    padding-block-start: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
+  .credits h2 {
+    font-size: var(--size-h3);
+    margin-block: 0 var(--space-2);
+  }
+  .credits dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+  }
+  .credits dt {
+    color: var(--muted);
+  }
+  .credits dd {
+    margin: 0;
+  }
+  @media (max-width: 40rem) {
+    .credits dl {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .credits dd {
+      margin-block-end: var(--space-1);
+    }
+  }
+</style>

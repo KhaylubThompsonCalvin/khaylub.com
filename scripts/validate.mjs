@@ -83,7 +83,10 @@ for (const file of walk('content', ['.md'])) {
   // Raw HTML figures in Markdown bodies (the case-study convention) count as media references too.
   for (const m of content.matchAll(/<img[^>]+src="([^"]+)"/gi)) refs.add(m[1]);
   const local = [...refs].filter((r) => !/^https?:/.test(r) && mediaExts.includes(extname(r).toLowerCase()));
-  if (local.length > 0 && !data.provenance) fail(`media without a provenance record in ${file}: ${local.join(', ')}`);
+  // A record is source, license, and date (generator when AI-made); an empty group written by the
+  // Studio for an untouched optional field is no record.
+  const record = data.provenance && typeof data.provenance === 'object' && data.provenance.source && data.provenance.license && data.provenance.date;
+  if (local.length > 0 && !record) fail(`media without a provenance record (source, license, date) in ${file}: ${local.join(', ')}`);
 }
 
 // 4b. Media size (P2-CE-17): 5 MB per file anywhere; 25 MB in total outside public/climb/, whose

@@ -48,5 +48,7 @@ test.describe('headers from render.yaml', () => {
     expect((await request.get('/og/projects/khaylub-com-v1.png')).headers()['cache-control']).toMatch(/max-age=604800/);
     expect((await request.get('/sitemap-index.xml')).headers()['cache-control']).toMatch(/max-age=3600/);
     expect((await request.get('/.well-known/security.txt')).headers()['cache-control']).toMatch(/max-age=3600/);
+    // The build stamp is polled by the publishing harness until it shows the new commit: never cached.
+    expect((await request.get('/build.json')).headers()['cache-control']).toBe('no-cache');
   });
 });

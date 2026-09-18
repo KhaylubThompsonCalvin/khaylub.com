@@ -11,7 +11,8 @@ import { join, extname, sep } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import matter from 'gray-matter';
 
-type Front = { slug: string; status: string; title: string; context?: string; collection: string; employer_visible?: boolean; featured?: boolean };
+type Provenance = { source?: string; license?: string; generator?: string; date?: string | Date };
+type Front = { slug: string; status: string; title: string; context?: string; collection: string; employer_visible?: boolean; featured?: boolean; provenance?: Provenance; ai_assisted?: boolean };
 
 function entries(): Front[] {
   const out: Front[] = [];
@@ -128,4 +129,35 @@ test.describe('the context line of a project', () => {
     test.info().annotations.push({ type: 'projects with context', description: String(withContext.length) });
     expect(withContext.length).toBeGreaterThanOrEqual(0);
   });
+});
+
+test.describe('the Credits and Process section (Phase 27)', () => {
+  const withCredits = published.filter((e) => e.provenance && e.provenance.source && e.provenance.license && e.provenance.date);
+  const without = published.filter((e) => !e.provenance || !e.provenance.source);
+
+  test('at least one published entry carries a provenance record, so the section is exercised', () => {
+    expect(withCredits.length).toBeGreaterThan(0);
+  });
+
+  for (const e of withCredits) {
+    test(`${route(e)} shows its credits: source, license, generator when present, date`, async ({ page }) => {
+      await page.goto(route(e));
+      const section = page.locator('section.credits');
+      await expect(section).toHaveCount(1);
+      await expect(section.getByRole('heading', { name: 'Credits and process' })).toBeVisible();
+      await expect(section).toContainText(e.provenance!.source!);
+      await expect(section).toContainText(e.provenance!.license!);
+      if (e.provenance!.generator) await expect(section).toContainText(e.provenance!.generator);
+      const date = e.provenance!.date instanceof Date ? e.provenance!.date.toISOString().slice(0, 10) : String(e.provenance!.date);
+      await expect(section).toContainText(date);
+      if (e.ai_assisted) await expect(section).toContainText('AI assistance');
+    });
+  }
+
+  for (const e of without.slice(0, 2)) {
+    test(`${route(e)} carries no credits section without a provenance record`, async ({ page }) => {
+      await page.goto(route(e));
+      await expect(page.locator('section.credits')).toHaveCount(0);
+    });
+  }
 });

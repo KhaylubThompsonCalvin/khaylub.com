@@ -48,6 +48,9 @@ const expectedHeaders = {
   'content-security-policy': "frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'",
   'strict-transport-security': 'max-age=31536000; includeSubDomains',
 };
+// The candidate policy (Phase 27) is served Report-Only; its exact text lives in the middleware and
+// only its presence and its no-frame, no-plugin lines are asserted here.
+const REPORT_ONLY = /default-src 'self'.*frame-ancestors 'none'.*object-src 'none'/;
 
 try {
   check(await ready(), `the server did not answer on ${base} within 10 s\n${serverLog}`);
@@ -64,6 +67,7 @@ try {
     for (const [name, value] of Object.entries(expectedHeaders)) {
       check(admin.headers.get(name) === value, `/keystatic header ${name}: expected "${value}", got "${admin.headers.get(name)}"`);
     }
+    check(REPORT_ONLY.test(admin.headers.get('content-security-policy-report-only') ?? ''), `/keystatic must carry the candidate policy as Content-Security-Policy-Report-Only, got "${admin.headers.get('content-security-policy-report-only')}"`);
 
     const robots = await get('/robots.txt');
     check(robots.status === 200 && /Disallow: \/\s*$/m.test(await robots.text()), '/robots.txt must disallow everything');
@@ -91,4 +95,4 @@ if (failures.length) {
   for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
-console.log(`anonymous-check: PASS on ${base} (redirect, login shell only, private headers, robots, API reads 404, write refused, files 404)`);
+console.log(`anonymous-check: PASS on ${base} (redirect, login shell only, private headers, the Report-Only candidate policy, robots, API reads 404, write refused, files 404)`);
