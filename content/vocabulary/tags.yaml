@@ -17,3 +17,4 @@ terms:
   - { slug: portfolio, label: Portfolio, description: About this site and its history. }
   - { slug: tableau, label: Tableau, description: Tableau workbooks and public stories. }
   - { slug: estimating, label: Estimating, description: Turning measurements into defensible bids. }
+  - { slug: writing, label: Writing, description: Essays, letters, and poems, as writing. }

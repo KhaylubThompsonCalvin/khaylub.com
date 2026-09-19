@@ -67,6 +67,10 @@
     {
       "label": "Estimating",
       "value": "estimating"
+    },
+    {
+      "label": "Writing",
+      "value": "writing"
     }
   ],
   "skills": [
