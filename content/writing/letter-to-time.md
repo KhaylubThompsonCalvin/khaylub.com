@@ -2,10 +2,13 @@
 slug: letter-to-time
 title: Letter to Time
 type: essay
-status: draft
+status: published
 date: 2026-04-28
 updated: 2026-09-19
-summary: ' A letter to Time, written at 29: Idaho night skies through a sunroof, first-grade races, a limbo bar at 19 inches, a coach''s words, football, a daughter''s eyes, and the turn from chasing Time to aligning with it.'
+summary: >-
+  A letter to Time, written at 29: Idaho night skies through a sunroof,
+  first-grade races, a limbo bar at 19 inches, a coach's words, football, a
+  daughter's eyes, and the turn from chasing Time to aligning with it.
 tags:
   - writing
 skills: []
