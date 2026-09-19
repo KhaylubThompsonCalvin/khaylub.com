@@ -100,9 +100,17 @@ test.describe('owner gate: records and decisions', () => {
     // Whitespace-tolerant: the pointer is hard-wrapped prose.
     const nextSentence = /Phase (\d+)\s+\([^)]*\)\s+is\s+the\s+next\s+gated\s+phase\s+and\s+is\s+NOT\s+opened;\s+it\s+opens\s+only\s+on\s+the\s+owner's\s+instruction\s+through\s+`\/phase (\d+)`/g;
     const matches = [...pointer.matchAll(nextSentence)];
-    expect(matches.length, 'exactly one phase is named as the next gated phase').toBe(1);
-    const next = Number(matches[0][1]);
-    expect(Number(matches[0][2]), 'the /phase command names the same phase').toBe(next);
+    // The end of the roadmap (after Phase 28): no next gated phase exists; the pointer says so with
+    // the terminal sentence and names the deferred initiatives as opening only by the owner's decision.
+    const terminal = /No\s+gated\s+phase\s+follows\s+Phase\s+(\d+)\s+in\s+the\s+roadmap/.exec(pointer);
+    expect(matches.length + (terminal ? 1 : 0), 'exactly one next gated phase is named, or the roadmap is declared ended').toBe(1);
+    const closedSoFar = [...pointer.matchAll(/Phase (\d+)\s+\([^)]*\)\s+is\s+ACCEPTED\s+and\s+CLOSED/g)].map((m) => Number(m[1]));
+    if (terminal) {
+      expect(Number(terminal[1]), 'the roadmap ends at the last closed phase').toBe(Math.max(...closedSoFar));
+      expect(pointer, "the deferred initiatives open only by the owner's decision").toMatch(/open\s+only\s+by\s+the\s+owner's\s+decision,\s+never\s+on\s+their\s+own/);
+    }
+    const next = terminal ? Number(terminal[1]) + 1 : Number(matches[0][1]);
+    if (!terminal) expect(Number(matches[0][2]), 'the /phase command names the same phase').toBe(next);
     // The previous gate is the highest phase recorded as accepted and closed. It is normally next - 1;
     // when the roadmap defers a phase by owner decision (Phase 22, D-26), every phase between the last
     // closed one and the next one must be named as DEFERRED, never silently skipped.
