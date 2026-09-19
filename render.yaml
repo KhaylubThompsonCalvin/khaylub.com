@@ -309,6 +309,8 @@ services:
       paths:
         - studio/**
         - render.yaml
+        # The Studio's pickers are generated from the vocabulary at build, so a new term redeploys it.
+        - content/vocabulary/**
     envVars:
       - key: NODE_VERSION
         value: 22.14.0

@@ -147,7 +147,8 @@ test.describe('the Blueprint services', () => {
     expect(studio.headers, 'no public header rules: the Studio sets its own in middleware').toBeUndefined();
     expect(studio.routes).toBeUndefined();
     expect(studio.pullRequestPreviewsEnabled).toBe(false);
-    expect(studio.buildFilter?.paths, 'redeploys only when the Studio or the Blueprint changes').toEqual(['studio/**', 'render.yaml']);
+    // The Studio's pickers are generated from the vocabulary at build (Phase 28), so a new term redeploys it too.
+    expect(studio.buildFilter?.paths, 'redeploys only when the Studio, the Blueprint, or the vocabulary changes').toEqual(['studio/**', 'render.yaml', 'content/vocabulary/**']);
     expect(studio.envVars.find((e) => e.key === 'PUBLIC_KEYSTATIC_STORAGE')?.value, 'cloud mode: no secret anywhere').toBe('cloud');
     for (const v of studio.envVars) {
       if (/SECRET|TOKEN|PASSWORD|PRIVATE/i.test(v.key)) expect(v.value, `${v.key} has no value in the Blueprint`).toBeUndefined();
