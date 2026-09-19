@@ -25,30 +25,16 @@ const shell = process.platform === 'win32';
 
 const log = (m) => console.log(`studio-harness: ${m}`);
 const run = (cmd, a, opts = {}) => execFileSync(cmd, a, { stdio: 'inherit', shell, ...opts });
-
-// 1. The throwaway checkout: a worktree of HEAD, detached, in the temp directory.
-const root = mkdtempSync(join(tmpdir(), 'khaylub-studio-'));
-run('git', ['worktree', 'add', '--detach', '--quiet', root, 'HEAD']);
-log(`throwaway checkout at a temp directory (${root.length} characters long)`);
-
-// 2. The local Studio from this repository's studio/, writing into the worktree. Astro 7 runs the
-// development server as a daemon that outlives the npm process, so it is stopped by its own
-// command (astro dev stop), before starting in case one is left over, and after the run.
-const stopDaemon = () => {
+const quiet = (fn) => {
   try {
-    execFileSync(npx, ['astro', 'dev', 'stop'], { cwd: join(repo, 'studio'), stdio: 'ignore', shell });
+    fn();
   } catch {}
 };
-stopDaemon();
-const server = spawn(npm, ['run', 'dev', '--', '--host', '127.0.0.1', '--port', String(port)], {
-  cwd: join(repo, 'studio'),
-  env: { ...process.env, STUDIO_LOCAL_ROOT: root, PUBLIC_KEYSTATIC_STORAGE: 'local' },
-  stdio: ['ignore', 'pipe', 'pipe'],
-  shell,
-});
-let serverLog = '';
-server.stdout.on('data', (d) => (serverLog += d));
-server.stderr.on('data', (d) => (serverLog += d));
+
+// Astro 7 runs the development server as a daemon that outlives the npm process, so it is stopped
+// by its own command, before starting in case one is left over and after the run. The daemon is
+// the one for studio/: a development Studio the owner has open on this machine is stopped too.
+const stopDaemon = () => quiet(() => execFileSync(npx, ['astro', 'dev', 'stop'], { cwd: join(repo, 'studio'), stdio: 'ignore', shell }));
 
 async function ready() {
   for (let i = 0; i < 240; i += 1) {
@@ -61,9 +47,31 @@ async function ready() {
   return false;
 }
 
+let root = null;
+let server = null;
 let code = 1;
 try {
-  if (!(await ready())) throw new Error(`the Studio did not answer on ${base} within 120 s\n${serverLog.slice(-2000)}`);
+  // 1. The throwaway checkout: a worktree of HEAD, detached, in the temp directory.
+  root = mkdtempSync(join(tmpdir(), 'khaylub-studio-'));
+  run('git', ['worktree', 'add', '--detach', '--quiet', root, 'HEAD']);
+  log(`throwaway checkout at a temp directory (${root.length} characters long)`);
+
+  // 2. The local Studio from this repository's studio/, writing into the worktree.
+  stopDaemon();
+  let serverLog = '';
+  const failed = new Promise((_, reject) => {
+    server = spawn(npm, ['run', 'dev', '--', '--host', '127.0.0.1', '--port', String(port)], {
+      cwd: join(repo, 'studio'),
+      env: { ...process.env, STUDIO_LOCAL_ROOT: root, PUBLIC_KEYSTATIC_STORAGE: 'local' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell,
+    });
+    server.stdout.on('data', (d) => (serverLog += d));
+    server.stderr.on('data', (d) => (serverLog += d));
+    server.on('error', (e) => reject(new Error(`could not start the Studio: ${e.message}`)));
+  });
+  const up = await Promise.race([ready(), failed]);
+  if (!up) throw new Error(`the Studio did not answer on ${base} within 120 s\n${serverLog.slice(-2000)}`);
   log(`Studio answering on ${base} in local mode`);
 
   // 3. The Playwright project against it.
@@ -87,23 +95,28 @@ try {
 } catch (e) {
   console.error(`studio-harness: ${e.message}`);
 } finally {
-  // 5. Stop the daemon and the npm process, and drop the worktree.
+  // 5. Stop the daemon and the npm process, wait for them, and drop the worktree.
   stopDaemon();
-  if (process.platform === 'win32') {
-    try {
-      execFileSync('taskkill', ['/PID', String(server.pid), '/T', '/F'], { stdio: 'ignore' });
-    } catch {}
-  } else server.kill('SIGTERM');
-  if (keep) log(`worktree kept for inspection: ${root}`);
-  else {
-    try {
-      run('git', ['worktree', 'remove', '--force', root], { stdio: 'ignore' });
-    } catch {}
-    if (existsSync(root)) rmSync(root, { recursive: true, force: true });
-    try {
-      run('git', ['worktree', 'prune'], { stdio: 'ignore' });
-    } catch {}
-    log('worktree removed');
+  if (server) {
+    const exited = new Promise((r) => {
+      if (server.exitCode !== null) r();
+      else {
+        server.once('exit', r);
+        setTimeout(r, 5000);
+      }
+    });
+    if (process.platform === 'win32') quiet(() => execFileSync('taskkill', ['/PID', String(server.pid), '/T', '/F'], { stdio: 'ignore' }));
+    else server.kill('SIGTERM');
+    await exited;
+  }
+  if (root) {
+    if (keep) log(`worktree kept for inspection: ${root}`);
+    else {
+      quiet(() => run('git', ['worktree', 'remove', '--force', root], { stdio: 'ignore' }));
+      quiet(() => existsSync(root) && rmSync(root, { recursive: true, force: true }));
+      quiet(() => run('git', ['worktree', 'prune'], { stdio: 'ignore' }));
+      log(existsSync(root) ? `worktree could not be fully removed: ${root}` : 'worktree removed');
+    }
   }
 }
 console.log(`studio-harness: ${code === 0 ? 'PASS' : 'FAIL'}`);

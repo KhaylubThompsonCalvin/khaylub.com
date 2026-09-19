@@ -97,7 +97,15 @@ for (const [name, spec] of editable) {
       test.skip(info.project.name !== 'mobile', 'the phone pass');
       await page.goto(`/keystatic/collection/${name}/create`);
       for (const f of flatten(spec.fields)) {
-        if (f.spec.kind === 'body' || f.spec.kind === 'array-object' || !('required' in f.spec) || !f.spec.required) continue;
+        if (f.spec.kind === 'body' || !('required' in f.spec) || !f.spec.required) continue;
+        if (f.spec.kind === 'array-object') {
+          // A required list's control is its Add button (the last Add on the form).
+          const adds = page.getByRole('button', { name: 'Add', exact: true });
+          const add = adds.nth((await adds.count()) - 1);
+          await add.scrollIntoViewIfNeeded();
+          await expect(add, `${name}.${f.key} list's Add visible on a phone`).toBeVisible();
+          continue;
+        }
         if (f.spec.kind === 'image') continue; // the file button is asserted below
         const c = control(page, f.key, f.spec).first();
         await c.scrollIntoViewIfNeeded();
@@ -154,7 +162,7 @@ for (const [name, spec] of editable) {
             if (sub.kind === 'image') {
               const [chooser] = await Promise.all([page.waitForEvent('filechooser'), dialog.getByRole('button', { name: 'Choose file' }).first().click()]);
               await chooser.setFiles(image);
-            } else if (sub.kind === 'text' && 'required' in sub && sub.required) await dialog.getByRole('textbox', { name: new RegExp(`^${escapeRe(label(k))}\*?$`) }).fill(sample(sub.min, sub.max));
+            } else if (sub.kind === 'text' && 'required' in sub && sub.required) await dialog.getByRole('textbox', { name: new RegExp(`^${escapeRe(label(k))}\\*?$`) }).fill(sample(sub.min, sub.max));
           }
           await dialog.getByRole('button', { name: 'Add', exact: true }).click();
           await expect(dialog).toBeHidden();
