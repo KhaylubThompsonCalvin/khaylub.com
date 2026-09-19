@@ -486,8 +486,8 @@ public site never reads it, and its build, headers, budgets, and tests are uncha
 
 | Collection | Entry written | Form | Not in the form (and why) |
 |---|---|---|---|
-| notes, writing, journal | `content/<collection>/<slug>.md` | the body first; the shared fields; `series` and `part` | `cover`, `cover_alt`, `provenance` (Phase 27: Keystatic writes a group on every save, so an optional provenance group cannot be expressed); `featured` (Git-only, owner-approved); `problem`, `role` (projects only) |
-| projects | `content/projects/<slug>/index.md` | the fields first; `project_status`, `context` (course, term, institution; ADR-012), `problem`, `role`, `links`, `outcome`; the body description lists the thirteen case-study headings in order | `cover`, `cover_alt`, `provenance`, `featured` (as above) |
+| notes, writing, journal | `content/<collection>/<slug>.md` | the body first; the shared fields; `series` and `part`; since Phase 27 the optional `cover`, `cover_alt`, and `provenance` group (an untouched group is written empty and read as absent) | `featured` (Git-only, owner-approved); `problem`, `role` (projects only) |
+| projects | `content/projects/<slug>/index.md` | the fields first; `project_status`, `context` (course, term, institution; ADR-012), `problem`, `role`, `links`, `outcome`; the optional cover and provenance group (Phase 27); the body description lists the thirteen case-study headings in order | `featured` (as above) |
 | music, video, gallery | `content/<collection>/<slug>/index.md` with the images beside | the fields first; `provenance` as a required group; images by upload (`poster`, `cover`, gallery `images[].src`); audio and video files by name under `public/media/<slug>/` or an `external_url` (uploads of large media are Phase 27) | `featured`, `problem`, `role`, `series`, `part` |
 
 Rules the editor enforces before a save: required fields, maximum lengths and the minimums of
@@ -709,10 +709,75 @@ and CI checks are kept, never weakened. The full record: vault document 52.
    (any line naming Content-Security-Policy is a candidate adjustment) and by the Phase 28 local
    harness before the candidate is ever enforced.
 
+### 10.10 The owner acceptance harness and the recovery record (Phase 28)
+
+1. **`npm run test:studio`** (`scripts/studio-harness.mjs`, `playwright.studio.config.ts`, `tests/studio/`):
+   the owner Studio's forms in a real browser against a local Studio in local storage mode, where no
+   sign-in exists, so no credential is involved. The harness makes a throwaway Git worktree of `HEAD`
+   in the system temp directory, starts the Studio from this repository's `studio/` with its local
+   root pointed at the worktree (`STUDIO_LOCAL_ROOT`, read only by a development server), runs the
+   Playwright project (desktop 1440 by 900 and phone 390 by 844), runs `validate` inside the worktree
+   over what the forms wrote, then stops the server (Astro's development daemon, by `astro dev stop`)
+   and removes the worktree. Everything asserted is derived from the field tables in
+   `studio/src/fields.ts`: the sidebar names every editable collection and no Git-only one; each form
+   shows every field's label and help text and no deferred field; the status picker offers
+   `withdrawn`; a Create with the required fields empty is refused; the Body editor is visible; the
+   Video form says its image is the poster; on the phone viewport no required control is hidden and
+   the page never scrolls sideways; one entry per collection is created through the form (the file
+   lands in the worktree and passes `validate`). `--keep` leaves the worktree for inspection.
+2. **`npm run test:visual`** (`playwright.visual.config.ts`, `tests/visual/`): every template route of
+   `tests/helpers.ts` screenshotted at the three viewports into `EVIDENCE_DIR` (default
+   `test-results/visual/`; point it at the vault's evidence folder; that path is never written here)
+   and asserted never to scroll sideways. No pixel comparison until the owner agrees a baseline
+   (vault document 50).
+3. **`npm run acceptance [<studio-branch>]`** (`scripts/acceptance.mjs`): the site's suite against
+   `dist/`, the publishing harness for the branch when one is named, the Studio harness, and the
+   visual harness, then one report `acceptance-report.md` in `EVIDENCE_DIR`: every step's PASS or
+   FAIL with its seconds, and the owner-judgment questions with the pictures to look at. Exit 1 on
+   any automated failure. "Owner Publishing Studio accepted" and "Phase 28 PASS" are the owner's
+   words, never the harness's.
+4. **Recovery, documented (document 41):**
+   - *A failed build:* an invalid save cannot merge (the six checks; the protection rule); production
+     keeps serving what it served. Fix the entry in the Studio and save again, or close the pull
+     request to hold the piece.
+   - *Rollback:* GitHub's Revert button on the merged pull request opens the undo, which merges like
+     any other pull request (a revert on a `studio/` branch merges by itself). A reverted publication
+     still needs the withdrawal below, because the host keeps the old page.
+   - *An accidental publication:* set the status to `withdrawn` and save; after the merge and the
+     deploy the address serves the notice and the piece is in no listing (10.9). Unlinked processed
+     images stay at their hashed addresses until the host purges them.
+   - *Replacing an asset:* upload the new file in the entry's image field and save; the pipeline
+     rebuilds the derived images and the card at the next deploy; the old hashed files linger unlinked.
+   - *Delete versus unpublish versus withdraw:* a draft never published may be deleted or left as a
+     draft; anything the public has seen is withdrawn, never deleted and never re-drafted (10.9).
+   - *Backup and export:* the repository is the content; every save is a commit; nothing lives only
+     in the Studio or on Render. A clone of the repository is the export.
+   - *Lost access:* Keystatic Cloud signs the owner in with GitHub; if the Studio is unreachable, the
+     files can be edited on GitHub directly and merge by the same pull-request path (the checks run
+     on any branch's pull request; only `studio/` branches merge by themselves).
+   - *The Studio domain:* `khaylub-studio.onrender.com` is a Render web service from `render.yaml`
+     (10.2); recreating it from the Blueprint restores it; nothing on it is unique.
+5. **The recovery test, rerun at Phase 28 (2026-09-18 and 2026-09-19 UTC, evidence in the vault):**
+   - *The failing document* (`studio/p28-drill-refused`, a note with an invalid status value, #74):
+     the pull request opened 10 s after the save; five of six required checks red; auto-merge
+     waiting; nothing merged; `main` unchanged; both origins 404; the derived places clear:
+     12 pass, 0 fail. Held back by deleting the branch (#74 closed unmerged).
+   - *The draft and its revert* (`studio/p28-drill-draft`, #75: opened 11 s after the save, six
+     checks green at 13m53s, merged by github-actions at 15m11s; staging served it, production
+     404: 12 pass, 0 fail; then `studio/p28-drill-revert`, `git revert -m 1` of that merge, #76:
+     merged at 9m59s, the file absent from `main`, production 404 and its derived places clear:
+     11 pass, 1 fail, the fail being staging's retained copy of the removed draft, the known fact
+     of 10.9 item 5). The withdrawn piece is proven at 10.9 (Phase 27, `p27-test-still`), not
+     repeated with a second public throwaway.
+6. **The owner's acceptance:** the owner authors the real piece in the Studio following vault document
+   56 ("How I Publish to Khaylub.com"), reports any improvisation, and the session runs
+   `npm run acceptance <branch>`; the report's owner-judgment questions are the only questions asked.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
 |---|---|---|---|---|
+| 2026-09-19 | the session (the harnesses) | 10.10 the Studio harness (31 tests, seven entries created and validated in a throwaway checkout), the visual harness (78 captures), the recovery test rerun (#74 refused, #75 draft, #76 revert) | PASS: every automated step green; the retention fact on staging seen again and kept as the known FAIL | none |
 | 2026-09-18 | the session (Playwright and the harness) | 10.9 the withdrawal proof: `p27-test-still` withdrawn from the Studio (#71, 13m57s to the merge); the former production URL serves the notice, the derived places clear, the default card; the merged Studio branch deleted | PASS: 13 of 13 through the harness; the retention fact mitigated | none |
 | 2026-09-18 | the session (Playwright and the harness), the owner (judgment) | 10.9 the owner's test piece: created in the local Studio by the driver, published (#67, 9m51s to the merge, every derived place on production), unpublished from the Studio's edit form (#68, 10m25s); the retention fact proven on production; the merged Studio branches deleted | PASS for the path; the retention FAIL kept on purpose; the owner's verdict on the placement and wording in the Phase 27 gate note | none |
 | 2026-09-18 | the session (the harness) | 10.9 the drills under `npm run test:publishing`: the failing document (#63: five checks red, no merge, held back by deleting the branch), the draft (#62: merged by itself at 11m21s, staging at 12m17s, production 404), the revert (#65: merged at 13m58s, `main` clean, production 404, staging still serving the removed page); the Studio candidate policy collected on the anonymous shell (`csp-report.mjs`: fonts and the two inline scripts found, the candidate adjusted, the rerun clean) | PASS for the path (every step automatic, every check read through the API); one FAIL kept on purpose: the retention fact in 10.9 item 5 | one: the first revert push carried a mistaken commit and was deleted within a minute (pull request #64 closed unmerged), so the drill ran under a second branch name |
