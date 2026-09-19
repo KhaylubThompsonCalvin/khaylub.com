@@ -24,7 +24,10 @@
     "report": "node scripts/build-report.mjs",
     "staging:verify": "node scripts/staging-verify.mjs",
     "lhci:staging": "node scripts/lhci-staging.mjs",
-    "test:publishing": "node scripts/publishing-verify.mjs"
+    "test:publishing": "node scripts/publishing-verify.mjs",
+    "test:studio": "node scripts/studio-harness.mjs",
+    "test:visual": "playwright test --config playwright.visual.config.ts",
+    "acceptance": "node scripts/acceptance.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.1",
