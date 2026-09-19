@@ -13,6 +13,7 @@ node_modules/
 .mcp.json
 
 # test and tooling output
+.portfolio/
 playwright-report/
 test-results/
 .lighthouseci/

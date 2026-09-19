@@ -773,6 +773,72 @@ and CI checks are kept, never weakened. The full record: vault document 52.
    56 ("How I Publish to Khaylub.com"), reports any improvisation, and the session runs
    `npm run acceptance <branch>`; the report's owner-judgment questions are the only questions asked.
 
+### 10.11 School work to the portfolio (Phase 28; reusable after it)
+
+The path from a finished term to a published Project entry, with the owner's approval between the
+recommendation and the authoring, and again before publication. Nothing here publishes by itself,
+touches a graded file, submits anything to a school, or holds a credential.
+
+1. **The auditor: `npm run portfolio:audit`** (`scripts/portfolio-audit.mjs`). Read-only over two roots
+   named by the environment, never by the repository: `PORTFOLIO_SCHOOL_ROOT` (the folder holding one
+   subfolder per course) and `KHAYLUB_VAULT` (the vault; only `01 Projects/<course>` for the courses
+   found and `01 Projects/Khaylub.com/docs/V2` are read). It groups files into assignment units (a
+   folder named lab, project, assignment, final, capstone, midterm, homework, exercise, or portfolio;
+   practice, reading, lecture, quiz, and template folders are noise), reads notebooks (cells,
+   executed cells, errors, chart outputs, headings, libraries, a school-database connection),
+   Tableau workbooks (worksheets, dashboards, stories, actions, a recorded local path), reports
+   (word counts), datasets (columns, a public-source hint), images, code, and the owner's vault notes
+   about each unit (portfolio notes, statuses, public links), and it knows what `content/` already
+   publishes. Every unit is scored 0 to 3 on completeness, technical evidence, employer value,
+   visual quality, story, source evidence, publishing readiness, privacy, and provenance readiness,
+   with the reason on every line; nothing is ranked by size or count; an earlier unit whose notebook
+   headings reappear in a later cumulative notebook is marked contained; a unit the owner's own
+   portfolio map or dedicated notes mark as published is set aside (`--include-published` lists
+   it). It flags, never prints, credentials, connection strings, private school URLs, possible
+   student identifiers, grades, emails, instructor quotations, classmate mentions, machine paths,
+   and text that reads like course material. Output in `PORTFOLIO_OUT` (default `.portfolio/`,
+   git-ignored): `report.md` (BEST, RUNNER-UP 1, RUNNER-UP 2, every unit ranked, the flags),
+   `candidates.json`, and `manifests/<candidate-id>.json` (course, term, institution, source paths,
+   vault references, technologies against the site vocabulary, skills, tags, evidence, exclusions,
+   the proposed Project structure, and the fields still needing the owner's words). `--course
+   <code>` limits the run to one course. Nothing is copied from a school file beyond names, counts,
+   and headings.
+2. **The approval gate.** The owner reads the report and names one candidate. Then the approved
+   package `PORTFOLIO_OUT/approved/<candidate-id>.json` is written from the owner's words (title,
+   slug, summary, type, project status, context, technologies, tags, skills, source, links, problem,
+   role, outcome, the Markdown body, AI assistance, the cover as a derived copy placed under
+   `PORTFOLIO_OUT` with its alt text, the provenance record, what was omitted for privacy, and
+   `approvedForPublication`, false until the owner says otherwise). No Studio branch exists before
+   this file does.
+3. **The authoring: `npm run studio:author -- <candidate-id>`** (`scripts/studio-author.mjs`). Checks
+   the package against the schema's rules first (the slug, lengths, the enum values, the thirteen
+   case-study headings for a case study, a cover's alt and provenance, no em dash, no graded original
+   as the cover) and refuses an incomplete one. `--preview` prints the content review and stops.
+   Otherwise it makes a worktree on `studio/<slug>` from `origin/main`, starts the local Studio
+   pointed at it (10.10; no sign-in exists locally; the deployed Studio is never automated), drives
+   the Projects form with Playwright from the package only (a field the package leaves out stays
+   empty), uploads the cover, fills the alt text and the credits, types the first paragraph in the
+   editor, presses Create, writes the approved Markdown body under the frontmatter Keystatic wrote,
+   runs `validate` in the worktree, and commits `studio: <slug>` as a draft. `--push` pushes the
+   branch (the workflow opens the pull request; the merged draft shows on staging). `--publish`
+   needs `"approvedForPublication": true`: it sets the status to published through the Studio's
+   edit form, commits, and pushes; the normal path merges it. `--acceptance` then runs
+   `npm run acceptance studio/<slug>` (10.10).
+4. **The owner's review (before `--publish`).** `--preview` is the review: title, summary, context,
+   technologies, the body, the media, the provenance, what was omitted. The owner answers one
+   question: does it represent the work accurately, and is it approved for publication.
+5. **Future terms.** Finish the term; run the auditor; read the top three; approve one; write the
+   package from the owner's words; `studio:author`; review with `--preview`; `--push` for the
+   staging draft; `--publish --acceptance` after the owner's word. The auditor is generic over
+   course folders; the authoring targets the Projects form; a Writing, Journal, or media piece goes
+   through the Studio by hand with the guide (vault document 56).
+6. **Security and privacy rules.** The school folders are read-only inputs and are never written;
+   nothing from them enters this repository except the derived copy the owner places under
+   `PORTFOLIO_OUT` and then chooses as the cover; `PORTFOLIO_OUT` is git-ignored; no credential,
+   token, or session state is stored anywhere; the deployed Studio is never automated; grades appear
+   only with the owner's explicit word; course material that is not the owner's work is flagged
+   and never republished.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |
