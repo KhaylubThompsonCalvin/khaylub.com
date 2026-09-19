@@ -803,35 +803,53 @@ touches a graded file, submits anything to a school, or holds a credential.
    the proposed Project structure, and the fields still needing the owner's words). `--course
    <code>` limits the run to one course. Nothing is copied from a school file beyond names, counts,
    and headings.
-2. **The approval gate.** The owner reads the report and names one candidate. Then the approved
-   package `PORTFOLIO_OUT/approved/<candidate-id>.json` is written from the owner's words (title,
-   slug, summary, type, project status, context, technologies, tags, skills, source, links, problem,
-   role, outcome, the Markdown body, AI assistance, the cover as a derived copy placed under
-   `PORTFOLIO_OUT` with its alt text, the provenance record, what was omitted for privacy, and
-   `approvedForPublication`, false until the owner says otherwise). No Studio branch exists before
-   this file does.
-3. **The authoring: `npm run studio:author -- <candidate-id>`** (`scripts/studio-author.mjs`). Checks
-   the package against the schema's rules first (the slug, lengths, the enum values, the thirteen
-   case-study headings for a case study, a cover's alt and provenance, no em dash, no graded original
-   as the cover) and refuses an incomplete one. `--preview` prints the content review and stops.
-   Otherwise it makes a worktree on `studio/<slug>` from `origin/main`, starts the local Studio
-   pointed at it (10.10; no sign-in exists locally; the deployed Studio is never automated), drives
-   the Projects form with Playwright from the package only (a field the package leaves out stays
-   empty), uploads the cover, fills the alt text and the credits, types the first paragraph in the
-   editor, presses Create, writes the approved Markdown body under the frontmatter Keystatic wrote,
-   runs `validate` in the worktree, and commits `studio: <slug>` as a draft. `--push` pushes the
-   branch (the workflow opens the pull request; the merged draft shows on staging). `--publish`
-   needs `"approvedForPublication": true`: it sets the status to published through the Studio's
-   edit form, commits, and pushes; the normal path merges it. `--acceptance` then runs
-   `npm run acceptance studio/<slug>` (10.10).
-4. **The owner's review (before `--publish`).** `--preview` is the review: title, summary, context,
-   technologies, the body, the media, the provenance, what was omitted. The owner answers one
-   question: does it represent the work accurately, and is it approved for publication.
+2. **The approval gate.** The owner reads the report and names one candidate (or names a piece
+   that never went through the auditor, such as an essay). Then the approved package
+   `PORTFOLIO_OUT/approved/<id>.json` is written from the owner's words:
+   `{ "collection", "slug", "fields": { <the collection's field keys> }, "body": "<Markdown>",
+   "omitted": ["what was left out and why"], "approvedForPublication": false }`. Field values follow
+   the field tables (`studio/src/fields.ts`): text, url, date, and integer fields as strings or
+   numbers, a select as one of its options, a checkbox as true or false, a multiselect as vocabulary
+   slugs, an image as `{ "file": "<a derived copy placed outside any graded original>" }`, a group as
+   an object, a list as an array. No Studio branch exists before this file does.
+3. **The commands** (`scripts/studio-author.mjs`; `tests/studio/author.spec.ts` is the browser driver):
+   - `npm run studio:review -- <id>`: the content review, nothing created: title, summary, collection,
+     type, date, context, technologies, tags, skills, source, links, the Work-page and AI-assistance
+     flags, media, provenance, what was omitted, the public URL that will result, the body; it ends
+     with the one question, "Approve publication?".
+   - `npm run studio:prepare -- <id>`: checks the package against the schema's rules (the slug,
+     lengths, the enum values, at least one tag, the thirteen case-study headings for a case study,
+     a cover's alt text and credits, no em dash, no image from a school folder) and refuses an
+     incomplete one; makes a worktree on `studio/<slug>` from `origin/main`; starts the local Studio
+     pointed at it (10.10); the driver opens the collection's form, fills only what the package
+     holds (every control found through the field tables; the Studio's own validation messages are
+     reported if it refuses), uploads the media, types the first paragraph in the editor, presses
+     Create, captures the form and the entry at desktop and phone widths (`EVIDENCE_DIR/studio`) with
+     no sideways scroll; the approved Markdown body is written under the frontmatter Keystatic
+     wrote; `validate` runs in the worktree; the entry is committed as a draft. Add `--push` to push
+     the branch: the workflow opens the pull request, the checks run, the merged draft shows on
+     staging, and `test:publishing --expect draft --live-page` watches it.
+   - `npm run studio:publish -- <id>`: needs `"approvedForPublication": true`; sets the status to
+     published through the Studio's edit form, commits, pushes; then
+     `test:publishing --expect published --live-page` (the branch, the pull request, the six checks,
+     auto-merge, the merge, main, both origins by their build stamp, the entry, the collection index,
+     the sitemap, both feeds, the graph, the card, and the live page in a browser at two widths: no
+     console error, no sideways scroll, zero axe violations, every image loaded with alt text, the
+     Credits section) and `npm run acceptance studio/<slug>` (10.10).
+   - The deployed Studio is never automated and no sign-in state is kept anywhere: the local Studio
+     in local storage mode writes the same files the deployed one would, and the branch, pull
+     request, checks, merge, and deploy are the same path. A stored Keystatic Cloud session would
+     work technically but is not used, by decision D-28 (runbook 10.8).
+4. **The owner's review (before `studio:publish`).** `studio:review` is the review. The owner
+   answers one question: does it represent the work accurately, and is it approved for publication.
 5. **Future terms.** Finish the term; run the auditor; read the top three; approve one; write the
-   package from the owner's words; `studio:author`; review with `--preview`; `--push` for the
-   staging draft; `--publish --acceptance` after the owner's word. The auditor is generic over
-   course folders; the authoring targets the Projects form; a Writing, Journal, or media piece goes
-   through the Studio by hand with the guide (vault document 56).
+   package from the owner's words; `studio:prepare -- <id> --push` for the staging draft;
+   `studio:review`; `studio:publish` after the owner's word. The auditor is generic over course
+   folders; the driver fills any collection the Studio edits from its field table. What stays in the
+   owner's own hands at Phase 28: the one real publication, made in the live Studio by the owner
+   following vault document 56, because the gate asks for the guide followed once without
+   improvisation and document 41 for a publication without Claude; the automation watches and
+   verifies every deterministic step after each save.
 6. **Security and privacy rules.** The school folders are read-only inputs and are never written;
    nothing from them enters this repository except the derived copy the owner places under
    `PORTFOLIO_OUT` and then chooses as the cover; `PORTFOLIO_OUT` is git-ignored; no credential,
