@@ -56,10 +56,10 @@ const { label, allHref, options, active, filtered = false } = Astro.props;
   .filter-bar a {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    padding: 0.25rem 0.75rem;
+    min-height: var(--target);
+    padding: var(--space-half) var(--space-1-5);
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     text-decoration: none;
   }
   .filter-bar a:hover {

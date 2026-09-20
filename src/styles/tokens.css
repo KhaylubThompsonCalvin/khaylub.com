@@ -19,6 +19,15 @@
   --size-h3: 1.25rem;
   --size-h2: 1.56rem;
   --size-h1: clamp(2.2rem, 6vw, 4rem);
+  /* Off the scale on purpose (F2): the header wordmark, the card summary, code blocks. */
+  --size-brand: 1.125rem;
+  --size-card: 0.95rem;
+  --size-code: 0.9rem;
+  --tracking-eyebrow: 0.08em;
+  --tracking-button: 0.04em;
+  --tracking-display: -0.01em;
+  --leading-heading: 1.15;
+  --leading-body: 1.5;
 
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -26,15 +35,48 @@
   --space-4: 2rem;
   --space-6: 3rem;
   --space-8: 4rem;
+  /* Below the scale: the tight gap or padding, and the list-link padding (F2, document 62). */
+  --space-half: 0.25rem;
+  --space-quarter: 0.125rem;
+  /* Between 1 and 2: the padding of buttons, nav items, chips, the search input, cards (F2). */
+  --space-1-5: 0.75rem;
+
+  /* Targets: the WCAG 2.5.5 size for controls, and the 2.5.8 minimum for inline list links (F2). */
+  --target: 44px;
+  --target-min: 24px;
 
   --measure: 60ch;
   --measure-reading: 65ch;
   --container: 72rem;
   --header-height: 56px;
+  /* Widths (F2): the contents side column; the card column and the flex bases that share its
+     size; the evidence and gallery tile minimum. */
+  --width-sidebar: 16rem;
+  --width-column: 16rem;
+  --width-tile: 12rem;
   --radius: 10px;
   --radius-sm: 6px;
+  --radius-btn: 8px;
+  --radius-pill: 999px;
+  --radius-photo: 12px;
   --ease: 150ms ease;
+
+  /* Interaction tints and elevation (F2): the button hover and active mixes; the card and the
+     open menu shadows. The primary nav keeps its own 6% hover until F4. */
+  --tint-hover: 8%;
+  --tint-active: 16%;
+  --shadow-card: 0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
+  --shadow-menu: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
 }
+
+/* Breakpoints (documented constants, not tokens: a custom property cannot drive an @media
+   condition in plain CSS). A change is made in every file that names the value.
+   560px  the doors side by side; previous and next (Doors, PrevNext)
+   900px  the second hero column; section spacing (IdentityCard, base.css)
+   1024px the primary nav expands; the contents side column; the artifact two-column layout
+          (PrimaryNav, TableOfContents, [collection]/[slug])
+   1200px the 270 px portrait (IdentityCard)
+   40rem  the Credits list stacks (Credits) */
 
 @media (prefers-color-scheme: dark) {
   :root {

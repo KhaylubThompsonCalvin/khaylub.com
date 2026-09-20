@@ -42,17 +42,17 @@ const { kind, items, idPrefix } = Astro.props;
     flex-wrap: wrap;
     align-items: baseline;
     gap: var(--space-1) var(--space-2);
-    padding: 0.5rem 0;
+    padding: var(--space-1) 0;
     border-bottom: 1px solid var(--line);
   }
   .term-label {
     font-weight: 600;
-    min-width: 12rem;
+    min-width: var(--width-tile);
   }
   /* Every link is its own target (WCAG 2.5.8, 24 px): the labels and the comma-separated proofs. */
   .evidence a {
     display: inline-block;
-    min-height: 24px;
-    padding: 0.125rem 0;
+    min-height: var(--target-min);
+    padding: var(--space-quarter) 0;
   }
 </style>

@@ -81,7 +81,7 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
     aspect-ratio: 3 / 4;
     object-fit: cover;
     object-position: 50% 18%;
-    border-radius: 12px;
+    border-radius: var(--radius-photo);
   }
   @media (min-width: 900px) {
     /* Two columns: the text in the first, the portrait in the second, spanning the text's rows.
