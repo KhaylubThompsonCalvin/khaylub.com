@@ -71,8 +71,8 @@ const groups = COLLECTIONS.map((c) => ({ ...c, nodes: g.nodes.filter((n) => n.co
   /* The comma-separated relation links are each a target (WCAG 2.5.8, 24 px). */
   .graph-list li a {
     display: inline-block;
-    min-height: 24px;
-    padding: 0.125rem 0;
+    min-height: var(--target-min);
+    padding: var(--space-quarter) 0;
   }
   .graph-list h2 {
     margin-top: var(--space-3);

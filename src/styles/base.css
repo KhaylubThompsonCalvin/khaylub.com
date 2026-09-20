@@ -8,10 +8,10 @@
 html {
   font-family: var(--font-body);
   font-size: 100%;
-  line-height: 1.5;
+  line-height: var(--leading-body);
   color: var(--ink);
   background: var(--bg);
-  scroll-padding-top: calc(var(--header-height) + 1rem);
+  scroll-padding-top: calc(var(--header-height) + var(--space-2));
   -webkit-text-size-adjust: 100%;
 }
 
@@ -42,10 +42,10 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  line-height: 1.15;
+  line-height: var(--leading-heading);
   margin: 0 0 var(--space-2);
-  letter-spacing: -0.01em;
-  scroll-margin-top: calc(var(--header-height) + 1rem);
+  letter-spacing: var(--tracking-display);
+  scroll-margin-top: calc(var(--header-height) + var(--space-2));
 }
 
 h1 {
@@ -97,8 +97,8 @@ a:hover {
    it appears, from the search fallback lists to the graph. Links inside running text are exempt. */
 li > a {
   display: inline-block;
-  min-height: 24px;
-  padding: 0.125rem 0;
+  min-height: var(--target-min);
+  padding: var(--space-quarter) 0;
 }
 
 /* Native players keep focus inside their own controls; the ring still shows around the player. */
@@ -119,7 +119,7 @@ small,
 
 .eyebrow {
   font-size: var(--size-sm);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--muted);
   margin: 0 0 var(--space-1);
@@ -171,26 +171,26 @@ small,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 0.75rem 1rem;
+  min-height: var(--target);
+  padding: var(--space-1-5) var(--space-2);
   border: 2px solid var(--ink);
-  border-radius: 8px;
+  border-radius: var(--radius-btn);
   background: transparent;
   color: var(--ink);
   font: inherit;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-button);
   text-decoration: none;
   cursor: pointer;
   transition: transform var(--ease), background-color var(--ease);
 }
 .btn:hover {
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  background: color-mix(in srgb, var(--ink) var(--tint-hover), transparent);
   transform: translateY(-1px);
 }
 .btn:active {
   transform: none;
-  background: color-mix(in srgb, var(--ink) 16%, transparent);
+  background: color-mix(in srgb, var(--ink) var(--tint-active), transparent);
 }
 .btn-primary {
   background: var(--ink);
@@ -217,7 +217,7 @@ small,
 /* Cards */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--width-card-min), 1fr));
   gap: var(--space-2);
   list-style: none;
   padding: 0;
@@ -232,13 +232,13 @@ small,
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 0.75rem;
+  padding: var(--space-1-5);
   min-height: 7.5rem;
   transition: border-color var(--ease), box-shadow var(--ease);
 }
 .card:hover {
   border-color: var(--muted);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
+  box-shadow: var(--shadow-card);
 }
 .card:focus-within {
   border-color: var(--focus);
@@ -270,7 +270,7 @@ small,
 .card .summary {
   margin: 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: var(--size-card);
 }
 .card .meta {
   display: flex;
@@ -286,7 +286,7 @@ small,
   line-height: 1.4;
   padding: 2px 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -335,8 +335,8 @@ pre {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: var(--size-code);
+  line-height: var(--leading-body);
 }
 code {
   font-family: ui-monospace, 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;

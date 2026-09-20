@@ -61,9 +61,9 @@ const links = [
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0 0.75rem;
+    min-width: var(--target);
+    min-height: var(--target);
+    padding: 0 var(--space-1-5);
     background: transparent;
     /* The border is the button's boundary: 3:1 (WCAG 1.4.11), like the search field. */
     border: 1px solid var(--muted);
@@ -79,15 +79,15 @@ const links = [
     display: none;
     position: absolute;
     right: 0;
-    top: calc(100% + 0.5rem);
+    top: calc(100% + var(--space-1));
     min-width: 14rem;
     margin: 0;
-    padding: 0.5rem;
+    padding: var(--space-1);
     list-style: none;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
+    box-shadow: var(--shadow-menu);
     z-index: 50;
   }
   .nav-list[data-open='true'] {
@@ -98,21 +98,21 @@ const links = [
   .nav-list-static {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem 0.75rem;
+    gap: var(--space-half) var(--space-1-5);
     margin: 0;
     padding: 0;
     list-style: none;
   }
   .nav-list-static a {
     display: inline-block;
-    min-height: 44px;
-    padding: 0.75rem 0.25rem;
+    min-height: var(--target);
+    padding: var(--space-1-5) var(--space-half);
   }
   .nav-list a {
     display: block;
-    padding: 0.75rem 0.75rem;
-    min-height: 44px;
-    min-width: 44px;
+    padding: var(--space-1-5) var(--space-1-5);
+    min-height: var(--target);
+    min-width: var(--target);
     text-decoration: none;
     border-radius: var(--radius-sm);
     border-bottom: 2px solid transparent;
@@ -127,8 +127,8 @@ const links = [
   }
   .utility {
     border-top: 1px solid var(--line);
-    margin-top: 0.25rem;
-    padding-top: 0.25rem;
+    margin-top: var(--space-half);
+    padding-top: var(--space-half);
   }
   @media (min-width: 1024px) {
     .menu-btn,
@@ -144,10 +144,10 @@ const links = [
       background: transparent;
       border: 0;
       box-shadow: none;
-      gap: 0.25rem;
+      gap: var(--space-half);
     }
     .nav-list a {
-      padding: 0.75rem 0.5rem;
+      padding: var(--space-1-5) var(--space-1);
       border-radius: 0;
     }
     .utility {
@@ -156,7 +156,7 @@ const links = [
       padding-top: 0;
     }
     .utility:first-of-type {
-      margin-left: 0.75rem;
+      margin-left: var(--space-1-5);
     }
   }
 </style>

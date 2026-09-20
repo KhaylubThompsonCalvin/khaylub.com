@@ -736,9 +736,18 @@ and CI checks are kept, never weakened. The full record: vault document 52.
    pinned Chromium; the file name is `<route-name>--<project>.png` (`home` for the front page,
    otherwise the path with its slashes turned into `--`); `baseline-record.json` beside the
    captures records the browser and version, the OS, the build's commit, the date, the projects,
-   the determinism settings, and every capture with its overflow. No pixel comparison until the
-   owner agrees a golden set: a golden update is an owner-approved visual change (vault document
-   57 section 4).
+   the determinism settings, and every capture with its overflow. Since F2 (2026-09-20) every lazy
+   image is loaded and decoded before the capture and native `<video>` controls are masked in a
+   constant grey, so two runs of the same build are identical to the pixel.
+   **The golden comparison:** `node scripts/visual-diff.mjs <before-dir> <after-dir> [--report
+   <file>] [--diff-dir <dir>]` compares two capture sets by name, pixel by pixel, with a threshold
+   of zero (exit 1 on any differing, missing, or resized capture; `--diff-dir` writes a red mask of
+   the differing pixels per capture; `--report` writes the table as Markdown). A foundation package
+   such as F2 proves "nothing moved" with it: BEFORE from the `main` build, AFTER from the branch
+   build, zero differing pixels on all 156 captures. A golden update is an owner-approved visual
+   change (vault document 57 section 4); the design tokens themselves are held by
+   `tests/tokens.spec.ts` (every `var()` defined; the F2 values in `tokens.css`; no tokenised
+   literal outside it; the tints and shadows resolving to the mixes they replaced).
 3. **`npm run acceptance [<studio-branch>]`** (`scripts/acceptance.mjs`): the site's suite against
    `dist/`, the publishing harness for the branch when one is named, the Studio harness, and the
    visual harness, then one report `acceptance-report.md` in `EVIDENCE_DIR`: every step's PASS or

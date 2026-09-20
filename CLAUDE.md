@@ -44,7 +44,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 | `src/layouts/BaseLayout.astro` | skip link, header, nav, `main`, footer, SEO head |
 | `src/components/` | IdentityCard, RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
 | `src/lib/` | catalog (public/private filter, featured set, evidence), profile, seo |
-| `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, motion |
+| `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, targets, widths, radii, tints, motion (`tests/tokens.spec.ts` holds every `var()` defined and the tokenised values out of components; breakpoints are documented literals) |
 | `src/islands/` | React islands (the climb), loaded only after the door is pressed |
 | `src/pages/` | routes; `[collection]/` handles indexes and artifact pages |
 | `public/resume/` | the resume PDF, supplied by the owner and never edited by Claude |
