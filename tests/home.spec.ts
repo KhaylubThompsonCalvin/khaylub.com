@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('home', () => {
   for (const [w, h] of [[375, 667], [390, 844], [768, 1024], [1440, 900]] as const) {
-    test(`doors, availability, and the climb door are above the fold at ${w}x${h}`, async ({ page }) => {
+    test(`doors, availability, and the climb line are above the fold at ${w}x${h}`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: h });
       await page.goto('/');
       for (const name of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
@@ -10,7 +10,7 @@ test.describe('home', () => {
         expect(box, name).not.toBeNull();
         expect(box!.y + box!.height, `${name} bottom`).toBeLessThanOrEqual(h);
       }
-      const climb = await page.getByRole('button', { name: 'Enter the climb' }).boundingBox();
+      const climb = await page.getByRole('link', { name: 'enter the climb' }).boundingBox();
       expect(climb!.y + climb!.height).toBeLessThanOrEqual(h);
       await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
     });
@@ -21,7 +21,7 @@ test.describe('home', () => {
     const order = await page.locator('main h1, main h2').evaluateAll((els) => els.map((e) => e.textContent?.trim().split(' as of')[0] ?? ''));
     expect(order.slice(0, 3)).toEqual(['Khaylub Thompson-Calvin', 'Now', "Khaylub's Top 8"]);
     const recruiter = page.getByRole('navigation', { name: 'Quick links' }).getByRole('link');
-    await expect(recruiter).toHaveText(['About', 'Skills', 'Projects', 'GitHub', 'Résumé', 'Contact']);
+    await expect(recruiter).toHaveText(['About', 'GitHub', 'Résumé', 'Contact']);
   });
 
   test('nothing plays or animates on its own; reduced motion removes transitions', async ({ browser }) => {

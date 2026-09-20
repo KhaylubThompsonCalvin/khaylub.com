@@ -2,7 +2,7 @@
 # Keys are fixed by src/lib/profile.ts; an unknown key fails the build.
 name: Khaylub Thompson-Calvin
 site_name: Khaylub.com
-role_line: Computer Information Systems student · Builder · Lifelong learner
+role_line: Computer Information Systems student · Building software, data, and web projects
 location: Hillsboro, OR
 email: khaylubthompsoncalvin@gmail.com
 github: https://github.com/KhaylubThompsonCalvin
@@ -10,9 +10,11 @@ linkedin: https://www.linkedin.com/in/khaylub-thompson-calvin-40543b294/
 # Expected reply time shown on the contact page. Nothing renders when empty.
 # Placeholder authorized by the owner in the Phase 10 prompt (2026-09-10); the owner may replace it.
 response_time: Usually replies within 1 to 2 business days.
-# Optional photo for the identity card (path under public/). Empty means no photo is rendered.
-photo: ''
-photo_alt: ''
+# Optional portrait for the identity card: a file name under src/assets/profile/ (the build derives the
+# sized AVIF and WebP variants). Empty means no portrait is rendered. headshot.png is the owner's own
+# professional headshot (2026), a 3:4 crop of the original, which stays outside the repository.
+photo: headshot.png
+photo_alt: Portrait of Khaylub Thompson-Calvin wearing a dark suit and tie, looking at the camera.
 security_contact: mailto:khaylubthompsoncalvin@gmail.com
 # security.txt Expires is computed as security_as_of plus one year at build time (decision D-20).
 security_as_of: 2026-09-09

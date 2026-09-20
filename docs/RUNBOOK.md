@@ -143,8 +143,9 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
    and fails on a non-200 or a console error; collects every Content-Security-Policy report-only
    violation per page (the `securitypolicyviolation` event and the console) and fails on any,
    quoting the policy the page was served under; types "climb" into search and requires results
-   (Pagefind's WebAssembly under the `/search/*` policy); presses "Enter the climb" and requires
-   zero scene bytes before the press and a model request after it; checks the indexing state
+   (Pagefind's WebAssembly under the `/search/*` policy); presses "Tap to explore" on `/climb/` and
+   requires zero scene bytes before the press and a model request after it (Home carries no climb
+   code since the hero package of 2026-09-20, only a link to `/climb/`); checks the indexing state
    (`Disallow: /`, the noindex meta, the banner, and no sitemap for the preview build) and labels
    a sitemap the build does not produce but the host still serves as a stale file from a previous
    deploy; and checks the five Open Graph cards of step 5 (tags present, the image a 1200 by 630
