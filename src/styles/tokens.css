@@ -49,10 +49,11 @@
   --measure-reading: 65ch;
   --container: 72rem;
   --header-height: 56px;
-  /* Widths (F2): the contents side column; the card column and the flex bases that share its
-     size; the evidence and gallery tile minimum. */
+  /* Widths (F2): the contents side column; the card grid's column minimum; the evidence and
+     gallery tile minimum. A token owns a meaning, not a number: the search input's and the climb
+     door's 16rem flex bases stay literal (their own things, used once). */
   --width-sidebar: 16rem;
-  --width-column: 16rem;
+  --width-card-min: 16rem;
   --width-tile: 12rem;
   --radius: 10px;
   --radius-sm: 6px;

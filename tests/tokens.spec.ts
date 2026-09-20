@@ -56,7 +56,7 @@ test.describe('design tokens', () => {
       '--target': '44px',
       '--target-min': '24px',
       '--width-sidebar': '16rem',
-      '--width-column': '16rem',
+      '--width-card-min': '16rem',
       '--width-tile': '12rem',
       '--radius-btn': '8px',
       '--radius-pill': '999px',
@@ -111,6 +111,8 @@ test.describe('design tokens', () => {
 
   test('the values F2 tokenised do not reappear as literals outside tokens.css', () => {
     // Each entry: the literal as it would appear in a declaration, and the token that owns it now.
+    // 16rem is not listed: the search input's and the climb door's flex bases keep it as a literal
+    // by the owner's decision (a token owns a meaning, not a number).
     const owned: [RegExp, string][] = [
       [/(?<![\w.-])44px(?![\w-])/, '--target'],
       [/(?<![\w.-])24px(?![\w-])/, '--target-min'],
@@ -119,7 +121,6 @@ test.describe('design tokens', () => {
       [/(?<![\w.-])0\.25rem(?![\w-])/, '--space-half'],
       [/(?<![\w.-])0\.125rem(?![\w-])/, '--space-quarter'],
       [/(?<![\w.-])0\.5rem(?![\w-])/, '--space-1'],
-      [/(?<![\w.-])16rem(?![\w-])/, '--width-sidebar or --width-column'],
       [/(?<![\w.-])12rem(?![\w-])/, '--width-tile'],
       [/(?<![\w.-])0\.08em(?![\w-])/, '--tracking-eyebrow'],
     ];
