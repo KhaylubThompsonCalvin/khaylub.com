@@ -25,7 +25,7 @@ const steps = [];
 function step(name, command, commandArgs, env = {}) {
   const t0 = Date.now();
   console.log(`\nacceptance: ${name}`);
-  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell, env: { ...process.env, ...env } });
+  const r = spawnSync(command, commandArgs, { stdio: 'inherit', shell: command !== process.execPath && shell, env: { ...process.env, ...env } });
   const seconds = Math.round((Date.now() - t0) / 1000);
   const ok = r.status === 0;
   steps.push({ name, ok, seconds, command: [command, ...commandArgs].join(' ') });
@@ -36,7 +36,7 @@ if (!skip('site')) {
   if (!existsSync('dist/index.html')) step('build', npm, ['run', 'build']);
   step('the site suite (npm test)', npm, ['test']);
 }
-if (branch) step(`the publishing harness for ${branch}`, process.execPath, ['scripts/publishing-verify.mjs', branch, '--out', join(dir, 'publishing-verify.json')]);
+if (branch) step(`the publishing harness for ${branch}`, process.execPath, ['scripts/publishing-verify.mjs', branch, '--live-page', '--out', join(dir, 'publishing-verify.json')]);
 if (!skip('studio')) step('the Studio harness (test:studio)', process.execPath, ['scripts/studio-harness.mjs']);
 if (!skip('visual')) step('the visual harness (test:visual)', npm, ['run', 'test:visual'], { EVIDENCE_DIR: join(dir, 'visual') });
 

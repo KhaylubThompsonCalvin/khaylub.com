@@ -29,7 +29,10 @@
     "test:visual": "playwright test --config playwright.visual.config.ts",
     "acceptance": "node scripts/acceptance.mjs",
     "portfolio:audit": "node scripts/portfolio-audit.mjs",
-    "studio:author": "node scripts/studio-author.mjs"
+    "studio:author": "node scripts/studio-author.mjs",
+    "studio:prepare": "node scripts/studio-author.mjs",
+    "studio:review": "node scripts/studio-author.mjs --review",
+    "studio:publish": "node scripts/studio-author.mjs --publish --acceptance"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.1",

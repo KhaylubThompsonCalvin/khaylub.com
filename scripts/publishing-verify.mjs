@@ -8,7 +8,10 @@
 // No secret: gh uses the session's own login (in CI, the workflow token).
 //
 // Usage: node scripts/publishing-verify.mjs <branch> [--expect published|draft|withdrawn|removed|refused|held]
-//        [--timeout 25m] [--staging <url>] [--production <url>] [--out report.json] [--no-wait]
+//        [--timeout 25m] [--staging <url>] [--production <url>] [--out report.json] [--no-wait] [--live-page]
+//   --live-page  after the origin checks, open the production page in a real browser at desktop and
+//                phone widths: no console error, no sideways scroll, zero axe violations, every image
+//                loaded with alt text, the Credits section counted; screenshots to EVIDENCE_DIR/live
 //
 //   published  the default when the merged file says so: merged, live on both origins
 //   draft      merged; staging serves it; production answers 404
@@ -51,6 +54,7 @@ const staging = opt('staging', STAGING).replace(/\/$/, '');
 const production = opt('production', PRODUCTION).replace(/\/$/, '');
 const out = opt('out', null);
 const wait = !args.includes('--no-wait');
+const livePage = args.includes('--live-page');
 
 const steps = [];
 const report = { branch, expect: null, at: new Date().toISOString(), staging, production, steps, ok: true };
@@ -250,7 +254,46 @@ for (const [label, origin] of [['staging', staging], ['production', production]]
     }
   }
 }
+if (livePage && (expect === 'published' || expect === 'withdrawn')) await checkLivePages();
 finish();
+
+// The live page in a real browser (Playwright and axe resolve from this repository's install): no
+// console error, no sideways scroll, zero axe violations, every image loaded with alt text, the
+// Credits section counted, the withdrawal notice when that is the expectation; screenshots kept.
+async function checkLivePages() {
+  const { chromium } = await import('playwright');
+  const AxeBuilder = (await import('@axe-core/playwright')).default;
+  const { mkdirSync } = await import('node:fs');
+  const dir = process.env.EVIDENCE_DIR ? process.env.EVIDENCE_DIR + '/live' : 'test-results/live';
+  mkdirSync(dir, { recursive: true });
+  const browser = await chromium.launch();
+  try {
+    for (const e of entries) {
+      for (const [name, viewport] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]]) {
+        const context = await browser.newContext({ viewport });
+        const page = await context.newPage();
+        const errors = [];
+        page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+        page.on('pageerror', (err) => errors.push(err.message));
+        const res = await page.goto(production + e.url, { waitUntil: 'networkidle', timeout: 60_000 });
+        await page.screenshot({ path: dir + '/' + e.slug + '-' + name + '.png', fullPage: true });
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+        const axe = await new AxeBuilder({ page }).analyze();
+        const imgs = await page.locator('main img').evaluateAll((list) => list.map((img) => ({ alt: img.getAttribute('alt') ?? '', ok: img.complete && img.naturalWidth > 0 })));
+        const credits = await page.locator('section.credits').count();
+        const notice = await page.locator('[data-withdrawn="true"]').count();
+        const imagesOk = imgs.every((img) => img.ok && img.alt.length > 0);
+        const ok = res?.status() === 200 && errors.length === 0 && overflow <= 1 && axe.violations.length === 0 && imagesOk && (expect !== 'withdrawn' || notice === 1);
+        const parts = [String(res?.status()), errors.length + ' console error(s)', 'overflow ' + overflow + 'px', axe.violations.length + ' axe violation(s)' + (axe.violations.length ? ': ' + axe.violations.map((v) => v.id).join(', ') : ''), imgs.length + ' image(s)' + (imgs.length ? (imagesOk ? ' loaded with alt text' : ' with a missing load or alt') : ''), 'Credits section ' + credits];
+        if (expect === 'withdrawn') parts.push('withdrawal notice ' + notice);
+        step('live page ' + e.url + ' (' + name + ')', ok, parts.join('; '));
+        await context.close();
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+}
 
 function wantStatus(label, e) {
   if (expect === 'withdrawn') return 200;
