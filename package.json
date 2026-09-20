@@ -32,7 +32,8 @@
     "studio:author": "node scripts/studio-author.mjs",
     "studio:prepare": "node scripts/studio-author.mjs",
     "studio:review": "node scripts/studio-author.mjs --review",
-    "studio:publish": "node scripts/studio-author.mjs --publish --acceptance"
+    "studio:publish": "node scripts/studio-author.mjs --publish --acceptance",
+    "design:review": "node scripts/design-review.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.1",
