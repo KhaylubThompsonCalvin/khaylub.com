@@ -1,10 +1,10 @@
 ---
 import { identity } from '@lib/profile';
 const id = identity();
+// The Home hero's quick links: verification and contact only (About, GitHub, Résumé, Contact; the
+// owner's decision of 2026-09-20). Skills and Projects keep their routes and their place in the nav.
 const links = [
   { href: '/about/', label: 'About' },
-  { href: '/work/#skills', label: 'Skills' },
-  { href: '/projects/', label: 'Projects' },
   { href: id.github, label: 'GitHub', external: true },
   { href: '/resume/', label: 'Résumé' },
   { href: '/contact/', label: 'Contact' },

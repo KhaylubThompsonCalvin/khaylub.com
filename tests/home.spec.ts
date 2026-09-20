@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home', () => {
-  for (const [w, h] of [[375, 667], [390, 844], [768, 1024], [1440, 900]] as const) {
-    test(`doors, availability, and the climb door are above the fold at ${w}x${h}`, async ({ page }) => {
+  // The first-screen rule (FR-A1 as amended by the owner on 2026-09-20; P2-FE-04): 390x844 is the
+  // mobile first-screen acceptance viewport, with 768x1024 and 1440x900 alongside. 375x667 no longer
+  // carries a fold requirement (the portrait sits between the availability line and the links on a
+  // phone); it is the short-phone usability test below. 320 px is the reflow viewport (tests/visual).
+  for (const [w, h] of [[390, 844], [768, 1024], [1440, 900]] as const) {
+    test(`doors, availability, and the climb line are above the fold at ${w}x${h}`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: h });
       await page.goto('/');
       for (const name of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
@@ -10,18 +14,49 @@ test.describe('home', () => {
         expect(box, name).not.toBeNull();
         expect(box!.y + box!.height, `${name} bottom`).toBeLessThanOrEqual(h);
       }
-      const climb = await page.getByRole('button', { name: 'Enter the climb' }).boundingBox();
+      const climb = await page.getByRole('link', { name: 'enter the climb' }).boundingBox();
       expect(climb!.y + climb!.height).toBeLessThanOrEqual(h);
       await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
     });
   }
+
+  test('a short phone (375x667) scrolls, clips nothing, and keeps every hero control usable', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/');
+    const doc = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, scrollable: document.documentElement.scrollHeight > window.innerHeight }));
+    expect(doc.overflow, 'horizontal overflow').toBe(0);
+    expect(doc.scrollable, 'the page scrolls vertically').toBe(true);
+    // Nothing in the hero is clipped or pushed sideways: every piece lies inside the viewport's width.
+    for (const el of await page.locator('.hero > *, .hero a, .hero img').all()) {
+      const box = await el.boundingBox();
+      expect(box, 'a hero element has a box').not.toBeNull();
+      expect(box!.x, 'left edge').toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width, 'right edge').toBeLessThanOrEqual(375);
+    }
+    await expect(page.getByRole('heading', { level: 1, name: 'Khaylub Thompson-Calvin' })).toBeInViewport();
+    await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
+    // The controls are reachable and work: the primary doors, the quick links, the mobile menu.
+    for (const name of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
+      const door = page.getByRole('link', { name });
+      await door.scrollIntoViewIfNeeded();
+      await expect(door).toBeInViewport();
+      const box = await door.boundingBox();
+      expect(box!.height, `${name} target height`).toBeGreaterThanOrEqual(44);
+    }
+    await expect(page.getByRole('navigation', { name: 'Quick links' }).getByRole('link')).toHaveCount(4);
+    await page.getByRole('link', { name: 'VIEW MY WORK' }).click();
+    await expect(page).toHaveURL(/\/work\/$/);
+    await page.goBack();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Work' })).toBeVisible();
+  });
 
   test('blocks appear in the required DOM order', async ({ page }) => {
     await page.goto('/');
     const order = await page.locator('main h1, main h2').evaluateAll((els) => els.map((e) => e.textContent?.trim().split(' as of')[0] ?? ''));
     expect(order.slice(0, 3)).toEqual(['Khaylub Thompson-Calvin', 'Now', "Khaylub's Top 8"]);
     const recruiter = page.getByRole('navigation', { name: 'Quick links' }).getByRole('link');
-    await expect(recruiter).toHaveText(['About', 'Skills', 'Projects', 'GitHub', 'Résumé', 'Contact']);
+    await expect(recruiter).toHaveText(['About', 'GitHub', 'Résumé', 'Contact']);
   });
 
   test('nothing plays or animates on its own; reduced motion removes transitions', async ({ browser }) => {
