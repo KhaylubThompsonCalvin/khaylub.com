@@ -143,8 +143,9 @@ build refuses them, so staging under option (b) is not byte-for-byte the product
    and fails on a non-200 or a console error; collects every Content-Security-Policy report-only
    violation per page (the `securitypolicyviolation` event and the console) and fails on any,
    quoting the policy the page was served under; types "climb" into search and requires results
-   (Pagefind's WebAssembly under the `/search/*` policy); presses "Enter the climb" and requires
-   zero scene bytes before the press and a model request after it; checks the indexing state
+   (Pagefind's WebAssembly under the `/search/*` policy); presses "Tap to explore" on `/climb/` and
+   requires zero scene bytes before the press and a model request after it (Home carries no climb
+   code since the hero package of 2026-09-20, only a link to `/climb/`); checks the indexing state
    (`Disallow: /`, the noindex meta, the banner, and no sitemap for the preview build) and labels
    a sitemap the build does not produce but the host still serves as a stale file from a previous
    deploy; and checks the five Open Graph cards of step 5 (tags present, the image a 1200 by 630
@@ -726,10 +727,18 @@ and CI checks are kept, never weakened. The full record: vault document 52.
    the page never scrolls sideways; one entry per collection is created through the form (the file
    lands in the worktree and passes `validate`). `--keep` leaves the worktree for inspection.
 2. **`npm run test:visual`** (`playwright.visual.config.ts`, `tests/visual/`): every template route of
-   `tests/helpers.ts` screenshotted at the three viewports into `EVIDENCE_DIR` (default
-   `test-results/visual/`; point it at the vault's evidence folder; that path is never written here)
-   and asserted never to scroll sideways. No pixel comparison until the owner agrees a baseline
-   (vault document 50).
+   `tests/helpers.ts` captured into `EVIDENCE_DIR` (default `test-results/visual/`; point it at the
+   vault's evidence folder; that path is never written here) and asserted never to scroll sideways.
+   Since the design initiative's package F1 (2026-09-19) the environment is deterministic: six
+   projects (desktop 1440 by 900, tablet 768 by 1024, phone 390 by 844, reflow 320 by 568, and
+   desktop-dark and phone-dark under the dark scheme), device scale factor 1, reduced motion,
+   animations disabled and the caret hidden at capture, a fixed locale and time zone, Playwright's
+   pinned Chromium; the file name is `<route-name>--<project>.png` (`home` for the front page,
+   otherwise the path with its slashes turned into `--`); `baseline-record.json` beside the
+   captures records the browser and version, the OS, the build's commit, the date, the projects,
+   the determinism settings, and every capture with its overflow. No pixel comparison until the
+   owner agrees a golden set: a golden update is an owner-approved visual change (vault document
+   57 section 4).
 3. **`npm run acceptance [<studio-branch>]`** (`scripts/acceptance.mjs`): the site's suite against
    `dist/`, the publishing harness for the branch when one is named, the Studio harness, and the
    visual harness, then one report `acceptance-report.md` in `EVIDENCE_DIR`: every step's PASS or

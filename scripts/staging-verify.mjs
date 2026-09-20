@@ -64,7 +64,7 @@ export async function verify(base, { preview = false, mobile = false } = {}) {
   if (report.search.status === 200 && !(report.search.results > 0)) report.search.failure = fail('no search results for "climb"');
 
   // The climb: nothing from the scene before the press; a model request after it.
-  report.climb = await visit('/', async (page, entry) => {
+  report.climb = await visit('/climb/', async (page, entry) => {
     const before = [];
     page.on('request', (r) => { if (/\/climb\/.*\.(glb|mp4)$/.test(r.url())) before.push(r.url()); });
     entry.sceneRequestsBeforePress = before.length;

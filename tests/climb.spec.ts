@@ -42,14 +42,28 @@ async function enter(page: Page, door: ReturnType<Page['getByRole']>) {
 }
 
 test.describe('the climb is opt-in', () => {
-  for (const path of ['/', '/climb/']) {
+  // Home carries no climb code at all: a plain link under the doors goes to /climb/, where the door lives
+  // (the owner's hero decision of 2026-09-20).
+  test('Home requests no climb bytes and links to /climb/ under the doors', async ({ page }) => {
+    const w = watch(page);
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    expect(w.requests.filter((u) => CLIMB_ASSETS.test(u)), 'climb assets requested on Home').toEqual([]);
+    expect(await page.locator('[data-climb-door], [data-climb-mount]').count(), 'no climb door or mount on Home').toBe(0);
+    const line = page.locator('.hero .climb-line');
+    await expect(line).toHaveText('Or enter the climb, the original 3D experience.');
+    await expect(line.getByRole('link', { name: 'enter the climb' })).toHaveAttribute('href', '/climb/');
+    expect(w.errors, 'console errors').toEqual([]);
+  });
+
+  for (const path of ['/climb/']) {
     test(`zero climb bytes before the click on ${path}; the ported scene after; skip returns focus`, async ({ page, request }) => {
       const w = watch(page);
       await page.goto(path);
       await page.waitForLoadState('networkidle');
       expect(w.requests.filter((u) => CLIMB_ASSETS.test(u)), 'climb assets requested before the click').toEqual([]);
 
-      const door = page.getByRole('button', { name: path === '/' ? 'Enter the climb' : 'Tap to explore' });
+      const door = page.getByRole('button', { name: 'Tap to explore' });
       await enter(page, door);
 
       // The real scene: both models, the island chunk, and the hero beat with the name as an h2.

@@ -1,49 +1,63 @@
 ---
+// The Home hero (the identity card): the name, the role line, the availability statement, the
+// portrait, the recruiter row, the two primary doors, and the quiet line to the climb. One grid
+// at every width: a single column on a phone (the portrait after the availability statement and
+// before the recruiter links), two columns from 900 px with the portrait in the second, top
+// aligned with the name (the owner's composite hero decision of 2026-09-20, vault document 60).
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { identity, availability, monthLabel } from '@lib/profile';
 import RecruiterRow from './RecruiterRow.astro';
 import Doors from './Doors.astro';
-import ClimbDoor from './ClimbDoor.astro';
-import ClimbMount from './ClimbMount.astro';
 
 const id = identity();
 const avail = availability();
+
+// The portrait is a file under src/assets/profile/, named by `photo` in the profile, so the build
+// derives the sized AVIF and WebP variants from one lossless source.
+const portraits = import.meta.glob<{ default: ImageMetadata }>('/src/assets/profile/*.{png,jpg,webp}', { eager: true });
+const photo = id.photo ? portraits[`/src/assets/profile/${id.photo}`]?.default : undefined;
+if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is not a file under src/assets/profile/`);
 ---
 
 <section class="hero" aria-labelledby="site-name">
-  <div class="hero-text">
-    <p class="eyebrow">{id.site_name}</p>
-    <h1 id="site-name">{id.name}</h1>
-    <p class="role muted">{id.role_line} · {id.location}</p>
-    <p class="availability">
-      {avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
-    </p>
-    <RecruiterRow />
-    <Doors />
-    <ClimbDoor />
-  </div>
+  <h1 id="site-name">{id.name}</h1>
+  <p class="role muted">{id.role_line} · {id.location}</p>
+  <p class="availability">
+    {avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
+  </p>
   {
-    id.photo && (
+    photo && (
       <div class="hero-photo">
-        <img src={id.photo} alt={id.photo_alt} width="400" height="400" fetchpriority="high" />
+        <Picture
+          src={photo}
+          alt={id.photo_alt}
+          widths={[160, 225, 270, 320, 450, 540]}
+          sizes="(min-width: 1200px) 270px, (min-width: 900px) 225px, 160px"
+          formats={['avif', 'webp']}
+          fallbackFormat="webp"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
       </div>
     )
   }
-  {/* The climb mounts here, across both columns, once the door is pressed. */}
-  <ClimbMount class="hero-mount" />
+  <RecruiterRow />
+  <Doors />
+  <p class="climb-line small muted">Or <a href="/climb/">enter the climb</a>, the original 3D experience.</p>
 </section>
 
 <style>
   .hero {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+    column-gap: var(--space-3);
     margin-bottom: var(--space-6);
   }
-  @media (min-width: 900px) {
-    .hero {
-      grid-template-columns: 2fr 1fr;
-      align-items: start;
-    }
+  .hero > :not(.hero-photo) {
+    grid-column: 1;
   }
   .role {
     margin: 0 0 var(--space-1);
@@ -52,17 +66,44 @@ const avail = availability();
     font-weight: 600;
     margin: 0 0 var(--space-2);
   }
-  .hero :global(.hero-mount) {
-    grid-column: 1 / -1;
-    min-width: 0;
+  .climb-line {
+    margin: 0;
   }
-  .hero-photo img {
+  /* The portrait: 3:4, the face kept in frame as the box changes, 160 px wide and centred on a phone. */
+  .hero-photo {
+    justify-self: center;
+    margin: var(--space-1) 0 var(--space-2);
+  }
+  .hero-photo :global(img) {
+    display: block;
+    width: 160px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: 50% 18%;
     border-radius: 12px;
-    max-width: 280px;
   }
-  @media (max-width: 360px) {
-    .eyebrow {
-      display: none;
+  @media (min-width: 900px) {
+    /* Two columns: the text in the first, the portrait in the second, spanning the text's rows.
+       The last row takes any extra height so the text rows stay tight when the portrait is taller. */
+    .hero {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      grid-template-rows: repeat(5, auto) 1fr;
+      align-items: start;
+    }
+    .hero-photo {
+      grid-column: 2;
+      grid-row: 1 / span 6;
+      justify-self: end;
+      margin: 0;
+    }
+    .hero-photo :global(img) {
+      width: 225px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .hero-photo :global(img) {
+      width: 270px;
     }
   }
 </style>

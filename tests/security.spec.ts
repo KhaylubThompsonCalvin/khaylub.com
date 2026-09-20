@@ -26,8 +26,8 @@ test.describe('security regression', () => {
     for (const path of ['/', '/work/', '/climb/', '/projects/khaylub-com-v1/']) {
       await page.goto(path);
       await page.waitForLoadState('networkidle');
-      if (path === '/') {
-        await page.getByRole('button', { name: 'Enter the climb' }).click();
+      if (path === '/climb/') {
+        await page.getByRole('button', { name: 'Tap to explore' }).click();
         await page.getByRole('button', { name: 'Skip the climb' }).waitFor();
         // The ported scene: models, meshopt WebAssembly, webp textures through blob: URLs.
         await page.locator('.climb canvas').waitFor({ timeout: 60_000 });
