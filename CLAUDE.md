@@ -281,6 +281,22 @@ case is prepared, not a gate). `studio-cleanup.yml` deletes merged Studio branch
 its candidate Content Security Policy Report-Only (scripts hashed per response; `'unsafe-inline'` for styles
 only, accepted by D-29; enforcement deferred). Large media stays on external URLs (no R2, by D-29). One UX
 follow-up is carried to the post-Phase-28 visual sprint: the artifact's own "Source:" line below the Credits
-block. Phase 28 (Owner publishing launch and acceptance) is the next gated phase and is NOT opened; it opens
-only on the owner's instruction through `/phase 28`.
+block. Phase 28 (Owner publishing launch and acceptance) is ACCEPTED and CLOSED: the owner recorded "Owner
+Publishing Studio accepted" and "Phase 28 PASS" on 2026-09-19 after publishing the first real piece alone in the
+live Studio, following the owner guide (vault document 56) without improvisation: "Letter to Time" (WR 121,
+2026-04-28), the first Writing artifact, live at `/writing/letter-to-time/` by the normal path (PRs #80 and #81,
+about fourteen minutes from each save to its merge). The owner acceptance harness is in place: `npm run
+test:studio` (the Studio's forms in a real browser against a local Studio in a throwaway worktree, no
+credential), `npm run test:visual` (every template route at three viewports, no sideways scroll), `npm run
+acceptance <studio-branch>` (the site suite, the publishing harness, the two above, one report with the
+owner-judgment questions), and `npm run test:publishing <branch> --live-page` (the live page: console, overflow,
+axe, images, Credits). The recovery test was rerun on the current `main` (runbook 10.10). The school-to-portfolio
+automation is reusable after the phase: `npm run portfolio:audit` (read-only over the course folders and the
+vault named by `PORTFOLIO_SCHOOL_ROOT` and `KHAYLUB_VAULT`, nine scored dimensions, privacy flags), then
+`studio:review`, `studio:prepare`, and `studio:publish` from an owner-approved package (runbook 10.11); the
+deployed Studio is never automated. Three facts to keep in mind: the `writing` tag exists for essays and letters;
+the Studio redeploys when `content/vocabulary/**` changes; `.portfolio/` is the git-ignored working folder of
+the auditor and the packages. No gated phase follows Phase 28 in the roadmap: the visual and UX redesign (vault
+document 50) and, after it, professional readiness (document 55) are deferred initiatives that open only by the
+owner's decision, never on their own.
 Phase 21 owns the production move of khaylub.com from V1 to V2.
