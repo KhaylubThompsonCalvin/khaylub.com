@@ -3,7 +3,10 @@
 // Metadata: unique title, description, canonical on the production domain, Open Graph tags,
 // optional JSON-LD, and a noindex meta on preview builds.
 import '../styles/tokens.css';
+import '../styles/fonts.css';
 import '../styles/base.css';
+import fraunces from '../assets/fonts/fraunces-latin.woff2?url';
+import ktSans from '../assets/fonts/kt-sans-latin.woff2?url';
 import SkipLink from '@components/SkipLink.astro';
 import SiteHeader from '@components/SiteHeader.astro';
 import SiteFooter from '@components/SiteFooter.astro';
@@ -72,6 +75,9 @@ const structured = jsonLd ?? {
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content={imageAlt} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* The two faces are on the text path of every page (F3): preloaded so the swap from the metric-matched fallback lands early. */}
+    <link rel="preload" href={ktSans} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fraunces} as="font" type="font/woff2" crossorigin />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={`${id.site_name} feed`} href="/feed.xml" />
     <link rel="alternate" type="application/feed+json" title={`${id.site_name} feed (JSON)`} href="/feed.json" />

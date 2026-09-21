@@ -875,6 +875,45 @@ touches a graded file, submits anything to a school, or holds a credential.
    only with the owner's explicit word; course material that is not the owner's work is flagged
    and never republished.
 
+### 10.12 The web fonts: rebuilding the subsets (the design initiative's F3)
+
+The two faces under `src/assets/fonts/` (Fraunces for the display, KT Sans, the site's subset of IBM
+Plex Sans, for the text) were built once from the official upstream releases with fontTools, which
+is a local tool, not a project dependency. `PROVENANCE.txt` beside the files records the release
+files, their SHA-256, the fontTools version, and the shipped files' sizes and SHA-256; `validate`
+refuses a font without a provenance entry, a SHA-256, or a licence text beside it, and a pair over
+the 100 KB font line of `budget.json`. To rebuild (only when a face or its release changes):
+
+1. Fetch the release files named in `PROVENANCE.txt` (the Fraunces 1.000 zip from
+   `undercasetype/Fraunces`; `plex-sans-variable.zip` from the `@ibm/plex-sans-variable@0.2.0`
+   release of `IBM/plex`) and check their SHA-256 against the record. Extract
+   `Fraunces[SOFT,WONK,opsz,wght].ttf` and `fonts/complete/ttf/IBM Plex Sans Var-Roman.ttf`.
+2. With Python 3.13 and fontTools 4.57.0 (`python -m pip install "fonttools[woff]==4.57.0" brotli`),
+   instance the axes the site uses and pin the rest at the values the owner approved:
+   `python -m fontTools.varLib.instancer Fraunces.ttf wght=400:700 opsz=9 SOFT=0 WONK=1 -o fraunces-inst.ttf`
+   and `python -m fontTools.varLib.instancer IBMPlexSansVar-Roman.ttf wght=400:700 wdth=100 -o plex-inst.ttf`.
+3. Rename the Plex instance (the OFL reserves the name Plex; a modified version must not carry it):
+   set name IDs 1, 4, and 16 to `KT Sans`, 6 to `KTSans-Variable`, and 3 to
+   `KTSans-Variable;subset of IBM Plex Sans Var 3.000`, and append the modification note to name ID 0
+   (a five-line fontTools script; the exact one is in the vault checkpoint of 2026-09-20).
+4. Subset both to the site's Latin range with the layout features kept:
+   `pyftsubset <instance> --unicodes="U+0020-007E,U+00A0-00FF,U+2010-2027,U+2030-205E,U+2190-2199"
+   --layout-features="kern,liga,calt,ccmp,mark,mkmk" --flavor=woff2 --output-file=<name>-latin.woff2`.
+5. Copy the two WOFF2 files into `src/assets/fonts/`, update `PROVENANCE.txt` (sizes, SHA-256,
+   the tool version), run `node scripts/font-metrics.mjs --georgia <georgia.ttf> --segoe <segoeui.ttf>`
+   for the formula values, then measure the rendered width ratio of the site's own text (the essay
+   for the text face, the headings at 700 for the display face) and set `size-adjust` in
+   `src/styles/fonts.css` to the measured ratio (the OS/2 average the formula uses does not match
+   English text for these faces); the vertical overrides are the face's ascent and descent over the
+   adjusted em. Rebuild, run `npm test` (`tests/fonts.spec.ts` checks the origin, the budget, the
+   preloads, the licences, and the reading treatment), and the full guard for Lighthouse's LCP and
+   CLS gates.
+
+The measures (`--measure`, `--measure-reading`, `--measure-longform`) are written in rem at the ch
+widths the design names, rendered in KT Sans, so the line length does not jump while the fallback
+swaps (a ch is the current font's zero; KT Sans's zero is 11 percent wider than Segoe UI's while
+its text is 1 percent wider). A new text face means recomputing them: 0.6em per zero for KT Sans.
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |

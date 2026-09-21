@@ -1,0 +1,27 @@
+Web fonts of khaylub.com (the design initiative's F3 package, 2026-09-20). Both faces are under the
+SIL Open Font License 1.1; the licence texts sit beside the files. Built once, locally, with
+fontTools 4.57.0 (Python 3.13.1) from the official upstream release files; the commands are in docs/RUNBOOK.md
+section 10.12; the input and output SHA-256 hashes below are the record.
+
+fraunces-latin.woff2 (30,992 bytes)
+  SHA-256 4697b02b041431d5bd8e488f56334b94a5572a1d794df7060aa76450dc40ea53
+  Source: Fraunces 1.000 by Undercase Type, github.com/undercasetype/Fraunces, release
+  UnderCaseType_Fraunces_1.000.zip (2020-10-29; SHA-256
+  8d8b81dfaeb89433f5c908e1d8d0a4b202bd627bd80d4cd5ff56f311fdcad19f), the file
+  "Fonts - Desktop/Fraunces[SOFT,WONK,opsz,wght].ttf" (360,440 bytes; SHA-256
+  7464bf3306f218e5e494ad830b18ecdcfb405868addcd7f7128d0d024f8589d1). Licence: OFL-Fraunces.txt (the
+  repository's OFL.txt at tag 1.000). No reserved font name; the family name is kept.
+  Instanced to wght 400 to 700 with opsz 9, SOFT 0, WONK 1 (the font's default values, the configuration
+  the owner approved in the mocks), then subset to Latin (U+0020-007E, U+00A0-00FF, U+2010-2027,
+  U+2030-205E, U+2190-2199) with the features kern, liga, calt, ccmp, mark, mkmk. 234 glyphs.
+
+kt-sans-latin.woff2 (27,884 bytes)
+  SHA-256 9ecad970b71ea21cc176a8264230d1ac159615ade998335fd6f6ec76c6695f7d
+  Source: IBM Plex Sans Var 3.000 by IBM (Mike Abbink, Bold Monday), github.com/IBM/plex, release
+  @ibm/plex-sans-variable@0.2.0 (2025-06-25), plex-sans-variable.zip (SHA-256
+  f83825d527be6cd39c8971c932b9bf22688a3ad3e5ac6305b6143d02f52b87b6), the file
+  "fonts/complete/ttf/IBM Plex Sans Var-Roman.ttf" (537,852 bytes; SHA-256
+  3ed3ea3b1b3854afdf3306e9ab60773ec03cd7466bf0017131c166d943408713). Licence: OFL-IBM-Plex.txt (the
+  release's license.txt). "Plex" is a reserved font name under the OFL, so this modified version
+  (instanced to wght 400 to 700 at wdth 100, subset to the same Latin range and features) is renamed
+  KT Sans in its name table and in the site's CSS; the colophon credits IBM Plex Sans. 240 glyphs.

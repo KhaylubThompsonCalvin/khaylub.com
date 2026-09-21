@@ -11,13 +11,16 @@
   --focus: #1d4ed8;
   --scrim: rgba(36, 28, 18, 0.85);
 
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* The faces (F3, document 63): Fraunces for the name, titles, headings, and the wordmark; KT Sans,
+     the site's subset of IBM Plex Sans, for everything else. The Fallback faces are the system fonts
+     metric-matched in fonts.css; the plain stacks after them are the safety net. */
+  --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif;
+  --font-body: 'KT Sans', 'KT Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --size-sm: 0.8rem;
   --size-body: 1rem;
   --size-h3: 1.25rem;
-  --size-h2: 1.56rem;
+  --size-h2: 1.75rem;
   --size-h1: clamp(2.2rem, 6vw, 4rem);
   /* Off the scale on purpose (F2): the header wordmark, the card summary, code blocks. */
   --size-brand: 1.125rem;
@@ -28,6 +31,10 @@
   --tracking-display: -0.01em;
   --leading-heading: 1.15;
   --leading-body: 1.5;
+  /* Long-form reading (F3, decision 5): the prose of artifact bodies only; the interface keeps
+     --size-body and --leading-body. */
+  --size-reading: 1.0625rem;
+  --leading-reading: 1.6;
 
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -45,8 +52,13 @@
   --target: 44px;
   --target-min: 24px;
 
-  --measure: 60ch;
-  --measure-reading: 65ch;
+  /* Measures in rem (F3): the ch values the design names, rendered in KT Sans (a zero is 0.6em), so
+     the line length does not jump while the metric-matched fallback swaps to the web face (a ch is
+     the current font's zero; KT Sans's is 11 percent wider than Segoe UI's while its text is only
+     1 percent wider). 60ch at 1rem = 36rem; 65ch = 39rem; 62ch at 1.0625rem = 39.525rem. */
+  --measure: 36rem;
+  --measure-reading: 39rem;
+  --measure-longform: 39.525rem;
   --container: 72rem;
   --header-height: 56px;
   /* Widths (F2): the contents side column; the card grid's column minimum; the evidence and

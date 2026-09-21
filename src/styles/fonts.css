@@ -1,0 +1,43 @@
+/* The two self-hosted faces (the design initiative's F3, vault document 63; decisions D-31), served
+   from src/assets/fonts/ through Vite with a content hash, so the /_astro/ immutable cache tier of
+   render.yaml applies. Latin subsets, weight 400 to 700 in one variable file each, font-display swap.
+   Provenance and licences: src/assets/fonts/PROVENANCE.txt and the OFL texts beside the files.
+   KT Sans is the site's subset of IBM Plex Sans: "Plex" is a reserved font name under the OFL, so the
+   modified version carries its own name; the colophon credits IBM Plex Sans.
+   The two Fallback faces are the system fonts drawn at the web face's width and vertical metrics so
+   the swap moves nothing measurable. size-adjust is the measured width ratio of the site's own text
+   (the essay for KT Sans, the headings at 700 for Fraunces; scripts/font-metrics.mjs prints the
+   OS/2 formula values, which the rendered text overrode: 101.72% became 101.01%, 112.72% became
+   97.24%); the vertical overrides are the face's metrics over the adjusted em. */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('../assets/fonts/fraunces-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2010-2027, U+2030-205E, U+2190-2199;
+}
+@font-face {
+  font-family: 'KT Sans';
+  src: url('../assets/fonts/kt-sans-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+2010-2027, U+2030-205E, U+2190-2199;
+}
+@font-face {
+  font-family: 'Fraunces Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 97.24%;
+  ascent-override: 100.58%;
+  descent-override: 26.22%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'KT Sans Fallback';
+  src: local('Segoe UI'), local('Roboto'), local('Helvetica Neue'), local('Arial');
+  size-adjust: 101.01%;
+  ascent-override: 101.48%;
+  descent-override: 27.23%;
+  line-gap-override: 0%;
+}

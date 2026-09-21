@@ -47,7 +47,7 @@ test.describe('design tokens', () => {
     expect(undefinedRefs, 'custom properties referenced but never defined').toEqual([]);
   });
 
-  test('the F2 tokens exist in tokens.css with the values the site had before them', () => {
+  test('the F2 and F3 tokens exist in tokens.css with the decided values', () => {
     const tokens = strip(readFileSync('src/styles/tokens.css', 'utf8'));
     const expected: Record<string, string> = {
       '--space-half': '0.25rem',
@@ -71,6 +71,13 @@ test.describe('design tokens', () => {
       '--leading-body': '1.5',
       '--tint-hover': '8%',
       '--tint-active': '16%',
+      // F3 (document 63): the faces and the long-form reading treatment.
+      '--size-h2': '1.75rem',
+      '--size-reading': '1.0625rem',
+      '--leading-reading': '1.6',
+      '--measure-longform': '39.525rem',
+      '--font-display': "'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif",
+      '--font-body': "'KT Sans', 'KT Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
     };
     for (const [name, value] of Object.entries(expected)) {
       const m = tokens.match(new RegExp(`${name}:\\s*([^;]+);`));

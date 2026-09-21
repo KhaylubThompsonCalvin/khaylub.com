@@ -119,6 +119,26 @@ if (existsSync(climbDir)) {
   }
 }
 
+// 4d. The web fonts (the design initiative's F3, vault document 63): every font file under
+//     src/assets/fonts/ is named in PROVENANCE.txt with a SHA-256, a licence file sits beside it,
+//     and the pair stays inside the 100 KB font line of budget.json.
+const fontsDir = 'src/assets/fonts';
+if (existsSync(fontsDir)) {
+  const fontFiles = readdirSync(fontsDir).filter((f) => /.(woff2|woff|ttf|otf)$/i.test(f));
+  const provenance = existsSync(join(fontsDir, 'PROVENANCE.txt')) ? readFileSync(join(fontsDir, 'PROVENANCE.txt'), 'utf8') : '';
+  if (fontFiles.length > 0 && !provenance) fail(`${fontsDir}/PROVENANCE.txt is missing`);
+  const licences = readdirSync(fontsDir).filter((f) => /^OFL-.*.txt$/i.test(f));
+  if (fontFiles.length > 0 && licences.length === 0) fail(`no licence text beside the fonts in ${fontsDir}`);
+  let fontBytes = 0;
+  for (const f of fontFiles) {
+    fontBytes += statSync(join(fontsDir, f)).size;
+    if (!provenance.includes(f)) fail(`font without a provenance entry: ${fontsDir}/${f}`);
+    else if (!/SHA-256 [0-9a-f]{64}/.test(provenance.slice(provenance.indexOf(f), provenance.indexOf(f) + 200))) fail(`font provenance entry lacks a SHA-256: ${f}`);
+  }
+  const fontBudget = (JSON.parse(readFileSync('budget.json', 'utf8'))[0]?.resourceSizes ?? []).find((r) => r.resourceType === 'font')?.budget;
+  if (fontBudget && fontBytes > fontBudget * 1024) fail(`the fonts total ${fontBytes} bytes, over the ${fontBudget} KB font budget`);
+}
+
 // 5. Featured set: exactly the approved three (decision D-10), in any order.
 const approved = ['khaylub-com-v1', 'fuel-economy-regression', 'sql-python-analytics-pipeline'];
 const featured = [];
