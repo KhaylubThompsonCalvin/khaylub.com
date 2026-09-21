@@ -133,7 +133,7 @@ if (existsSync(fontsDir)) {
   for (const f of fontFiles) {
     fontBytes += statSync(join(fontsDir, f)).size;
     if (!provenance.includes(f)) fail(`font without a provenance entry: ${fontsDir}/${f}`);
-    else if (!/SHA-256 [0-9a-f]{64}/.test(provenance.slice(provenance.indexOf(f), provenance.indexOf(f) + 200))) fail(`font provenance entry lacks a SHA-256: ${f}`);
+    else if (!/SHA-256 (core |ext )?[0-9a-f]{64}/.test(provenance.slice(provenance.indexOf(f), provenance.indexOf(f) + 260))) fail(`font provenance entry lacks a SHA-256: ${f}`);
   }
   const fontBudget = (JSON.parse(readFileSync('budget.json', 'utf8'))[0]?.resourceSizes ?? []).find((r) => r.resourceType === 'font')?.budget;
   if (fontBudget && fontBytes > fontBudget * 1024) fail(`the fonts total ${fontBytes} bytes, over the ${fontBudget} KB font budget`);

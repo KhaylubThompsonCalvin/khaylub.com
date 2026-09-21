@@ -6,7 +6,7 @@ import { join } from 'node:path';
 // from this origin and nowhere else, stay inside the font budget, swap in with the metric-matched
 // fallbacks, are preloaded, and ship with their licences and provenance.
 const FONT_DIR = 'src/assets/fonts';
-const FILES = ['fraunces-latin.woff2', 'kt-sans-latin.woff2'];
+const FILES = ['fraunces-core.woff2', 'fraunces-ext.woff2', 'kt-sans-core.woff2', 'kt-sans-ext.woff2'];
 const BUDGET_KB = (JSON.parse(readFileSync('budget.json', 'utf8'))[0].resourceSizes as { resourceType: string; budget: number }[]).find((r) => r.resourceType === 'font')!.budget;
 
 test.describe('the web fonts', () => {
@@ -14,7 +14,7 @@ test.describe('the web fonts', () => {
     const sizes = FILES.map((f) => statSync(join(FONT_DIR, f)).size);
     const total = sizes.reduce((a, b) => a + b, 0);
     expect(total, 'both files together in bytes').toBeLessThan(BUDGET_KB * 1024);
-    for (const [i, f] of FILES.entries()) expect(sizes[i], f).toBeLessThan(60 * 1024);
+    for (const [i, f] of FILES.entries()) expect(sizes[i], f).toBeLessThan(30 * 1024);
     const names = readdirSync(FONT_DIR);
     expect(names).toEqual(expect.arrayContaining(['OFL-Fraunces.txt', 'OFL-IBM-Plex.txt', 'PROVENANCE.txt']));
     const provenance = readFileSync(join(FONT_DIR, 'PROVENANCE.txt'), 'utf8');
@@ -27,7 +27,7 @@ test.describe('the web fonts', () => {
   test('the stylesheet declares the faces with swap and the metric-matched fallbacks', () => {
     const css = readFileSync('src/styles/fonts.css', 'utf8');
     for (const family of ['Fraunces', 'KT Sans', 'Fraunces Fallback', 'KT Sans Fallback']) expect(css).toContain(`font-family: '${family}'`);
-    expect((css.match(/font-display: swap/g) ?? []).length, 'swap on both web faces').toBe(2);
+    expect((css.match(/font-display: swap/g) ?? []).length, 'swap on the four web font files').toBe(4);
     expect((css.match(/size-adjust: [\d.]+%/g) ?? []).length, 'size-adjust on both fallbacks').toBe(2);
     expect(css).not.toMatch(/https?:\/\//);
   });
@@ -37,12 +37,13 @@ test.describe('the web fonts', () => {
       const requests: string[] = [];
       page.on('request', (r) => requests.push(r.url()));
       await page.goto(path, { waitUntil: 'networkidle' });
+      // The two core files; the extension files load only where a page uses one of their characters.
       const fontRequests = requests.filter((u) => /\.woff2?(\?|$)/.test(u));
-      expect(fontRequests.length, 'exactly the two files').toBe(2);
+      expect(fontRequests.map((u) => u.split('/').pop()!.replace(/\.[\w-]+\.woff2$/, '')).sort(), 'the two core files and nothing else').toEqual(['fraunces-core', 'kt-sans-core']);
       for (const u of fontRequests) expect(new URL(u).origin, u).toBe(new URL(page.url()).origin);
       expect(requests.filter((u) => !u.startsWith(new URL(page.url()).origin)), 'third-party requests').toEqual([]);
       const preloads = await page.locator('link[rel="preload"][as="font"]').evaluateAll((els) => els.map((e) => `${e.getAttribute('href')} ${e.getAttribute('crossorigin') !== null}`));
-      expect(preloads.length, 'both fonts preloaded').toBe(2);
+      expect(preloads.length, 'the two core files preloaded').toBe(2);
       for (const p of preloads) expect(p).toMatch(/\/_astro\/.+\.woff2 true$/);
       const loaded = await page.evaluate(async () => {
         await document.fonts.ready;

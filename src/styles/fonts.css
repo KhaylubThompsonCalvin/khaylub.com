@@ -1,9 +1,13 @@
 /* The two self-hosted faces (the design initiative's F3, vault document 63; decisions D-31), served
    from src/assets/fonts/ through Vite with a content hash, so the /_astro/ immutable cache tier of
-   render.yaml applies. Latin subsets, weight 400 to 700 in one variable file each, font-display swap.
-   Provenance and licences: src/assets/fonts/PROVENANCE.txt and the OFL texts beside the files.
-   KT Sans is the site's subset of IBM Plex Sans: "Plex" is a reserved font name under the OFL, so the
-   modified version carries its own name; the colophon credits IBM Plex Sans.
+   render.yaml applies. One variable file per face for weight 400 to 700, split by character range:
+   the core (ASCII plus the few characters the site's text uses: é, É, the middle dot, ©, ×, the
+   en dash, curly quotes, the bullet, the ellipsis, the breadcrumb chevron) loads on every page and is preloaded; the
+   extension (the rest of Latin-1 and General Punctuation, arrows) loads only on a page that uses one
+   of its characters, so the first paint carries the fewest bytes (Lighthouse's LCP gate). font-display
+   swap on all four. Provenance and licences: src/assets/fonts/PROVENANCE.txt and the OFL texts beside
+   the files. KT Sans is the site's subset of IBM Plex Sans: "Plex" is a reserved font name under the
+   OFL, so the modified version carries its own name; the colophon credits IBM Plex Sans.
    The two Fallback faces are the system fonts drawn at the web face's width and vertical metrics so
    the swap moves nothing measurable. size-adjust is the measured width ratio of the site's own text
    (the essay for KT Sans, the headings at 700 for Fraunces; scripts/font-metrics.mjs prints the
@@ -11,19 +15,35 @@
    97.24%); the vertical overrides are the face's metrics over the adjusted em. */
 @font-face {
   font-family: 'Fraunces';
-  src: url('../assets/fonts/fraunces-latin.woff2') format('woff2');
+  src: url('../assets/fonts/fraunces-core.woff2') format('woff2');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+2010-2027, U+2030-205E, U+2190-2199;
+  unicode-range: U+0020-007E, U+00A0, U+00A9, U+00B7, U+00D7, U+00C9, U+00E9, U+2013, U+2018-201D, U+2022, U+2026, U+203A;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('../assets/fonts/fraunces-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00A1-00A8, U+00AA-00B6, U+00B8-00C8, U+00CA-00D6, U+00D8-00E8, U+00EA-00FF, U+2010-2012, U+2014-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-2039, U+203B-205E, U+2190-2199;
 }
 @font-face {
   font-family: 'KT Sans';
-  src: url('../assets/fonts/kt-sans-latin.woff2') format('woff2');
+  src: url('../assets/fonts/kt-sans-core.woff2') format('woff2');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+2010-2027, U+2030-205E, U+2190-2199;
+  unicode-range: U+0020-007E, U+00A0, U+00A9, U+00B7, U+00D7, U+00C9, U+00E9, U+2013, U+2018-201D, U+2022, U+2026, U+203A;
+}
+@font-face {
+  font-family: 'KT Sans';
+  src: url('../assets/fonts/kt-sans-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00A1-00A8, U+00AA-00B6, U+00B8-00C8, U+00CA-00D6, U+00D8-00E8, U+00EA-00FF, U+2010-2012, U+2014-2017, U+201E-2021, U+2023-2025, U+2027, U+2030-2039, U+203B-205E, U+2190-2199;
 }
 @font-face {
   font-family: 'Fraunces Fallback';

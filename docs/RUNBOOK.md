@@ -896,10 +896,17 @@ the 100 KB font line of `budget.json`. To rebuild (only when a face or its relea
    set name IDs 1, 4, and 16 to `KT Sans`, 6 to `KTSans-Variable`, and 3 to
    `KTSans-Variable;subset of IBM Plex Sans Var 3.000`, and append the modification note to name ID 0
    (a five-line fontTools script; the exact one is in the vault checkpoint of 2026-09-20).
-4. Subset both to the site's Latin range with the layout features kept:
-   `pyftsubset <instance> --unicodes="U+0020-007E,U+00A0-00FF,U+2010-2027,U+2030-205E,U+2190-2199"
-   --layout-features="kern,liga,calt,ccmp,mark,mkmk" --flavor=woff2 --output-file=<name>-latin.woff2`.
-5. Copy the two WOFF2 files into `src/assets/fonts/`, update `PROVENANCE.txt` (sizes, SHA-256,
+4. Subset each instance twice with the layout features kept: the core file
+   (`--unicodes="U+0020-007E,U+00A0,U+00A9,U+00B7,U+00D7,U+00C9,U+00E9,U+2013,U+2018-201D,U+2022,U+2026,U+203A"`,
+   ASCII plus the characters the site's text and CSS use, the breadcrumb chevron included) and the
+   extension file (`--unicodes="U+00A1-00A8,U+00AA-00B6,U+00B8-00C8,U+00CA-00D6,U+00D8-00E8,U+00EA-00FF,
+   U+2010-2012,U+2014-2017,U+201E-2021,U+2023-2025,U+2027,U+2030-2039,U+203B-205E,U+2190-2199"`), each with
+   `--layout-features="kern,liga,calt,ccmp,mark,mkmk" --flavor=woff2`. The split keeps the bytes on
+   the first paint small (Lighthouse's LCP gate on the media pages): the core files are preloaded on
+   every page, the extension files load only where a page uses one of their characters. A new
+   character in the site's copy that falls in the extension range costs one extra request on that
+   page, nothing else; a character outside both ranges renders in the fallback face.
+5. Copy the four WOFF2 files into `src/assets/fonts/`, update `PROVENANCE.txt` (sizes, SHA-256,
    the tool version), run `node scripts/font-metrics.mjs --georgia <georgia.ttf> --segoe <segoeui.ttf>`
    for the formula values, then measure the rendered width ratio of the site's own text (the essay
    for the text face, the headings at 700 for the display face) and set `size-adjust` in
