@@ -342,6 +342,22 @@ code {
   font-family: ui-monospace, 'Cascadia Mono', Consolas, 'Liberation Mono', monospace;
 }
 
+/* Long-form reading (F3, decision 5): the prose of an artifact body reads at --size-reading with
+   --leading-reading inside a --measure-longform line. Code blocks keep --size-code and --leading-body;
+   tables, captions, and small text keep the interface size, so only the prose grows. */
+.body {
+  font-size: var(--size-reading);
+  line-height: var(--leading-reading);
+  max-width: var(--measure-longform);
+}
+.body table {
+  font-size: var(--size-body);
+  line-height: var(--leading-body);
+}
+.body :is(figcaption, small, .small) {
+  line-height: var(--leading-body);
+}
+
 /* Figures inside artifact bodies */
 figure {
   margin: var(--space-3) 0;
