@@ -921,6 +921,30 @@ widths the design names, rendered in KT Sans, so the line length does not jump w
 swaps (a ch is the current font's zero; KT Sans's zero is 11 percent wider than Segoe UI's while
 its text is 1 percent wider). A new text face means recomputing them: 0.6em per zero for KT Sans.
 
+### 10.13 The colour system: the Appearance control, the contrast test, changing a palette value (F4)
+
+- **The Appearance control** (the footer on every page; F4, vault document 64): Light, Dark, or
+  System. The choice is stored on the device only, as `localStorage['khaylub-theme']` (`light` or
+  `dark`; System removes the key), by `src/scripts/theme.ts`, which sets `data-theme` on `<html>`,
+  keeps `aria-pressed` and the two `theme-color` metas in step, and follows a device change while
+  System is chosen. `src/scripts/theme-early.js` (a classic script in the head, served hashed from
+  `/_astro/`, about 260 bytes) applies a stored choice before first paint. To clear a preference
+  on a device: choose System, or remove the key in the browser's storage. No account, no server,
+  no cookie. `tests/theme.spec.ts` proves the control, persistence, the early application, and
+  that no inline script exists.
+- **Changing a palette value:** edit the token in `src/styles/tokens.css` in both dark blocks (the
+  media block and the `data-theme` block carry the same values), keep the light values on `:root`,
+  then run `npx playwright test tests/contrast.spec.ts tests/tokens.spec.ts` (the floors: text
+  4.5:1 on the page and the card, the focus ring and the accent boundary 3:1, in both palettes; the
+  metas and `src/lib/og.ts` equal to the tokens), update the `theme-color` metas in
+  `src/layouts/BaseLayout.astro` and the values in `src/scripts/theme.ts` and `src/lib/og.ts` if
+  the background or the card text changed, regenerate the default social card with
+  `node scripts/og-default.mjs`, and run `npm test` (axe in both palettes and with the control
+  pinning the opposite scheme) and the full guard. The roles never change meaning: `--interactive`
+  is the chrome's ink treatment, `--link-content` the sienna of links inside content, `--signal` the
+  sienna of the current page and a live state, `--focus` the blue ring, `--notice` the amber of an
+  informational notice (never danger).
+
 ## 9. Record of executions
 
 | Date | Who | Sections executed | Result | Improvisations (must be none for acceptance) |

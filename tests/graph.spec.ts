@@ -123,7 +123,8 @@ test.describe('wiki relationships', () => {
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await nodes.first().focus();
     expect(await page.evaluate(() => document.activeElement?.tagName.toLowerCase())).toBe('a');
-    expect(await page.locator('script:not([type="application/ld+json"])').evaluateAll((ss) => ss.filter((s) => !/PrimaryNav/.test(s.getAttribute('src') ?? '')).length)).toBe(0);
+    // Only the nav disclosure and the Appearance control's scripts (F4) travel with the page.
+    expect(await page.locator('script:not([type="application/ld+json"])').evaluateAll((ss) => ss.filter((s) => !/PrimaryNav|SiteFooter|theme-early/.test(s.getAttribute('src') ?? '')).length)).toBe(0);
     // The map view named in the story map redirects here.
     const res = await request.get('/library/map', { maxRedirects: 0 });
     expect(res.status()).toBe(301);

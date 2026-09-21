@@ -7,6 +7,7 @@ import '../styles/fonts.css';
 import '../styles/base.css';
 import fraunces from '../assets/fonts/fraunces-core.woff2?url';
 import ktSans from '../assets/fonts/kt-sans-core.woff2?url';
+import themeEarly from '../scripts/theme-early.js?url';
 import SkipLink from '@components/SkipLink.astro';
 import SiteHeader from '@components/SiteHeader.astro';
 import SiteFooter from '@components/SiteFooter.astro';
@@ -59,7 +60,11 @@ const structured = jsonLd ?? {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {preview ? <meta name="robots" content="noindex, nofollow" /> : noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#e9e1d6" />
+    {/* The browser chrome follows the scheme (F4): the system's by these media attributes, or the Appearance control's choice through src/scripts/theme.ts. */}
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ece4d8" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15120d" />
+    {/* The early theme script: external and tiny, before first paint, so a stored Light or Dark does not flash (F4, decision D-32). */}
+    <script is:inline src={themeEarly}></script>
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={id.site_name} />
     <meta property="og:url" content={canonical} />

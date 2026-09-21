@@ -9,11 +9,12 @@ import type { AnyEntry } from './catalog';
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
-// The light palette from src/styles/tokens.css (the card is a picture, so it carries its own colours).
-const BG = '#e9e1d6';
-const INK = '#241c12';
-const MUTED = '#5b513f';
-const ACCENT = '#caa46f';
+// The light palette from src/styles/tokens.css (the card is a picture, so it carries its own colours;
+// tests/contrast.spec.ts holds these equal to the tokens). F4 (D-32): the light palette C.
+export const BG = '#ece4d8';
+export const INK = '#221a11';
+export const MUTED = '#574c3b';
+export const ACCENT = '#8a4b1f';
 const FONT = "Georgia, 'Times New Roman', serif";
 
 const escapeXml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

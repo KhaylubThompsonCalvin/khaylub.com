@@ -1,15 +1,34 @@
-/* Design tokens from the Phase 6 visual system. Light palette on :root, dark palette under
-   prefers-color-scheme. Text on --bg: ink 12.6:1, muted 6.6:1. Accent is decoration only. */
+/* Design tokens. The palette is the design initiative's F4 (vault document 64, decision D-32), a
+   warm paper palette with a working sienna accent: light on :root, dark under prefers-color-scheme
+   and, since F4, under the Appearance control's data-theme attribute (light and dark force a scheme;
+   no attribute means the system decides). Text on --bg: ink 13.61:1 light and 14.78:1 dark, muted
+   6.66:1 and 8.35:1; the accent 5.36:1 and 8.68:1, so it may be text; the notice 4.99:1 and 9.19:1.
+   The palette tokens are values; the semantic aliases below them carry the roles components use. */
 :root {
   color-scheme: light dark;
-  --bg: #e9e1d6;
-  --ink: #241c12;
-  --muted: #5b513f;
-  --accent: #caa46f;
-  --card: #f4efe7;
-  --line: #c9bfae;
+  --bg: #ece4d8;
+  --ink: #221a11;
+  --muted: #574c3b;
+  --accent: #8a4b1f;
+  --card: #f6f1e9;
+  --line: #cbbfae;
   --focus: #1d4ed8;
-  --scrim: rgba(36, 28, 18, 0.85);
+  --notice: #7a5b15;
+  --scrim: rgba(34, 26, 17, 0.85);
+
+  /* The semantic roles (F4). --interactive is the chrome's normal interaction role and resolves to
+     the ink treatment; it is not a generic name for every interactive colour. --link-content is the
+     sienna role of links inside content being read; --signal is the sienna role of the current page,
+     a live state, and the Now rule; --focus stays the blue keyboard ring; --notice is the amber
+     "pay attention" role of informational notices. */
+  --surface: var(--card);
+  --surface-raised: var(--card);
+  --text: var(--ink);
+  --text-secondary: var(--muted);
+  --border: var(--line);
+  --interactive: var(--ink);
+  --link-content: var(--accent);
+  --signal: var(--accent);
 
   /* The faces (F3, document 63): Fraunces for the name, titles, headings, and the wordmark; KT Sans,
      the site's subset of IBM Plex Sans, for everything else. The Fallback faces are the system fonts
@@ -91,16 +110,36 @@
    1200px the 270 px portrait (IdentityCard)
    40rem  the Credits list stacks (Credits) */
 
+/* The dark palette: the system's preference, unless the Appearance control pins a scheme. The two
+   blocks carry the same values; a change is made in both. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14110c;
-    --ink: #e9e1d6;
-    --muted: #b8ad9c;
-    --card: #1e1913;
-    --line: #3a3229;
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #15120d;
+    --ink: #ebe4d8;
+    --muted: #b7ac9b;
+    --accent: #e0a56a;
+    --card: #1f1a14;
+    --line: #3b332a;
     --focus: #8ab6e2;
-    --scrim: rgba(20, 17, 12, 0.85);
+    --notice: #d9b060;
+    --scrim: rgba(21, 18, 13, 0.85);
   }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #15120d;
+  --ink: #ebe4d8;
+  --muted: #b7ac9b;
+  --accent: #e0a56a;
+  --card: #1f1a14;
+  --line: #3b332a;
+  --focus: #8ab6e2;
+  --notice: #d9b060;
+  --scrim: rgba(21, 18, 13, 0.85);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {

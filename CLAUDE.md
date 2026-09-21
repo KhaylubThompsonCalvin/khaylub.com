@@ -44,7 +44,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 | `src/layouts/BaseLayout.astro` | skip link, header, nav, `main`, footer, SEO head |
 | `src/components/` | IdentityCard, RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
 | `src/lib/` | catalog (public/private filter, featured set, evidence), profile, seo |
-| `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, targets, widths, radii, tints, motion (`tests/tokens.spec.ts` holds every `var()` defined and the tokenised values out of components; breakpoints are documented literals) |
+| `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, targets, widths, radii, tints, motion (`tests/tokens.spec.ts` holds every `var()` defined and the tokenised values out of components; breakpoints are documented literals). The colour roles are semantic aliases over the palette (`--surface`, `--text`, `--text-secondary`, `--border`, `--interactive` for the chrome's ink treatment, `--link-content` for sienna links inside content, `--signal` for the current page and live state, `--focus` the blue ring, `--notice` the amber notice); `tests/contrast.spec.ts` asserts every floor in both palettes and holds the theme-color metas and the Open Graph constants to the tokens |
 | `src/islands/` | React islands (the climb), loaded only after the door is pressed |
 | `src/pages/` | routes; `[collection]/` handles indexes and artifact pages |
 | `public/resume/` | the resume PDF, supplied by the owner and never edited by Claude |
@@ -61,7 +61,11 @@ authority; `src/styles/tokens.css` implements them (light and dark palettes, foc
 reduced-motion block). Use the tokens. Do not add colors, fonts, or motion outside them, and do not
 redesign: Phase 10 composes the existing components against the Phase 6 wireframes (W1 Home,
 W2 Work, W16 mobile navigation). A design skill may guide composition; it never overrides the
-tokens or the wireframes.
+tokens or the wireframes. Since the design initiative (vault documents 57 to 64): the palette is F4's
+warm paper with a working sienna accent in both schemes (decision D-32), with two link treatments on
+purpose (chrome links ink; links inside content sienna and underlined; colour never the only cue),
+the blue focus ring separate from the accent, and an Appearance control (Light, Dark, System) in the
+footer remembered on the device; the typography is F3's Fraunces and KT Sans (D-31).
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 

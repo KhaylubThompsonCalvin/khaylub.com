@@ -8,6 +8,17 @@ const year = new Date().getUTCFullYear();
 
 <footer class="site-footer">
   <div class="container">
+    {/* The Appearance control (F4, decision D-32): Light, Dark, or System, remembered on this device
+        by src/scripts/theme.ts; System is the default and follows the device. A preference, not a
+        navigation action, so it lives here and not in the header. */}
+    <div class="appearance" role="group" aria-labelledby="appearance-label" data-appearance>
+      <span id="appearance-label" class="small">Appearance</span>
+      <div class="appearance-choices">
+        <button type="button" aria-pressed="false" data-theme-choice="light">Light</button>
+        <button type="button" aria-pressed="false" data-theme-choice="dark">Dark</button>
+        <button type="button" aria-pressed="true" data-theme-choice="system">System</button>
+      </div>
+    </div>
     <ul class="footer-links">
       <li><a href={`mailto:${id.email}`}>Email</a></li>
       {/* rel="me" ties the profiles to this site (SEO-6). */}
@@ -41,7 +52,41 @@ const year = new Date().getUTCFullYear();
   </div>
 </footer>
 
+<script src="../scripts/theme.ts"></script>
+
 <style>
+  .appearance {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-1-5);
+    margin: 0 0 var(--space-3);
+  }
+  .appearance-choices {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+  }
+  .appearance-choices button {
+    min-height: var(--target);
+    min-width: var(--target);
+    padding: 0 var(--space-2);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: var(--size-sm);
+    cursor: pointer;
+  }
+  .appearance-choices button:hover {
+    background: color-mix(in srgb, var(--ink) var(--tint-hover), transparent);
+  }
+  .appearance-choices button[aria-pressed='true'] {
+    background: var(--interactive);
+    color: var(--bg);
+  }
   .site-footer {
     margin-top: auto;
     border-top: 1px solid var(--line);
