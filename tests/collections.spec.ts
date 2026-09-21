@@ -63,10 +63,10 @@ test.describe('collection listing engine', () => {
   test('browsing needs no JavaScript: the index carries only the nav and Appearance scripts and JSON-LD', async ({ request }) => {
     const html = await (await request.get('/data/')).text();
     const scripts = [...html.matchAll(/<script[^>]*>/g)].map((m) => m[0]).filter((s) => !/application\/ld\+json/.test(s));
-    // The nav disclosure, the Appearance control (F4), and its early head script; nothing else.
-    expect(scripts.length, scripts.join(' | ')).toBe(3);
-    expect(scripts.filter((x) => /PrimaryNav/.test(x))).toHaveLength(1);
-    expect(scripts.filter((x) => /SiteFooter/.test(x))).toHaveLength(1);
+    // The site's one module script (the nav disclosure and the Appearance control, F4) and the early
+    // theme script in the head; nothing else.
+    expect(scripts.length, scripts.join(' | ')).toBe(2);
+    expect(scripts.filter((x) => /BaseLayout/.test(x))).toHaveLength(1);
     expect(scripts.filter((x) => /theme-early/.test(x))).toHaveLength(1);
   });
 });

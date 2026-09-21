@@ -925,7 +925,8 @@ its text is 1 percent wider). A new text face means recomputing them: 0.6em per 
 
 - **The Appearance control** (the footer on every page; F4, vault document 64): Light, Dark, or
   System. The choice is stored on the device only, as `localStorage['khaylub-theme']` (`light` or
-  `dark`; System removes the key), by `src/scripts/theme.ts`, which sets `data-theme` on `<html>`,
+  `dark`; System removes the key), by `src/scripts/theme.ts` (bundled with the menu disclosure into
+  the site's one module script, `src/scripts/site.ts`), which sets `data-theme` on `<html>`,
   keeps `aria-pressed` and the two `theme-color` metas in step, and follows a device change while
   System is chosen. `src/scripts/theme-early.js` (a classic script in the head, served hashed from
   `/_astro/`, about 260 bytes) applies a stored choice before first paint. To clear a preference

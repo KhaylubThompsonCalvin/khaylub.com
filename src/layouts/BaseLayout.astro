@@ -65,6 +65,8 @@ const structured = jsonLd ?? {
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15120d" />
     {/* The early theme script: external and tiny, before first paint, so a stored Light or Dark does not flash (F4, decision D-32). */}
     <script is:inline src={themeEarly}></script>
+    {/* The site's one module script: the menu disclosure and the Appearance control (src/scripts/site.ts), bundled by Astro, external. */}
+    <script src="../scripts/site.ts"></script>
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={id.site_name} />
     <meta property="og:url" content={canonical} />

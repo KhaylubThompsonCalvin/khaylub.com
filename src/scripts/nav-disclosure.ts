@@ -1,7 +1,7 @@
 // Mobile menu disclosure. Astro bundles this as an external module script (no inline script),
 // which keeps the Content Security Policy strict. Behavior: the button toggles aria-expanded;
 // Escape closes and returns focus to the button; clicking outside closes; no focus trap.
-function setup(): void {
+export function setupNavDisclosure(): void {
   const button = document.getElementById('primary-nav-button');
   const list = document.getElementById('primary-nav-list');
   if (!button || !list) return;
@@ -30,6 +30,3 @@ function setup(): void {
   });
 }
 
-setup();
-
-export {};
