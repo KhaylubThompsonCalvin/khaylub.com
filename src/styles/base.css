@@ -78,14 +78,25 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+/* Two link treatments on purpose (F4, decision D-32): chrome and navigation links are ink with the
+   underline, hover, and current-state treatment below (they help navigate the site); links inside
+   content being read (.body, the Now callout, the climb line) take --link-content, the sienna, and
+   keep the underline. Colour is never the only cue. On hover the underline of a text link warms to
+   the accent (the hint); the text keeps its colour; the pressed and focus states stay as they are. */
 a {
-  color: var(--ink);
+  color: var(--interactive);
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
 a:hover {
   text-decoration-thickness: 2px;
+  text-decoration-color: var(--accent);
+}
+.body a,
+.callout a,
+.climb-line a {
+  color: var(--link-content);
 }
 
 :focus-visible {
@@ -249,6 +260,14 @@ small,
 .card h3 a {
   text-decoration: none;
 }
+/* The accent hint (F4, decision D-32): a hovered card underlines its title in the accent; the card
+   itself keeps the soft ink hover. */
+.card:hover h3 a {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
 /* The whole card is the target; keyboard focus stays on the link. */
 .card h3 a::after {
   content: '';
@@ -291,8 +310,8 @@ small,
   white-space: nowrap;
 }
 .badge-live {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--signal);
+  color: var(--signal);
 }
 
 /* Utility */
@@ -316,14 +335,16 @@ small,
 }
 
 .callout {
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid var(--signal);
   padding-left: 12px;
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
+/* An informational notice (F4): the amber rule means "pay attention", never danger. */
 .banner {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--notice);
   border-radius: var(--radius-sm);
   padding: var(--space-1) var(--space-2);
   margin-bottom: var(--space-3);

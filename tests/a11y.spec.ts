@@ -24,3 +24,17 @@ for (const path of [...TEMPLATES, '/404-does-not-exist/']) {
     await ctx.close();
   });
 }
+
+// The Appearance control (F4) can pin the scheme the device does not prefer: axe in that state too.
+for (const [path, device, choice] of [['/', 'light', 'Dark'], ['/writing/letter-to-time/', 'dark', 'Light']] as const) {
+  test(`axe: zero violations on ${path} with the Appearance control pinning ${choice} against a ${device} device`, async ({ browser }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'the palette does not depend on the viewport; run once');
+    const ctx = await browser.newContext({ colorScheme: device, viewport: { width: 1440, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto(path);
+    await page.getByRole('button', { name: choice }).click();
+    const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
+    expect(results.violations, describe(results.violations)).toEqual([]);
+    await ctx.close();
+  });
+}

@@ -21,7 +21,14 @@ const meta = COLLECTIONS.find((c) => c.name === collection)!;
 </section>
 
 <style>
+  /* An informational notice (F4): the amber rule and lead line mean "pay attention", never danger. */
   .withdrawn {
     padding-block: var(--space-4);
+    padding-left: var(--space-2);
+    border-left: 4px solid var(--notice);
+  }
+  .withdrawn h1 + p {
+    color: var(--notice);
+    font-weight: 600;
   }
 </style>

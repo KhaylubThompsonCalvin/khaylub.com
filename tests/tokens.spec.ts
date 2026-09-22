@@ -47,7 +47,7 @@ test.describe('design tokens', () => {
     expect(undefinedRefs, 'custom properties referenced but never defined').toEqual([]);
   });
 
-  test('the F2 and F3 tokens exist in tokens.css with the decided values', () => {
+  test('the F2, F3, and F4 tokens exist in tokens.css with the decided values', () => {
     const tokens = strip(readFileSync('src/styles/tokens.css', 'utf8'));
     const expected: Record<string, string> = {
       '--space-half': '0.25rem',
@@ -78,6 +78,23 @@ test.describe('design tokens', () => {
       '--measure-longform': '39.525rem',
       '--font-display': "'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif",
       '--font-body': "'KT Sans', 'KT Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+      // F4 (document 64, D-32): the palette, the notice, and the semantic roles.
+      '--bg': '#ece4d8',
+      '--ink': '#221a11',
+      '--muted': '#574c3b',
+      '--accent': '#8a4b1f',
+      '--card': '#f6f1e9',
+      '--line': '#cbbfae',
+      '--focus': '#1d4ed8',
+      '--notice': '#7a5b15',
+      '--surface': 'var(--card)',
+      '--surface-raised': 'var(--card)',
+      '--text': 'var(--ink)',
+      '--text-secondary': 'var(--muted)',
+      '--border': 'var(--line)',
+      '--interactive': 'var(--ink)',
+      '--link-content': 'var(--accent)',
+      '--signal': 'var(--accent)',
     };
     for (const [name, value] of Object.entries(expected)) {
       const m = tokens.match(new RegExp(`${name}:\\s*([^;]+);`));
