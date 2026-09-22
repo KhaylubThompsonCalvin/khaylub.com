@@ -18,6 +18,10 @@ export default defineConfig({
     // Never inline stylesheets: one external CSS file keeps the Content Security Policy strict.
     inlineStylesheets: 'never',
   },
+  // Component styles are scoped by a class (.astro-xxxxxxxx) rather than the attribute selector
+  // ([data-astro-cid-xxxxxxxx]): the same specificity, ten bytes fewer per selector, and the one
+  // stylesheet stays inside the 30 KB budget line as the design initiative adds components.
+  scopedStyleStrategy: 'class',
   markdown: {
     // No inline style attributes anywhere (CSP style-src 'self'; html-validate no-inline-style):
     // code blocks render as plain <pre><code class="language-x"> and take their look from base.css.

@@ -183,17 +183,15 @@ small,
   border-bottom: 1px solid var(--ink);
   margin-bottom: var(--space-2);
 }
-.section-heading .as-of {
+/* The dated "as of" beside a section or module head: the working face, quiet, small on a module. */
+.as-of {
   font-family: var(--font-body);
   font-size: var(--size-body);
   font-weight: 400;
   color: var(--muted);
 }
 .module-heading .as-of {
-  font-family: var(--font-body);
   font-size: var(--size-sm);
-  font-weight: 400;
-  color: var(--muted);
 }
 
 /* Buttons and doors */
@@ -273,22 +271,26 @@ small,
 .card:focus-within {
   border-color: var(--focus);
 }
-.card h3 {
+.card h3,
+.tile h3 {
   margin: 0;
 }
-.card h3 a {
+.card h3 a,
+.tile h3 a {
   text-decoration: none;
 }
-/* The accent hint (F4, decision D-32): a hovered card underlines its title in the accent; the card
-   itself keeps the soft ink hover. */
-.card:hover h3 a {
+/* The accent hint (F4, decision D-32): a hovered card or tile underlines its title in the accent;
+   the card itself keeps the soft ink hover. */
+.card:hover h3 a,
+.tile:hover h3 a {
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
-/* The whole card is the target; keyboard focus stays on the link. */
-.card h3 a::after {
+/* The whole card or tile is the target; keyboard focus stays on the link. */
+.card h3 a::after,
+.tile h3 a::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -331,6 +333,128 @@ small,
 .badge-live {
   border-color: var(--signal);
   color: var(--signal);
+}
+
+/* A row list (the profile modules, document 65): a link at the left, its small note at the right,
+   a quiet rule under each row. */
+.row-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.row-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The Top 8 tiles (document 65): a set of squares, the rank at the top and the title at the foot,
+   the owner's reason under each. Four across from 700 px, two across from 360 px, rows below;
+   on a full-width page the grid stops growing at about 200 px a tile. */
+.top8 {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 52rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-grid);
+}
+@media (min-width: 700px) {
+  .top8 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.tile {
+  position: relative;
+}
+.tile-art {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-1-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+.tile:hover .tile-art {
+  border-color: var(--muted);
+  box-shadow: var(--shadow-card);
+}
+.tile:focus-within .tile-art {
+  border-color: var(--focus);
+}
+.tile-rank {
+  font-size: var(--size-sm);
+  letter-spacing: var(--tracking-button);
+  color: var(--signal);
+  position: relative;
+}
+.tile h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--size-h3);
+  line-height: var(--leading-heading);
+  position: relative;
+}
+/* A cover fills the tile; the rank and the title sit on the scrim so they read in both schemes.
+   The tile is not clipped (a title under wider text spacing may grow it); only the cover is. */
+.tile-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: calc(var(--radius-sm) - 1px);
+}
+.has-cover .tile-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--radius-sm) - 1px);
+  background: linear-gradient(to bottom, transparent 30%, var(--scrim));
+}
+.has-cover .tile-rank,
+.has-cover h3 a {
+  color: var(--on-image);
+}
+.tile-cap {
+  margin: var(--space-1) 0 0;
+  font-size: var(--size-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.tile-meta {
+  white-space: nowrap;
+}
+.signal {
+  color: var(--signal);
+  font-weight: 600;
+}
+/* Under 360 px two squares would break titles mid-word: each tile becomes a row instead, the rank
+   beside the title, so the set stays short on the narrowest phones. */
+@media (max-width: 359px) {
+  .top8 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+  .tile-art {
+    aspect-ratio: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: var(--space-1-5);
+    min-height: var(--target);
+  }
+  .tile-rank {
+    flex: none;
+  }
 }
 
 /* Utility */

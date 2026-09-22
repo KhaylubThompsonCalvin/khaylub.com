@@ -40,7 +40,7 @@ const line = lead ? opening(lead.body) : undefined;
         </div>
       )}
       {notes.length > 0 && (
-        <ul class="rows">
+        <ul class="row-list">
           {notes.map((n) => (
             <li>
               <a href={routeFor(n)}>{n.data.title}</a>
@@ -69,20 +69,7 @@ const line = lead ? opening(lead.body) : undefined;
   .lead-line {
     margin: 0 0 var(--space-2);
   }
-  .rows {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .rows li {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-2);
-    padding: var(--space-1) 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .rows .small {
+  .row-list .small {
     white-space: nowrap;
   }
 </style>
