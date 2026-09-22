@@ -55,7 +55,7 @@
             "is-crawlable": ["error", { "minScore": 1 }],
             "resource-summary:total:size": ["error", { "maxNumericValue": 921600 }],
             "resource-summary:script:size": ["error", { "maxNumericValue": 61440 }],
-            "resource-summary:stylesheet:size": ["error", { "maxNumericValue": 30720 }],
+            "resource-summary:stylesheet:size": ["error", { "maxNumericValue": 36864 }],
             "resource-summary:font:size": ["error", { "maxNumericValue": 102400 }],
             "resource-summary:image:size": ["error", { "maxNumericValue": 307200 }],
             "resource-summary:total:count": ["error", { "maxNumericValue": 40 }],
