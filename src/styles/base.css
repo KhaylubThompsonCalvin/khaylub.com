@@ -151,17 +151,16 @@ small,
   max-width: var(--measure-reading);
 }
 
-.stack > * + * {
-  margin-top: var(--space-2);
+/* The page intro (the H1 and its sentence) keeps a gap of its own before the first section (F5). */
+.page-intro {
+  margin-bottom: var(--space-intro);
+}
+.page-intro > :last-child {
+  margin-bottom: 0;
 }
 
 .section {
-  margin-bottom: var(--space-6);
-}
-@media (min-width: 900px) {
-  .section {
-    margin-bottom: var(--space-8);
-  }
+  margin-bottom: var(--space-section);
 }
 
 .section-heading {
@@ -170,9 +169,29 @@ small,
   align-items: baseline;
   gap: var(--space-1) var(--space-2);
 }
+/* A profile module (F5, document 65): a named head on a rule, the section gap below. */
+.module {
+  margin-bottom: var(--space-module);
+}
+.module-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: var(--space-2);
+}
 .section-heading .as-of {
   font-family: var(--font-body);
   font-size: var(--size-body);
+  font-weight: 400;
+  color: var(--muted);
+}
+.module-heading .as-of {
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
   font-weight: 400;
   color: var(--muted);
 }
@@ -229,7 +248,7 @@ small,
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--width-card-min), 1fr));
-  gap: var(--space-2);
+  gap: var(--space-grid);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -243,7 +262,7 @@ small,
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: var(--space-1-5);
+  padding: var(--space-card);
   min-height: 7.5rem;
   transition: border-color var(--ease), box-shadow var(--ease);
 }
@@ -303,7 +322,7 @@ small,
   display: inline-block;
   font-size: var(--size-sm);
   line-height: 1.4;
-  padding: 2px 8px;
+  padding: var(--space-quarter) var(--space-1);
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   color: var(--muted);
@@ -336,7 +355,7 @@ small,
 
 .callout {
   border-left: 4px solid var(--signal);
-  padding-left: 12px;
+  padding-left: var(--space-1-5);
   color: var(--text-secondary);
 }
 
@@ -377,6 +396,10 @@ code {
 }
 .body :is(figcaption, small, .small) {
   line-height: var(--leading-body);
+}
+/* A subheading inside a body gets a rhythm of its own (base h3 sets no top margin). */
+.body h3 {
+  margin-top: var(--space-3);
 }
 
 /* Figures inside artifact bodies */

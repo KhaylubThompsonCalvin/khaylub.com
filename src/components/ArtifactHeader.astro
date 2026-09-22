@@ -66,6 +66,13 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
 </header>
 
 <style>
+  /* The title block keeps a gap of its own before the body (F5): the last line's margin is not it. */
+  .artifact-header {
+    margin-bottom: var(--space-header-body);
+  }
+  .artifact-header > :last-child {
+    margin-bottom: 0;
+  }
   .meta {
     display: flex;
     flex-wrap: wrap;

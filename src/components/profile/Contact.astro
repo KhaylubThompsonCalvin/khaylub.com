@@ -1,0 +1,60 @@
+---
+// The Contact module of the Home profile (F5, document 65): the ways to reach the owner as a table
+// of rows, each a 44 px target, from identity.yaml and the résumé record. The same facts as the
+// footer and the contact page; a design module, not a new source.
+import { identity, resumeMeta } from '@lib/profile';
+
+const id = identity();
+const resume = resumeMeta();
+const rows = [
+  { label: 'Email', href: `mailto:${id.email}` },
+  { label: 'GitHub', href: id.github, note: id.github.replace(/^https?:\/\/github\.com\//, ''), external: true },
+  { label: 'LinkedIn', href: id.linkedin, external: true },
+  { label: 'Résumé', href: '/resume/', note: `revision ${resume.revision}` },
+  { label: 'Résumé (PDF)', href: resume.pdf },
+];
+---
+
+<section class="module" aria-labelledby="contact-heading">
+  <h2 id="contact-heading" class="module-heading">Contact</h2>
+  <ul class="contact">
+    {
+      rows.map((r) => (
+        <li>
+          <a href={r.href} rel={r.external ? 'me noopener noreferrer' : undefined}>
+            <span>{r.label}</span>
+            {r.note && <span class="note">{r.note}</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .contact li {
+    border-bottom: 1px solid var(--border);
+  }
+  .contact a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--target);
+    padding: var(--space-1) 0;
+  }
+  .contact a > span:first-child {
+    white-space: nowrap;
+  }
+  .note {
+    font-size: var(--size-sm);
+    color: var(--text-secondary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+</style>

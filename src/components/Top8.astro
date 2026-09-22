@@ -1,7 +1,11 @@
 ---
-import { top8Entries } from '@lib/catalog';
+// Khaylub's Top 8: eight things ranked and dated, as a set of captioned tiles (the design
+// initiative's F5, vault document 65: the profile-page grammar, set like a publication). Each tile
+// carries its rank, its title in the display face, and, under the tile, the owner's one-line reason
+// with the kind and the date. A media entry's cover fills its tile under the scrim.
+import { top8Entries, badgeFor, routeFor, collectionLabel } from '@lib/catalog';
 import type { top8Revisions } from '@lib/profile';
-import ArtifactCard from './ArtifactCard.astro';
+import { coverThumb } from '@lib/media';
 
 interface Props {
   /** An archived revision; the newest revision when omitted. */
@@ -10,16 +14,36 @@ interface Props {
 const { revision } = Astro.props;
 const { asOf, entries, skipped } = await top8Entries(revision);
 const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const tiles = await Promise.all(
+  entries.map(async ({ entry, reason }, i) => {
+    const badge = badgeFor(entry);
+    const kind = entry.collection === 'projects' || entry.collection === 'data' ? badge.text : collectionLabel(entry.collection);
+    const cover = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
+    return { entry, reason, rank: i + 1, kind, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
+  })
+);
 ---
 
 <section class="section" aria-labelledby="top8-heading">
-  <h2 id="top8-heading" class="section-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>
+  <h2 id="top8-heading" class="section-heading module-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>
   {
-    entries.length > 0 ? (
-      <ol class="card-grid top8">
-        {entries.map(({ entry }, i) => (
+    tiles.length > 0 ? (
+      <ol class="top8">
+        {tiles.map((t) => (
           <li>
-            <ArtifactCard entry={entry} rank={i + 1} showCollection />
+            <article class:list={['tile', { 'has-cover': !!t.cover }]}>
+              <div class="tile-art">
+                {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
+                <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>
+                <h3>
+                  <span class="visually-hidden">Rank {t.rank}. </span>
+                  <a href={routeFor(t.entry)}>{t.entry.data.title}</a>
+                </h3>
+              </div>
+              <p class="tile-cap">
+                {t.reason} <span class="tile-meta"><span class:list={{ signal: t.live }}>{t.kind}</span> · {t.date}</span>
+              </p>
+            </article>
           </li>
         ))}
       </ol>
@@ -27,7 +51,7 @@ const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { mon
       <p class="muted">The first Top 8 is being chosen.</p>
     )
   }
-  <p class="small muted">
+  <p class="small muted top8-note">
     {revision ? 'Eight things I was proud of then, ranked and dated.' : 'Eight things I am proud of right now, ranked and dated.'} <a href="/top8/">{revision ? 'The current set' : 'Previous sets'}</a>.{skipped > 0 ? ` ${skipped} ${skipped === 1 ? 'slot is' : 'slots are'} not published yet and will appear when they are.` : ''}
   </p>
 </section>
@@ -35,5 +59,126 @@ const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { mon
 <style>
   .top8 {
     list-style: none;
+    padding: 0;
+    margin: 0;
+    /* Four tiles stay a set: on a full-width page the grid stops growing at about 200 px a tile. */
+    max-width: 52rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-grid);
+  }
+  @media (min-width: 700px) {
+    .top8 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .tile {
+    position: relative;
+  }
+  /* The tile: a square of surface with the rank at the top and the title at the foot. */
+  .tile-art {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-1-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--ease), box-shadow var(--ease);
+  }
+  .tile:hover .tile-art {
+    border-color: var(--muted);
+    box-shadow: var(--shadow-card);
+  }
+  .tile:focus-within .tile-art {
+    border-color: var(--focus);
+  }
+  .tile-rank {
+    font-size: var(--size-sm);
+    letter-spacing: var(--tracking-button);
+    color: var(--signal);
+    position: relative;
+  }
+  .tile h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--size-h3);
+    line-height: var(--leading-heading);
+    margin: 0;
+    position: relative;
+  }
+  .tile h3 a {
+    text-decoration: none;
+  }
+  /* The whole tile is the target; keyboard focus stays on the link (the card pattern). */
+  .tile h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+  }
+  .tile:hover h3 a {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  /* A cover fills the tile; the rank and the title sit on the scrim so they read in both schemes. */
+  .tile-art img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius-sm) - 1px);
+  }
+  /* The tile is not clipped (a title under wider text spacing may grow it); only the cover is. */
+  .has-cover .tile-art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: calc(var(--radius-sm) - 1px);
+    background: linear-gradient(to bottom, transparent 30%, var(--scrim));
+  }
+  .has-cover .tile-rank,
+  .has-cover h3 a {
+    color: var(--on-image);
+  }
+  .tile-cap {
+    margin: var(--space-1) 0 0;
+    font-size: var(--size-sm);
+    line-height: var(--leading-body);
+    color: var(--text-secondary);
+  }
+  .tile-meta {
+    white-space: nowrap;
+  }
+  .signal {
+    color: var(--signal);
+    font-weight: 600;
+  }
+  /* Under 360 px two squares would break titles mid-word: each tile becomes a row instead, the
+     rank beside the title, so the set stays short on the narrowest phones. */
+  @media (max-width: 359px) {
+    .top8 {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2);
+    }
+    .tile-art {
+      aspect-ratio: auto;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: baseline;
+      gap: var(--space-1-5);
+      min-height: var(--target);
+    }
+    .tile-rank {
+      flex: none;
+    }
+  }
+  .top8-note {
+    margin-top: var(--space-3);
   }
 </style>

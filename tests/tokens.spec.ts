@@ -118,6 +118,8 @@ test.describe('design tokens', () => {
       return value;
     });
     expect(hovered, 'the hover tint equals the literal 8% mix').toBe(expected);
+    // The cards live on Work since F5 (Home's Top 8 is a tile grid, document 65).
+    await page.goto('/work/');
     const card = page.locator('.card').first();
     await card.hover();
     await page.waitForTimeout(400);
