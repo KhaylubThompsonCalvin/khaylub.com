@@ -15,7 +15,7 @@ const rows = [
 ];
 ---
 
-<section class="module" aria-labelledby="contact-heading">
+<section class="module boxed" aria-labelledby="contact-heading">
   <h2 id="contact-heading" class="module-heading">Contact</h2>
   <ul class="contact">
     {
@@ -39,6 +39,9 @@ const rows = [
   }
   .contact li {
     border-bottom: 1px solid var(--border);
+  }
+  .contact li:last-child {
+    border-bottom: 0;
   }
   .contact a {
     display: flex;

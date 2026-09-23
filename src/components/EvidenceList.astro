@@ -16,7 +16,7 @@ const { kind, items, idPrefix } = Astro.props;
     items.map((t) => (
       <li data-term={t.slug} data-count={t.count} id={`${idPrefix}-${t.slug}`}>
         <span class="term-label"><a href={termRoute(kind, t.slug)}>{t.label}</a></span>
-        <span class="badge">{t.count} {t.count === 1 ? 'piece' : 'pieces'} of evidence</span>
+        <span class="count small muted">{t.count} {t.count === 1 ? 'piece' : 'pieces'} of evidence</span>
         <span class="term-items small muted">
           {t.items.map((it, i) => (
             <>
@@ -48,6 +48,9 @@ const { kind, items, idPrefix } = Astro.props;
   .term-label {
     font-weight: 600;
     min-width: var(--width-tile);
+  }
+  .count {
+    min-width: 9rem;
   }
   /* Every link is its own target (WCAG 2.5.8, 24 px): the labels and the comma-separated proofs. */
   .evidence a {

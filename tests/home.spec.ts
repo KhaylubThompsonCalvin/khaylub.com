@@ -6,7 +6,7 @@ test.describe('home', () => {
   // carries a fold requirement (the portrait sits between the availability line and the links on a
   // phone); it is the short-phone usability test below. 320 px is the reflow viewport (tests/visual).
   for (const [w, h] of [[390, 844], [768, 1024], [1440, 900]] as const) {
-    test(`doors, availability, and the climb line are above the fold at ${w}x${h}`, async ({ page }) => {
+    test(`doors and availability are above the fold at ${w}x${h}; the climb band follows the hero`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: h });
       await page.goto('/');
       for (const name of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
@@ -14,8 +14,15 @@ test.describe('home', () => {
         expect(box, name).not.toBeNull();
         expect(box!.y + box!.height, `${name} bottom`).toBeLessThanOrEqual(h);
       }
-      const climb = await page.getByRole('link', { name: 'enter the climb' }).boundingBox();
-      expect(climb!.y + climb!.height).toBeLessThanOrEqual(h);
+      // The climb's entrance (the visual redesign, document 65) is the poster band right under the
+      // hero: its link is on the first screen at 1440 and begins within the first screen on a phone.
+      const band = await page.locator('.climb-band').boundingBox();
+      expect(band, 'the climb band').not.toBeNull();
+      expect(band!.y, 'the band begins within the first screen').toBeLessThanOrEqual(h);
+      if (w >= 1440) {
+        const climb = await page.getByRole('link', { name: 'Enter the climb' }).boundingBox();
+        expect(climb!.y + climb!.height, 'the climb link above the fold').toBeLessThanOrEqual(h);
+      }
       await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
     });
   }
@@ -54,7 +61,7 @@ test.describe('home', () => {
   test('blocks appear in the required DOM order', async ({ page }) => {
     await page.goto('/');
     const order = await page.locator('main h1, main h2').evaluateAll((els) => els.map((e) => e.textContent?.trim().split(' as of')[0] ?? ''));
-    expect(order.slice(0, 3)).toEqual(['Khaylub Thompson-Calvin', 'Now', "Khaylub's Top 8"]);
+    expect(order.slice(0, 4)).toEqual(['Khaylub Thompson-Calvin', 'The climb', 'Now', "Khaylub's Top 8"]);
     const recruiter = page.getByRole('navigation', { name: 'Quick links' }).getByRole('link');
     await expect(recruiter).toHaveText(['About', 'GitHub', 'Résumé', 'Contact']);
   });
@@ -101,11 +108,14 @@ test.describe('home', () => {
   test('the profile modules follow the phone order in the DOM and sit in two columns at 1440', async ({ page }) => {
     await page.goto('/');
     const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(/\s+as of/)[0].trim());
-    expect(names.slice(0, 6)).toEqual(['Now', "Khaylub's Top 8", 'Writing', 'Library', 'Details', 'Contact']);
+    expect(names.slice(0, 7)).toEqual(['The climb', 'Now', "Khaylub's Top 8", 'Writing', 'Library', 'Details', 'Contact']);
     await page.setViewportSize({ width: 1440, height: 900 });
     const [now, top8, details] = await Promise.all(['#now-heading', '#top8-heading', '#details-heading'].map((s) => page.locator(s).boundingBox()));
     expect(now!.x, 'Now in the left column').toBeLessThan(top8!.x);
     expect(details!.x, 'Details under Now').toBe(now!.x);
-    expect(Math.abs(now!.y - top8!.y), 'Now and the Top 8 start on the same row').toBeLessThan(8);
+    // The identity column's modules sit in plates (the redesign), so the modules' boxes, not their
+    // headings, share the row.
+    const [nowBox, top8Box] = await Promise.all(['.profile .now .module', '.profile .top8-col .section'].map((s) => page.locator(s).boundingBox()));
+    expect(Math.abs(nowBox!.y - top8Box!.y), 'Now and the Top 8 start on the same row').toBeLessThan(8);
   });
 });

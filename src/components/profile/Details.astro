@@ -18,9 +18,9 @@ for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ 
 
 {
   rows.length > 0 && (
-    <section class="module" aria-labelledby="details-heading">
+    <section class="module boxed" aria-labelledby="details-heading">
       <h2 id="details-heading" class="module-heading">Details</h2>
-      <dl class="details">
+      <dl class="fact-table details">
         {rows.map((r) => (
           <div>
             <dt>{r.term}</dt>
@@ -39,23 +39,3 @@ for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ 
     </section>
   )
 }
-
-<style>
-  .details {
-    margin: 0;
-    font-size: var(--size-card);
-  }
-  .details div {
-    display: grid;
-    grid-template-columns: 6.5rem minmax(0, 1fr);
-    gap: var(--space-1);
-    padding: var(--space-1) 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .details dt {
-    color: var(--text-secondary);
-  }
-  .details dd {
-    margin: 0;
-  }
-</style>

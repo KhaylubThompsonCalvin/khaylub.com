@@ -27,7 +27,7 @@ const resume = resumeMeta();
   data-email={id.email}
   data-resume={resume.pdf}
 >
-  <button class="btn btn-dashed" type="button" aria-describedby="climb-hint" data-climb-enter>
+  <button class:list={['btn', standalone ? 'btn-primary door-btn' : '']} type="button" aria-describedby="climb-hint" data-climb-enter>
     {standalone ? 'Tap to explore' : 'Enter the climb'}
   </button>
   <p class="small muted" id="climb-hint">
@@ -73,5 +73,9 @@ const resume = resumeMeta();
   .climb-door p {
     margin: 0;
     flex: 1 1 16rem;
+  }
+  .door-btn {
+    min-height: 56px;
+    padding-inline: var(--space-3);
   }
 </style>

@@ -1,0 +1,140 @@
+---
+// The climb's entrance (the visual redesign, vault document 65): a poster band that names the
+// original interactive version of this site, says what it is, and offers one link. Nothing of the
+// scene loads here: the still is a cropped screenshot (src/assets/climb/PROVENANCE.txt) served
+// through Astro's image pipeline; the models, plates, and code load only on /climb/ after the
+// press. On Home the band follows the hero; on /climb/ it is the page's head (`standalone`), with
+// the door rendered by the page below it.
+import { Picture } from 'astro:assets';
+import still from '../assets/climb/spark-wakes.webp';
+
+interface Props {
+  standalone?: boolean;
+}
+const { standalone = false } = Astro.props;
+---
+
+<section class:list={['climb-band', { standalone }]} aria-labelledby="climb-band-heading">
+  <Picture
+    src={still}
+    alt=""
+    widths={[480, 720, 960]}
+    sizes="(min-width: 1200px) 1104px, 100vw"
+    formats={['avif', 'webp']}
+    fallbackFormat="webp"
+    loading={standalone ? 'eager' : 'lazy'}
+    decoding="async"
+    class="climb-still"
+  />
+  <div class="climb-words">
+    <div>
+      {
+        standalone ? (
+          <h1 id="climb-band-heading">The climb</h1>
+        ) : (
+          <h2 id="climb-band-heading">The climb</h2>
+        )
+      }
+      <p class="climb-what">
+        The original interactive version of this site: one scroll from night into day, a Wanderer, and a
+        Phoenix. The June 2026 release, kept as it shipped.
+      </p>
+      <p class="climb-line small">Optional. About 7 MB loads only when you enter; nothing of it loads on this page.</p>
+    </div>
+    {!standalone && <a class="btn btn-on-image" href="/climb/">Enter the climb</a>}
+  </div>
+</section>
+
+<style>
+  .climb-band {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-section);
+    /* The band is a poster: the still fills it, the words sit on the scrim at the foot. */
+    min-height: 17rem;
+    color: var(--on-image);
+  }
+  /* On a phone the poster sits above the words (a 3:2 still, then a dark panel), so the figure is
+     never under the type; from 900 px the words sit on the scrim to the right of the Wanderer. */
+  .climb-band :global(picture) {
+    display: block;
+    aspect-ratio: 3 / 2;
+  }
+  .climb-band :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 0% 35%;
+  }
+  .climb-words {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--scrim);
+  }
+  @media (min-width: 900px) {
+    .climb-band :global(picture) {
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
+    }
+    .climb-band :global(img) {
+      object-position: 0% 28%;
+    }
+    .climb-words {
+      align-self: end;
+      background: linear-gradient(to top, var(--scrim) 55%, transparent);
+    }
+  }
+  .climb-band h1,
+  .climb-band h2 {
+    color: var(--on-image);
+    margin: 0 0 var(--space-1);
+  }
+  .climb-band h2 {
+    font-size: var(--size-h2);
+  }
+  .climb-what {
+    max-width: var(--measure);
+    margin: 0 0 var(--space-1);
+  }
+  .climb-line {
+    margin: 0;
+  }
+  .btn-on-image {
+    justify-self: start;
+    min-height: 56px;
+    padding-inline: var(--space-3);
+    border-color: var(--on-image);
+    color: var(--on-image);
+    background: color-mix(in srgb, var(--scrim) 60%, transparent);
+  }
+  .btn-on-image:hover {
+    background: color-mix(in srgb, var(--on-image) 16%, transparent);
+  }
+  @media (min-width: 900px) {
+    .climb-band {
+      min-height: 21rem;
+    }
+    .climb-words {
+      /* The first column is left empty so the Wanderer stands clear at the left of the still. */
+      grid-template-columns: minmax(10rem, 1fr) minmax(0, 36rem) auto;
+      align-items: end;
+      padding: var(--space-4);
+    }
+    .climb-words > div {
+      grid-column: 2;
+    }
+    .btn-on-image {
+      justify-self: end;
+    }
+  }
+  .standalone {
+    margin-bottom: var(--space-4);
+  }
+</style>

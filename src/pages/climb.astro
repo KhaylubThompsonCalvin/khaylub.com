@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import ClimbBand from '@components/ClimbBand.astro';
 import ClimbDoor from '@components/ClimbDoor.astro';
 import Doors from '@components/Doors.astro';
 import ClimbMount from '@components/ClimbMount.astro';
@@ -12,7 +13,8 @@ import ClimbMount from '@components/ClimbMount.astro';
   fullBleed
 >
   <section class="climb-intro container">
-    <h1>The climb</h1>
+    {/* The room's head: the poster band with the page's title (the visual redesign); still nothing of the scene loads. */}
+    <ClimbBand standalone />
     <p class="measure">
       The first version of this site: one continuous scroll, a traveler walking from night into day,
       and a Phoenix near the end. It is the June 2026 scene ported into this site: the same models,

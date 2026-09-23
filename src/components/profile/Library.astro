@@ -1,19 +1,30 @@
 ---
-// The Library module of the Home profile (F5, document 65): every collection with its real count,
-// as rows, the way the Library page counts them.
-import { collectionCounts } from '@lib/catalog';
+// The Library module of the Home profile (document 65): every collection with its real count and
+// its newest item, as shelf rows, the way the Library page counts them.
+import { collectionCounts, published, routeFor, sortEntries } from '@lib/catalog';
 
 const counts = (await collectionCounts()).filter((c) => c.count > 0);
+const rows = await Promise.all(
+  counts.map(async (c) => {
+    const newest = sortEntries(await published(c.name), 'newest')[0];
+    return { ...c, newest: newest ? { title: newest.data.title as string, href: routeFor(newest) } : undefined };
+  })
+);
 ---
 
 <section class="module" aria-labelledby="library-heading">
   <h2 id="library-heading" class="module-heading">Library</h2>
-  <ul class="row-list">
+  <ul class="row-list shelf">
     {
-      counts.map((c) => (
+      rows.map((c) => (
         <li>
           <a href={c.route}>{c.label}</a>
-          <span class="small muted">{c.count} {c.count === 1 ? 'item' : 'items'}</span>
+          <span class="small muted count">{c.count} {c.count === 1 ? 'item' : 'items'}</span>
+          {c.newest && (
+            <p>
+              Newest: <a href={c.newest.href}>{c.newest.title}</a>
+            </p>
+          )}
         </li>
       ))
     }
@@ -26,5 +37,17 @@ const counts = (await collectionCounts()).filter((c) => c.count > 0);
 <style>
   .note {
     margin: var(--space-2) 0 0;
+  }
+  /* The count keeps the working face here: the module's rows are small. */
+  .shelf .count {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--size-sm);
+  }
+  .shelf li > a:first-child {
+    font-size: var(--size-body);
+  }
+  .shelf li {
+    padding: var(--space-1) 0;
   }
 </style>

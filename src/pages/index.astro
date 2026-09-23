@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import IdentityCard from '@components/IdentityCard.astro';
+import ClimbBand from '@components/ClimbBand.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
 import Details from '@components/profile/Details.astro';
@@ -11,10 +12,11 @@ import { identity, onRepeat } from '@lib/profile';
 import { published } from '@lib/catalog';
 import { personAndWebsite } from '@lib/seo';
 
-// The Home page is a profile (the design initiative's F5, vault document 65): the approved hero,
-// then a module column (Now, Details, Contact) beside an editorial column (the Top 8, Writing, the
-// Library). The DOM order is the reading order on a phone: hero, Now, the Top 8, Writing, the
-// Library, Details, Contact; at 900 px the grid places the modules in their columns.
+// The Home page is a profile (the visual redesign, vault document 65): the approved hero, then the
+// climb's poster band (the creative door, prominent and optional), then a module column (Now,
+// Details, Contact, boxed) beside an editorial column (the Top 8, Writing, the Library). The DOM
+// order is the phone order: hero, the climb, Now, the Top 8, Writing, the Library, Details,
+// Contact; at 900 px the grid places the modules in their columns.
 const id = identity();
 const repeat = onRepeat();
 const journal = (await published('journal')).slice(0, 5);
@@ -28,8 +30,9 @@ const jsonLd = await personAndWebsite();
   jsonLd={jsonLd}
 >
   <IdentityCard />
+  <ClimbBand />
   <div class="profile">
-    <div class="now"><NowLine /></div>
+    <div class="now"><NowLine boxed /></div>
     <div class="main">
       <div class="top8-col"><Top8 /></div>
       <div class="writing"><Writing /></div>

@@ -24,9 +24,15 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 ---
 
 <Breadcrumb trail={trail} />
-<div class="measure page-intro">
+{/* The room's plate (the visual redesign): Writing reads as the reading room, the others as the archive. */}
+<div class:list={['plate', 'page-intro', meta.name === 'writing' ? 'room-writing' : 'room-library']}>
   <h1>{filter ? `${meta.label}: ${filter.label}` : meta.label}</h1>
-  <p>{meta.description}</p>
+  <p class="lead measure">{meta.description}</p>
+  <ul class="counts">
+    <li><b>{all.length}</b> published {all.length === 1 ? 'item' : 'items'}</li>
+    {options.types.length > 0 && <li><b>{options.types.length}</b> {meta.name === 'projects' ? (options.types.length === 1 ? 'status' : 'statuses') : options.types.length === 1 ? 'type' : 'types'}</li>}
+    {options.tags.length > 0 && <li><b>{options.tags.length}</b> {options.tags.length === 1 ? 'tag' : 'tags'}</li>}
+  </ul>
 </div>
 
 <section class="section" aria-labelledby="list-heading">
@@ -56,7 +62,7 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 
   {
     shown.length > 0 ? (
-      <ul class="card-grid">
+      <ul class="card-grid list">
         {shown.map((e) => (
           <li>
             <ArtifactCard entry={e} />

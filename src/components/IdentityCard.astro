@@ -45,7 +45,6 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
   }
   <RecruiterRow />
   <Doors />
-  <p class="climb-line small muted">Or <a href="/climb/">enter the climb</a>, the original 3D experience.</p>
 </section>
 
 <style>
@@ -54,7 +53,14 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
     grid-template-columns: minmax(0, 1fr);
     row-gap: 0;
     column-gap: var(--space-3);
-    margin-bottom: var(--space-section);
+    /* The climb band follows at once: a section gap from 900 px, a tighter one on a phone so the
+       band begins on the first screen at 390 by 844. */
+    margin-bottom: var(--space-4);
+  }
+  @media (min-width: 900px) {
+    .hero {
+      margin-bottom: var(--space-6);
+    }
   }
   .hero > :not(.hero-photo) {
     grid-column: 1;
@@ -65,9 +71,6 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
   .availability {
     font-weight: 600;
     margin: 0 0 var(--space-2);
-  }
-  .climb-line {
-    margin: 0;
   }
   /* The portrait: 3:4, the face kept in frame as the box changes, 160 px wide and centred on a phone. */
   .hero-photo {
@@ -88,12 +91,12 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
        The last row takes any extra height so the text rows stay tight when the portrait is taller. */
     .hero {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      grid-template-rows: repeat(5, auto) 1fr;
+      grid-template-rows: repeat(4, auto) 1fr;
       align-items: start;
     }
     .hero-photo {
       grid-column: 2;
-      grid-row: 1 / span 6;
+      grid-row: 1 / span 5;
       justify-self: end;
       margin: 0;
     }

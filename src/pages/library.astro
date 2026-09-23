@@ -1,27 +1,55 @@
 ---
+// The Library entrance. The room (the visual redesign, document 65): the archive, a plate ruled
+// like shelves with the counts, then the collections as a shelf (a sentence and the newest item
+// under each), the Top 8, and how the library works.
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Card from '@components/Card.astro';
 import Top8 from '@components/Top8.astro';
-import { collectionCounts } from '@lib/catalog';
+import { collectionCounts, published, routeFor, sortEntries } from '@lib/catalog';
+
 const counts = await collectionCounts();
+const rows = await Promise.all(
+  counts.map(async (c) => {
+    const newest = c.count > 0 ? sortEntries(await published(c.name), 'newest')[0] : undefined;
+    return { ...c, newest: newest ? { title: newest.data.title as string, href: routeFor(newest) } : undefined };
+  })
+);
+const total = counts.reduce((n, c) => n + c.count, 0);
+const filled = counts.filter((c) => c.count > 0).length;
 ---
 
 <BaseLayout title="Library" description="The library entrance: every collection on this site with a count, the current Top 8, and how the library works." current="library">
-  <div class="measure page-intro">
+  <div class="plate room-library page-intro">
     <h1>Library</h1>
-    <p>
+    <p class="measure">
       Everything on this site lives in a collection. Projects and data work are the proof; Field Notes
       are the lessons; the rest is what I make when nobody is grading.
     </p>
+    <ul class="counts">
+      <li><b>{total}</b> published items</li>
+      <li><b>{filled}</b> of {counts.length} collections with something in them</li>
+      <li><a href="/timeline/"><b>1</b> timeline of everything by date</a></li>
+    </ul>
   </div>
 
   <section class="section" aria-labelledby="collections-heading">
     <h2 id="collections-heading">Collections</h2>
-    <ul class="card-grid">
+    <ul class="row-list shelf measure-reading">
       {
-        counts.map((c) => (
+        rows.map((c) => (
           <li>
-            <Card href={c.route} title={c.label} summary={c.description} meta={[`${c.count} ${c.count === 1 ? 'item' : 'items'}`]} />
+            <a href={c.route}>{c.label}</a>
+            <span class="count muted">{c.count}</span>
+            <p>
+              {c.description}
+              {c.newest ? (
+                <>
+                  {' '}
+                  Newest: <a href={c.newest.href}>{c.newest.title}</a>.
+                </>
+              ) : (
+                ' Nothing published yet.'
+              )}
+            </p>
           </li>
         ))
       }

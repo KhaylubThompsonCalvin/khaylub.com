@@ -49,9 +49,10 @@ const context: string | undefined = entry.collection === 'projects' ? data.conte
   }
   {
     links.length > 0 && (
-      <p class="proof">
+      <p class:list={['proof', { 'proof-links': compact }]}>
+        {compact && <span class="small muted">See: </span>}
         {links.map((l) => (
-          <a class:list={['btn', { 'btn-small': compact }]} href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+          <a class:list={{ btn: !compact }} href={l.href} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
             {l.label}
             <span class="visually-hidden"> for {entry.data.title}</span>
           </a>
@@ -90,9 +91,15 @@ const context: string | undefined = entry.collection === 'projects' ? data.conte
     position: relative;
     z-index: 1;
   }
-  .btn-small {
-    padding: var(--space-1) var(--space-1-5);
+  /* On an entry the proof is a row of plain links (Code, Live, Result), each its own 24 px target. */
+  .proof-links {
+    gap: var(--space-1) var(--space-2);
+    font-size: var(--size-sm);
+  }
+  .proof-links a {
+    display: inline-block;
+    min-height: var(--target-min);
+    padding: var(--space-quarter) 0;
     font-weight: 600;
-    letter-spacing: 0;
   }
 </style>

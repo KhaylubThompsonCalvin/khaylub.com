@@ -81,7 +81,7 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
           </aside>
         )
       }
-      <div class="body measure-reading">
+      <div class:list={['body', 'measure-reading', { reading: entry.collection === 'writing' }]}>
         <Content />
       </div>
     </div>

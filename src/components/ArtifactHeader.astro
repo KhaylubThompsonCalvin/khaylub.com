@@ -34,18 +34,18 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   {data.ai_assisted && <p class="muted small">Built with AI assistance in the code; the design, decisions, and testing are the author's.</p>}
   {
     (data.problem || data.role) && (
-      <dl class="summary-card">
+      <dl class="fact-table summary-card">
         {data.problem && (
-          <>
+          <div>
             <dt>Problem</dt>
             <dd class="problem">{data.problem}</dd>
-          </>
+          </div>
         )}
         {data.role && (
-          <>
+          <div>
             <dt>My role</dt>
             <dd class="role">{data.role}</dd>
-          </>
+          </div>
         )}
       </dl>
     )
@@ -53,13 +53,19 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   <ProjectFacts entry={entry} />
   {
     isData && (
-      <dl class="facts">
-        <dt>Question</dt>
-        <dd>{data.question}</dd>
-        <dt>Data</dt>
-        <dd>{data.dataset.name}. Source: {data.dataset.source}. License: {data.dataset.license}.</dd>
-        <dt>Result</dt>
-        <dd>{data.result}</dd>
+      <dl class="fact-table facts">
+        <div>
+          <dt>Question</dt>
+          <dd>{data.question}</dd>
+        </div>
+        <div>
+          <dt>Data</dt>
+          <dd>{data.dataset.name}. Source: {data.dataset.source}. License: {data.dataset.license}.</dd>
+        </div>
+        <div>
+          <dt>Result</dt>
+          <dd>{data.result}</dd>
+        </div>
       </dl>
     )
   }
@@ -79,27 +85,10 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
     align-items: center;
     gap: var(--space-1) var(--space-2);
   }
-  .summary-card {
-    margin: 0 0 var(--space-2);
-    padding: var(--space-2);
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-  }
-  .summary-card dt {
-    font-weight: 600;
-  }
-  .summary-card dd {
-    margin: 0 0 var(--space-1);
-  }
-  .summary-card dd:last-child {
-    margin-bottom: 0;
-  }
-  .facts dt {
-    font-weight: 600;
-    margin-top: var(--space-1);
-  }
-  .facts dd {
-    margin: 0;
+  /* The facts of a case study are a table of labelled rows (the evidence room), not a box. */
+  .summary-card,
+  .facts {
+    font-size: var(--size-body);
+    border-top: 2px solid var(--ink);
   }
 </style>

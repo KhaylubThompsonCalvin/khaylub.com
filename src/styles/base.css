@@ -128,10 +128,10 @@ small,
   color: var(--muted);
 }
 
+/* The kind line above a term page's title (Skill, Technology, Tag): small, sentence case, quiet. */
 .eyebrow {
   font-size: var(--size-sm);
   letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
   color: var(--muted);
   margin: 0 0 var(--space-1);
 }
@@ -172,6 +172,21 @@ small,
 /* A profile module (F5, document 65): a named head on a rule, the section gap below. */
 .module {
   margin-bottom: var(--space-module);
+}
+/* The identity column's modules sit in light plates (the profile grammar: the owner's facts in a
+   box); the wide column's modules stay open on the paper. */
+.module.boxed {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1-5) var(--space-2) var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.module.boxed .module-heading {
+  font-size: var(--size-h3);
+}
+.module.boxed > :last-child {
+  margin-bottom: 0;
 }
 .module-heading {
   display: flex;
@@ -230,17 +245,6 @@ small,
 .btn-primary:active {
   background: color-mix(in srgb, var(--ink) 80%, var(--bg));
 }
-.btn-dashed {
-  border-style: dashed;
-  border-color: var(--muted);
-  background: var(--card);
-  font-weight: 600;
-  letter-spacing: 0;
-}
-.btn-dashed:hover {
-  border-color: var(--ink);
-  transform: none;
-}
 
 /* Cards */
 .card-grid {
@@ -252,24 +256,28 @@ small,
   margin: 0;
 }
 
+/* An entry (the visual redesign, document 65): a rule-topped column of text, not a box. The title
+   is set in the display face; the rule warms to the accent on hover and turns the focus blue when
+   the link has focus. The class stays .card so every listing route keeps its structure and tests. */
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: var(--space-card);
-  min-height: 7.5rem;
-  transition: border-color var(--ease), box-shadow var(--ease);
+  padding: var(--space-2) 0;
+  border-top: 2px solid var(--ink);
+  transition: border-color var(--ease);
 }
 .card:hover {
-  border-color: var(--muted);
-  box-shadow: var(--shadow-card);
+  border-top-color: var(--accent);
 }
 .card:focus-within {
-  border-color: var(--focus);
+  border-top-color: var(--focus);
+}
+.card h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--size-h3);
 }
 .card h3,
 .tile h3 {
@@ -302,6 +310,37 @@ small,
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
+/* An index lists its entries as rows in one column at the reading measure, a media entry with its
+   cover at the left; Work keeps the grid for its three featured projects. */
+.card-grid.list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  max-width: var(--measure-reading);
+}
+.card-grid.list .card {
+  border-top-width: 1px;
+  border-top-color: var(--line);
+}
+.card-grid.list li:first-child .card {
+  border-top-width: 2px;
+  border-top-color: var(--ink);
+}
+.card-grid.list .card:hover {
+  border-top-color: var(--accent);
+}
+.card-grid.list .card:focus-within {
+  border-top-color: var(--focus);
+}
+@media (min-width: 560px) {
+  .card-grid.list .card:has(.thumb) {
+    display: grid;
+    grid-template-columns: var(--width-tile) minmax(0, 1fr);
+    column-gap: var(--space-3);
+  }
+  .card-grid.list .card:has(.thumb) .thumb {
+    grid-row: 1 / span 4;
+  }
+}
 .card .thumb img {
   width: 100%;
   height: 100%;
@@ -320,19 +359,18 @@ small,
   margin-top: auto;
 }
 
+/* A status word (Published, Live, Private beta, a collection name): plain small text, never a
+   pill; a live thing in the signal colour, weighted so colour is not the only cue. */
 .badge {
   display: inline-block;
   font-size: var(--size-sm);
   line-height: 1.4;
-  padding: var(--space-quarter) var(--space-1);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
   color: var(--muted);
   white-space: nowrap;
 }
 .badge-live {
-  border-color: var(--signal);
   color: var(--signal);
+  font-weight: 600;
 }
 
 /* A row list (the profile modules, document 65): a link at the left, its small note at the right,
@@ -349,6 +387,120 @@ small,
   gap: var(--space-2);
   padding: var(--space-1) 0;
   border-bottom: 1px solid var(--border);
+}
+
+/* A room's plate (the visual redesign, document 65): the head of a section index, a light plate
+   that carries the page's name, its sentence, and its counts. Each room sets one atmosphere on the
+   same plate: Work an ink rule and the availability; the Library the shelf lines; Writing the
+   display face for its sentence. One language, different rooms. */
+.plate {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  margin-bottom: var(--space-intro);
+}
+.plate > :last-child {
+  margin-bottom: 0;
+}
+.plate h1 {
+  margin-bottom: var(--space-1);
+}
+.plate.room-work {
+  border-top: 4px solid var(--ink);
+}
+.plate.room-library {
+  border-bottom: 6px solid var(--border);
+}
+.plate.room-writing .lead {
+  font-family: var(--font-display);
+  font-size: var(--size-h3);
+  line-height: 1.4;
+}
+/* The counts row: what the room holds, each count a link into it. */
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0;
+}
+.counts li {
+  font-size: var(--size-sm);
+  color: var(--text-secondary);
+}
+.counts b {
+  font-family: var(--font-display);
+  font-size: var(--size-h3);
+  font-weight: 700;
+  color: var(--text);
+  margin-right: var(--space-half);
+}
+.counts a {
+  text-decoration: none;
+}
+.counts a:hover b {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+/* A shelf: the collections as rows, a sentence and the newest item under each title. */
+.shelf li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--space-3);
+  padding: var(--space-2) 0;
+}
+.shelf li > a:first-child,
+.shelf .count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--size-h3);
+}
+.shelf p {
+  grid-column: 1 / -1;
+  margin: var(--space-half) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--size-card);
+}
+/* The newest item's link is a target of its own (WCAG 2.5.8), clear of the title link above it. */
+.shelf p a {
+  display: inline-block;
+  min-height: var(--target-min);
+  padding: var(--space-quarter) 0;
+}
+/* A fact table: labelled rows with a rule under each (Details on Home, the facts of a case study). */
+.fact-table {
+  margin: 0 0 var(--space-2);
+  font-size: var(--size-card);
+}
+.fact-table > div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+.boxed .fact-table > div:last-child {
+  border-bottom: 0;
+}
+.fact-table dt {
+  color: var(--text-secondary);
+}
+.fact-table dd {
+  margin: 0;
+}
+/* The reading room: an essay's first paragraph opens with a large initial in the display face. */
+.body.reading > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 0.8;
+  float: left;
+  padding: 0 0.12em 0 0;
+  color: var(--signal);
 }
 
 /* The Top 8 tiles (document 65): a set of squares, the rank at the top and the title at the foot,
@@ -391,10 +543,23 @@ small,
   border-color: var(--focus);
 }
 .tile-rank {
-  font-size: var(--size-sm);
-  letter-spacing: var(--tracking-button);
+  font-family: var(--font-display);
+  font-size: var(--size-h2);
+  font-weight: 700;
+  line-height: 1;
   color: var(--signal);
   position: relative;
+}
+/* The kind of thing (Live, Data, Field Notes, Gallery) in the tile's top corner, small and quiet. */
+.tile-kind {
+  position: absolute;
+  top: var(--space-1-5);
+  right: var(--space-1-5);
+  font-size: var(--size-sm);
+  color: var(--text-secondary);
+}
+.has-cover .tile-kind {
+  color: var(--on-image);
 }
 .tile h3 {
   font-family: var(--font-display);

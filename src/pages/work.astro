@@ -2,6 +2,8 @@
 // Work: the fast path for hiring managers. Every fact on this page is read from content/:
 // featured projects and evidence from the catalog; education, certifications, availability,
 // identity, and the résumé metadata from the profile files. Nothing is typed here twice.
+// The room (the visual redesign, document 65): the workshop, a plate with an ink rule and the
+// counts of what the room holds; the featured projects as rule-topped entries, not boxes.
 import BaseLayout from '@layouts/BaseLayout.astro';
 import ArtifactCard from '@components/ArtifactCard.astro';
 import EvidenceList from '@components/EvidenceList.astro';
@@ -25,13 +27,19 @@ const evidenceTotal = new Set(groups.flatMap((g) => g.skills.flatMap((s) => s.it
   description={`${feat.length} featured projects with code and results, ${skillCount} skills with evidence, education, and certifications of ${id.name}. The fast path for hiring managers.`}
   current="work"
 >
-  <div class="measure page-intro">
+  <div class="plate room-work page-intro">
     <h1>Work</h1>
     <p class="availability">{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small></p>
-    <p>
+    <p class="measure">
       {feat.length} projects with code and results, the skills and technologies they show, and where I
       studied. The <a href="/resume/">résumé</a> has the same facts in one page.
     </p>
+    <ul class="counts">
+      <li><a href="#featured-heading"><b>{feat.length}</b> featured projects</a></li>
+      <li><a href="#skills"><b>{skillCount}</b> skills with evidence</a></li>
+      <li><a href="#technologies"><b>{tech.length}</b> technologies</a></li>
+      <li><b>{evidenceTotal}</b> published pieces of proof</li>
+    </ul>
   </div>
 
   <section class="section" aria-labelledby="featured-heading">
