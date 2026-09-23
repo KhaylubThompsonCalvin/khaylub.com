@@ -636,7 +636,7 @@ small,
   }
   .top8[data-spare2] > li:first-child .tile-art {
     aspect-ratio: auto;
-    height: calc((100cqw - var(--space-grid)) / 2);
+    min-height: calc((100cqw - var(--space-grid)) / 2);
   }
 }
 @media (min-width: 700px) {
@@ -654,7 +654,7 @@ small,
   }
   .top8[data-spare4] > li:first-child .tile-art {
     aspect-ratio: auto;
-    height: calc((100cqw - 3 * var(--space-grid)) / 4);
+    min-height: calc((100cqw - 3 * var(--space-grid)) / 4);
   }
 }
 .tile {

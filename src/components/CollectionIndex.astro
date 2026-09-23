@@ -46,9 +46,9 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
     {shown.length} {shown.length === 1 ? 'item' : 'items'}{filter ? ` with ${filter.kind === 'type' ? (meta.name === 'projects' ? 'status' : 'type') : filter.kind} ${filter.label}` : ''}
   </h2>
 
-  <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} />
-  <FilterBar label="Filter by tag" allHref={meta.route} options={options.tags} active={filter?.kind === 'tag' ? filter.slug : undefined} filtered={!!filter} />
-  <FilterBar label="Filter by series" allHref={meta.route} options={options.series} active={filter?.kind === 'series' ? filter.slug : undefined} filtered={!!filter} />
+  <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
+  <FilterBar label="Filter by tag" allHref={meta.route} options={options.tags} active={filter?.kind === 'tag' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
+  <FilterBar label="Filter by series" allHref={meta.route} options={options.series} active={filter?.kind === 'series' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
 
   {
     !filter && shown.length > 1 && (
@@ -73,7 +73,7 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
           <li>
             <ArtifactCard entry={e}>
               {/* The reading room features its newest piece with a line of its own words. */}
-              {meta.name === 'writing' && i === 0 && !filter && openingLine(e.body) && <p class="pull-quote">{openingLine(e.body)}</p>}
+              {meta.name === 'writing' && i === 0 && !filter && sort === 'newest' && openingLine(e.body) && <p class="pull-quote">{openingLine(e.body)}</p>}
             </ArtifactCard>
           </li>
         ))}
