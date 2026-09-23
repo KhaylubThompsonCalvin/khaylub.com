@@ -56,23 +56,42 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 
 ## Design authority
 
-The Phase 6 visual system and the Phase 8 design system (vault documents 29 and 31) are the
-authority; `src/styles/tokens.css` implements them (light and dark palettes, focus ring,
-reduced-motion block). Use the tokens. Do not add colors, fonts, or motion outside them, and do not
-redesign: Phase 10 composes the existing components against the Phase 6 wireframes (W1 Home,
-W2 Work, W16 mobile navigation). A design skill may guide composition; it never overrides the
-tokens or the wireframes. Since the design initiative (vault documents 57 to 65): the palette is F4's
-warm paper with a working sienna accent in both schemes (decision D-32), with two link treatments on
-purpose (chrome links ink; links inside content sienna and underlined; colour never the only cue),
-the blue focus ring separate from the accent, and an Appearance control (Light, Dark, System) in the
-footer remembered on the device; the typography is F3's Fraunces and KT Sans (D-31); the spacing is
-F5's semantic layer in `tokens.css` (`--space-section`, `--space-intro`, `--space-header-body`,
-`--space-module`, `--space-card`, `--space-grid`, the page and footer roles; the owner's direction B,
-balanced), and the Home page below the hero is the profile composition of the Visual North Star
-(document 65): Now, the Top 8 as ranked captioned tiles (`Top8.astro`, the tile pattern in
-`base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
-that is the phone order, two columns from 900 px. Component styles are scoped by class
-(`scopedStyleStrategy: 'class'`) to keep the one stylesheet inside its 36 KiB line.
+The live design is the full visual redesign (PR #92, merge `5db842a`, 2026-09-23). Its authority is
+the vault's Visual North Star (document 65); the state of every visual item is document 66; the
+record is the checkpoint `2026-09-23 - V2 Design Checkpoint - Full Visual Redesign`. The project
+skill `khaylub-visual-director` is the short form: load it before any presentation change.
+
+- **What the site is:** a professional profile, a personal library, and a creative internet home.
+  Classic MySpace profile grammar (ownership, named modules, labelled fact rows, a ranked and
+  dated Top 8), set with editorial structure (two faces at work, rules, reading measures,
+  restraint). Real content only; mobile designed at 390 and 320, not stacked.
+- **The tokens** (`src/styles/tokens.css`, held by `tests/tokens.spec.ts` and
+  `tests/contrast.spec.ts`) are the only source of colour, type, space, and motion: palette C, warm
+  paper with a working sienna accent (D-32; chrome links ink, content links sienna and underlined,
+  colour never the only cue; the blue focus ring; the footer Appearance control, Light, Dark,
+  System); Fraunces and KT Sans (D-31); the F2 scale and the F5 semantic spacing roles.
+- **The rooms:** Home the front porch (the approved hero, D-30 and FR-A1, then the climb band,
+  then the profile: Now, Details, Contact in plates in a 20rem identity column; the Top 8, Writing,
+  the Library shelf); Work the workshop and evidence room; the Library the archive; Writing the
+  reading room; data and case studies the evidence space (one labelled fact table); the climb the
+  cinematic island.
+- **The climb** is a prominent, optional destination: a poster band under the hero explains it and
+  links to `/climb/`; Home loads only its still, and the Three.js scene loads only after the press
+  (`tests/climb.spec.ts`).
+- **Component language:** rule-topped entries and rows, plates, shelves, labelled fact tables,
+  counts rows, restrained sienna signals, status as plain words. Never repeated rounded cards,
+  pills, SaaS or bento grids, decorative gradients or glass, icons for decoration, fake numbers,
+  or motion for its own sake.
+- **The Top 8:** ranked and dated; the kind is what a thing is (Project, Data, Field Note,
+  Gallery), a status (Live, Private beta) is never the kind; fewer than eight real items is
+  intentional (the first-ranked tile takes the spare columns), never a fake eighth; nothing
+  overlaps at 320. Deferred, optional: the Climb still in the wide first tile.
+- **CSS and performance:** one global stylesheet, scoped by class, under a 36,864-byte ceiling
+  with about 480 bytes of headroom as local Lighthouse counts it. Consolidate or reuse before
+  adding; never weaken LCP, CLS, accessibility, or the stylesheet line.
+- **Workflow for visual work:** read document 65, load the skill, work in owner design mode or
+  Playwright, capture 1440, 390, and 320 in both palettes, critique the real screenshots, and keep
+  the architecture (Astro, the schemas, the Studio, publishing, Render) as it is.
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 
