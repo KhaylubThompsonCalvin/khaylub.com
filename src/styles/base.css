@@ -280,17 +280,17 @@ small,
   font-size: var(--size-h3);
 }
 .card h3,
-.tile h3 {
+.tile :is(h2, h3) {
   margin: 0;
 }
 .card h3 a,
-.tile h3 a {
+.tile :is(h2, h3) a {
   text-decoration: none;
 }
 /* The accent hint (F4, decision D-32): a hovered card or tile underlines its title in the accent;
    the card itself keeps the soft ink hover. */
 .card:hover h3 a,
-.tile:hover h3 a {
+.tile:hover :is(h2, h3) a {
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
@@ -298,7 +298,7 @@ small,
 }
 /* The whole card or tile is the target; keyboard focus stays on the link. */
 .card h3 a::after,
-.tile h3 a::after {
+.tile :is(h2, h3) a::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -705,7 +705,7 @@ small,
 .has-cover .tile-kind {
   color: var(--on-image);
 }
-.tile h3 {
+.tile :is(h2, h3) {
   grid-area: title;
   font-family: var(--font-display);
   font-weight: 700;
@@ -733,7 +733,7 @@ small,
   background: linear-gradient(to bottom, var(--scrim), transparent 38%, transparent 45%, var(--scrim));
 }
 .has-cover .tile-rank,
-.has-cover h3 a {
+.has-cover :is(h2, h3) a {
   color: var(--on-image);
 }
 .tile-cap {

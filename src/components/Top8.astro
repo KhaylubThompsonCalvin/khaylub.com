@@ -10,8 +10,12 @@ import { coverThumb } from '@lib/media';
 interface Props {
   /** An archived revision; the newest revision when omitted. */
   revision?: ReturnType<typeof top8Revisions>[number];
+  /** On the Top 8 pages the page's H1 names the set, so the module draws no heading and the tile
+      titles are the page's H2s (one title, no skipped level). Home and the Library keep the head. */
+  titled?: boolean;
 }
-const { revision } = Astro.props;
+const { revision, titled = false } = Astro.props;
+const TileHeading = titled ? 'h2' : 'h3';
 const { asOf, entries, skipped } = await top8Entries(revision);
 const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 // The kind is what the thing is (a project, data work, a Field Note, a gallery piece); the status of
@@ -33,8 +37,8 @@ const spare4 = (4 - (tiles.length % 4)) % 4;
 const spare2 = tiles.length % 2;
 ---
 
-<section class="section" aria-labelledby="top8-heading">
-  <h2 id="top8-heading" class="section-heading module-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>
+<section class="section" aria-labelledby={titled ? undefined : 'top8-heading'}>
+  {!titled && <h2 id="top8-heading" class="section-heading module-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>}
   {
     tiles.length > 0 ? (
       <ol class="top8" data-spare4={spare4 || undefined} data-spare2={spare2 || undefined}>
@@ -45,10 +49,10 @@ const spare2 = tiles.length % 2;
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>
                 <span class="tile-kind">{t.kind}</span>
-                <h3>
+                <TileHeading>
                   <span class="visually-hidden">Rank {t.rank}. </span>
                   <a href={routeFor(t.entry)}>{t.entry.data.title}</a>
-                </h3>
+                </TileHeading>
               </div>
               <p class="tile-cap">
                 {t.reason}{' '}

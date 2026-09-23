@@ -3,14 +3,15 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Top8 from '@components/Top8.astro';
 import { top8Revisions } from '@lib/profile';
 const revisions = top8Revisions();
+const label = new Date(`${revisions[0].as_of}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
 
 <BaseLayout title="Top 8" description="Khaylub's Top 8: eight things he is proud of right now, ranked, dated, and revised monthly." current="library">
   <div class="measure page-intro">
-    <h1>Top 8</h1>
-    <p>Eight things I am proud of right now, ranked and dated. Revised at the monthly review; previous sets stay on the timeline.</p>
+    <h1>Khaylub's Top 8</h1>
+    <p>As of {label}. Eight things I am proud of right now, ranked and dated. Revised at the monthly review; previous sets stay on the timeline.</p>
   </div>
-  <Top8 />
+  <Top8 titled />
   <section class="section measure-reading" aria-labelledby="revisions-heading">
     <h2 id="revisions-heading">Revisions</h2>
     <ul>{revisions.map((r) => <li><a href={`/top8/${r.as_of}/`}>{r.as_of}</a></li>)}</ul>
