@@ -50,7 +50,6 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
       </dl>
     )
   }
-  <ProjectFacts entry={entry} />
   {
     isData && (
       <dl class="fact-table facts">
@@ -69,6 +68,7 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
       </dl>
     )
   }
+  <ProjectFacts entry={entry} />
 </header>
 
 <style>
@@ -85,10 +85,15 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
     align-items: center;
     gap: var(--space-1) var(--space-2);
   }
-  /* The facts of a case study are a table of labelled rows (the evidence room), not a box. */
+  /* The facts of a case study read as one table under one ink rule: a data entry's Question, Data,
+     and Result continue the Problem and My role rows. */
   .summary-card,
   .facts {
     font-size: var(--size-body);
     border-top: 2px solid var(--ink);
+  }
+  .summary-card + .facts {
+    border-top: 0;
+    margin-top: calc(-1 * var(--space-2));
   }
 </style>

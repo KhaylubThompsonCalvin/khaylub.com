@@ -2,29 +2,14 @@
 // The Writing module of the Home profile (F5, document 65): the newest essay with a line of its own
 // text, then the newest Field Notes. Everything comes from the published collections.
 import { published, routeFor } from '@lib/catalog';
+import { openingLine } from '@lib/excerpt';
 
 const writing = await published('writing');
 const notes = (await published('notes')).slice(0, 3);
 const lead = writing[0];
 const month = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 
-/** The first sentence or two of a Markdown body, plain, at most about 170 characters. */
-function opening(body: string | undefined): string | undefined {
-  if (!body) return undefined;
-  const para = body
-    .split(/\n\s*\n/)
-    .map((p) => p.replace(/[*_`>#\[\]]/g, '').replace(/\s+/g, ' ').trim())
-    .find((p) => p.length > 60);
-  if (!para) return undefined;
-  const sentences = para.match(/[^.!?]+[.!?]+/g) ?? [para];
-  let out = '';
-  for (const s of sentences) {
-    if ((out + s).length > 170) break;
-    out += s;
-  }
-  return (out || sentences[0].slice(0, 170)).trim();
-}
-const line = lead ? opening(lead.body) : undefined;
+const line = lead ? openingLine(lead.body) : undefined;
 ---
 
 {
@@ -33,7 +18,7 @@ const line = lead ? opening(lead.body) : undefined;
       <h2 id="writing-heading" class="module-heading">Writing</h2>
       {lead && (
         <div class="lead">
-          {line && <p class="opening">{line}</p>}
+          {line && <p class="pull-quote">{line}</p>}
           <p class="lead-line">
             <a href={routeFor(lead)}>{lead.data.title}</a> <span class="small muted">{(lead.data as { type?: string }).type ?? 'writing'} · {month(lead.data.date)}</span>
           </p>
@@ -54,18 +39,6 @@ const line = lead ? opening(lead.body) : undefined;
 }
 
 <style>
-  .opening {
-    font-family: var(--font-display);
-    font-size: var(--size-h3);
-    line-height: 1.45;
-    margin: 0 0 var(--space-1);
-  }
-  .opening::before {
-    content: '\201C';
-  }
-  .opening::after {
-    content: '\201D';
-  }
   .lead-line {
     margin: 0 0 var(--space-2);
   }

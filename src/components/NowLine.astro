@@ -11,7 +11,7 @@ const n = now();
 <section class:list={['section', 'module', { boxed }]} aria-labelledby="now-heading">
   <h2 id="now-heading" class="section-heading module-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h2>
   <p class="callout">
-    {n.lines.join(' ')}
+    {n.lines.join(' ')}{' '}
     <a href="/now/">More on the Now page</a>.
   </p>
 </section>

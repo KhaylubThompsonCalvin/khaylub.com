@@ -15,8 +15,10 @@ interface Props {
 const { label, allHref, options, active, filtered = false } = Astro.props;
 ---
 
+{/* A bar with a single value filters nothing (every item carries it), so it is not drawn; it
+    returns on its own when a second value is published. */}
 {
-  options.length > 0 && (
+  options.length > 1 && (
     <nav class="filter-bar" aria-label={label}>
       <span class="filter-label small muted">{label}</span>
       <ul>
