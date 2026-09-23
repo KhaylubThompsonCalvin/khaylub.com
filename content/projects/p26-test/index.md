@@ -2,7 +2,7 @@
 slug: p26-test
 title: Phase 26 Publishing test
 type: case-study
-status: published
+status: withdrawn
 date: 2026-09-18
 summary: >-
   A temporary published project used to verify the Phase 26 owner publishing

@@ -14,7 +14,7 @@ const items = Astro.props.headings.filter((h) => h.depth === 2);
 {
   items.length >= TOC_MIN_HEADINGS && (
     <nav class="toc" aria-label="Contents">
-      <p class="toc-title small muted">Contents</p>
+      <p class="toc-title">Contents</p>
       <ol>
         {items.map((h) => (
           <li>
@@ -27,24 +27,25 @@ const items = Astro.props.headings.filter((h) => h.depth === 2);
 }
 
 <style>
+  /* The contents (the redesign's evidence room): a head on an ink rule and a plain list with a quiet
+     rule under each entry, like the fact tables above it. No card, no capitals. */
   .toc {
     margin: 0 0 var(--space-3);
-    padding: var(--space-2);
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-top: 2px solid var(--ink);
+    padding-top: var(--space-1);
   }
   .toc-title {
-    margin: 0 0 var(--space-1);
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
+    margin: 0 0 var(--space-half);
+    font-family: var(--font-display);
+    font-weight: 700;
   }
   .toc ol {
     margin: 0;
-    padding-left: 1.25rem;
+    padding: 0;
+    list-style: none;
   }
   .toc li {
-    padding: var(--space-quarter) 0;
+    border-bottom: 1px solid var(--border);
   }
   .toc a {
     display: inline-block;

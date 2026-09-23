@@ -13,8 +13,8 @@ const label = new Date(`${revision.as_of}-01T00:00:00Z`).toLocaleDateString('en-
 
 <BaseLayout title={`Top 8, ${label}`} description={`Khaylub's Top 8 as revised in ${label}: eight things he was proud of then, ranked and dated.`} current="library">
   <div class="measure page-intro">
-    <h1>Top 8, {label}</h1>
+    <h1>Khaylub's Top 8, {label}</h1>
     <p>The set as it stood in {label}. <a href="/top8/">The current set and every revision</a>.</p>
   </div>
-  <Top8 revision={revision} />
+  <Top8 revision={revision} titled />
 </BaseLayout>

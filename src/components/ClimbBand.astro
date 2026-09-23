@@ -1,0 +1,48 @@
+---
+// The climb's entrance (the visual redesign, vault document 65): a poster band that names the
+// original interactive version of this site, says what it is, and offers one link. Nothing of the
+// scene loads here: the still is a cropped screenshot (src/assets/climb/PROVENANCE.txt) served
+// through Astro's image pipeline; the models, plates, and code load only on /climb/ after the
+// press. On Home the band follows the hero; on /climb/ it is the page's head (`standalone`), with
+// the door rendered by the page below it. The still loads eagerly on both: the band is in the first
+// viewport at 1440 by 900, so a lazy still would be the page's late LCP element.
+import { Picture } from 'astro:assets';
+import still from '../assets/climb/spark-wakes.webp';
+
+interface Props {
+  standalone?: boolean;
+}
+const { standalone = false } = Astro.props;
+---
+
+<section class:list={['climb-band', { standalone }]} aria-labelledby="climb-band-heading">
+  <Picture
+    src={still}
+    alt=""
+    widths={[480, 720, 960]}
+    sizes="(min-width: 1200px) 1104px, 100vw"
+    formats={['avif', 'webp']}
+    fallbackFormat="webp"
+    loading="eager"
+    fetchpriority="low"
+    decoding="async"
+    class="climb-still"
+  />
+  <div class="climb-words">
+    <div>
+      {
+        standalone ? (
+          <h1 id="climb-band-heading">The climb</h1>
+        ) : (
+          <h2 id="climb-band-heading">The climb</h2>
+        )
+      }
+      <p class="climb-what">
+        The original interactive version of this site: one scroll from night into day, a Wanderer, and a
+        Phoenix. The June 2026 release, kept as it shipped.
+      </p>
+      <p class="climb-line small">Optional. About 7 MB loads only when you enter; nothing of it loads on this page.</p>
+    </div>
+    {!standalone && <a class="btn btn-on-image" href="/climb/">Enter the climb</a>}
+  </div>
+</section>

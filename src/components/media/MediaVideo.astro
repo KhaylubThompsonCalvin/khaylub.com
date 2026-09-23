@@ -14,7 +14,9 @@ const { entry } = Astro.props;
 const data = entry.data as { poster: string; files?: string[]; external_url?: string; captions?: string; speech?: boolean; summary: string; type: string; title: string };
 const files = data.files ?? [];
 const poster = resolveRaster(entry, data.poster);
-const posterImg = poster ? await webpAt(poster, 1280) : { src: data.poster, width: 1280, height: 720 };
+// The poster is the page's largest paint: 960 px wide, enough for the frame (at most the reading
+// measure, about 624 CSS px), so the first render carries a quarter fewer bytes than at 1280.
+const posterImg = poster ? await webpAt(poster, 960) : { src: data.poster, width: 1280, height: 720 };
 const external = files.length === 0 && data.external_url ? new URL(data.external_url) : undefined;
 const host = external ? external.hostname.replace(/^www\./, '') : '';
 ---

@@ -5,6 +5,7 @@ import Breadcrumb from './Breadcrumb.astro';
 import FilterBar from './FilterBar.astro';
 import ArtifactCard from './ArtifactCard.astro';
 import { SORT_ORDERS, filterOptions, sortEntries, type AnyEntry, type ArtifactCollection, type SortOrder } from '@lib/catalog';
+import { openingLine } from '@lib/excerpt';
 
 interface Props {
   meta: { name: ArtifactCollection; label: string; route: string; description: string };
@@ -24,19 +25,30 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 ---
 
 <Breadcrumb trail={trail} />
-<div class="measure page-intro">
+{/* The room's plate (the visual redesign): Writing reads as the reading room, the others as the archive. */}
+<div class:list={['plate', 'page-intro', meta.name === 'writing' ? 'room-writing' : 'room-library']}>
   <h1>{filter ? `${meta.label}: ${filter.label}` : meta.label}</h1>
-  <p>{meta.description}</p>
+  <p class="lead measure">{meta.description}</p>
+  {/* The room's counts describe the whole collection; a filtered page states its own count below. */}
+  {
+    !filter && (
+      <ul class="counts">
+        <li><b>{all.length}</b> published {all.length === 1 ? 'item' : 'items'}</li>
+        {options.types.length > 1 && <li><b>{options.types.length}</b> {meta.name === 'projects' ? 'statuses' : 'types'}</li>}
+        {options.tags.length > 1 && <li><b>{options.tags.length}</b> tags</li>}
+      </ul>
+    )
+  }
 </div>
 
 <section class="section" aria-labelledby="list-heading">
-  <h2 id="list-heading">
+  <h2 id="list-heading" class:list={{ 'list-count': true }}>
     {shown.length} {shown.length === 1 ? 'item' : 'items'}{filter ? ` with ${filter.kind === 'type' ? (meta.name === 'projects' ? 'status' : 'type') : filter.kind} ${filter.label}` : ''}
   </h2>
 
-  <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} />
-  <FilterBar label="Filter by tag" allHref={meta.route} options={options.tags} active={filter?.kind === 'tag' ? filter.slug : undefined} filtered={!!filter} />
-  <FilterBar label="Filter by series" allHref={meta.route} options={options.series} active={filter?.kind === 'series' ? filter.slug : undefined} filtered={!!filter} />
+  <FilterBar label="Filter by type" allHref={meta.route} options={options.types} active={filter?.kind === 'type' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
+  <FilterBar label="Filter by tag" allHref={meta.route} options={options.tags} active={filter?.kind === 'tag' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
+  <FilterBar label="Filter by series" allHref={meta.route} options={options.series} active={filter?.kind === 'series' ? filter.slug : undefined} filtered={!!filter} total={all.length} />
 
   {
     !filter && shown.length > 1 && (
@@ -56,10 +68,13 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 
   {
     shown.length > 0 ? (
-      <ul class="card-grid">
-        {shown.map((e) => (
+      <ul class="card-grid list">
+        {shown.map((e, i) => (
           <li>
-            <ArtifactCard entry={e} />
+            <ArtifactCard entry={e}>
+              {/* The reading room features its newest piece with a line of its own words. */}
+              {meta.name === 'writing' && i === 0 && !filter && sort === 'newest' && openingLine(e.body) && <p class="pull-quote">{openingLine(e.body)}</p>}
+            </ArtifactCard>
           </li>
         ))}
       </ul>
@@ -73,6 +88,12 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 </section>
 
 <style>
+  /* The count is a working line, not a second title: the working face at the h3 size. */
+  .list-count {
+    font-family: var(--font-body);
+    font-size: var(--size-h3);
+    font-weight: 600;
+  }
   .sort-links a[aria-current='page'] {
     font-weight: 600;
     text-decoration: none;

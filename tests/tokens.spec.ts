@@ -118,12 +118,13 @@ test.describe('design tokens', () => {
       return value;
     });
     expect(hovered, 'the hover tint equals the literal 8% mix').toBe(expected);
-    // The cards live on Work since F5 (Home's Top 8 is a tile grid, document 65).
-    await page.goto('/work/');
-    const card = page.locator('.card').first();
+    // The card shadow token is carried by the Top 8 tiles (the entries are rule-topped since the
+    // visual redesign, document 65); a hovered tile's art takes it.
+    await page.goto('/');
+    const card = page.locator('.top8 .tile').first();
     await card.hover();
     await page.waitForTimeout(400);
-    const shadow = await card.evaluate((el) => getComputedStyle(el).boxShadow);
+    const shadow = await card.locator('.tile-art').evaluate((el) => getComputedStyle(el).boxShadow);
     const expectedShadow = await page.evaluate(() => {
       const probe = document.createElement('div');
       probe.style.boxShadow = '0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent)';

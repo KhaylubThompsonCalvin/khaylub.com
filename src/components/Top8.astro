@@ -3,45 +3,63 @@
 // initiative's F5, vault document 65: the profile-page grammar, set like a publication). Each tile
 // carries its rank, its title in the display face, and, under the tile, the owner's one-line reason
 // with the kind and the date. A media entry's cover fills its tile under the scrim.
-import { top8Entries, badgeFor, routeFor, collectionLabel } from '@lib/catalog';
+import { top8Entries, badgeFor, routeFor } from '@lib/catalog';
 import type { top8Revisions } from '@lib/profile';
 import { coverThumb } from '@lib/media';
 
 interface Props {
   /** An archived revision; the newest revision when omitted. */
   revision?: ReturnType<typeof top8Revisions>[number];
+  /** On the Top 8 pages the page's H1 names the set, so the module draws no heading and the tile
+      titles are the page's H2s (one title, no skipped level). Home and the Library keep the head. */
+  titled?: boolean;
 }
-const { revision } = Astro.props;
+const { revision, titled = false } = Astro.props;
+const TileHeading = titled ? 'h2' : 'h3';
 const { asOf, entries, skipped } = await top8Entries(revision);
 const label = new Date(`${asOf}-01T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+// The kind is what the thing is (a project, data work, a Field Note, a gallery piece); the status of
+// a project (Live, Private beta) is a separate word in the caption, never the kind. "Published" is
+// not shown: every tile is published.
+const KINDS: Record<string, string> = { projects: 'Project', data: 'Data', notes: 'Field Note', writing: 'Writing', journal: 'Journal', music: 'Music', video: 'Video', gallery: 'Gallery', experiments: 'Experiment' };
 const tiles = await Promise.all(
   entries.map(async ({ entry, reason }, i) => {
     const badge = badgeFor(entry);
-    const kind = entry.collection === 'projects' || entry.collection === 'data' ? badge.text : collectionLabel(entry.collection);
+    const status = entry.collection === 'projects' && badge.text !== 'Published' ? badge.text : undefined;
     const cover = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
-    return { entry, reason, rank: i + 1, kind, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
+    return { entry, reason, rank: i + 1, kind: KINDS[entry.collection] ?? entry.collection, status, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
   })
 );
+// A set of seven (or any count that leaves a gap in the last row) is laid out on purpose: the
+// first-ranked tile takes the spare columns as a wide tile, so no row implies a missing card.
+// Four across from 700 px, two across from 360 px; an eighth item returns the grid to squares.
+const spare4 = (4 - (tiles.length % 4)) % 4;
+const spare2 = tiles.length % 2;
 ---
 
-<section class="section" aria-labelledby="top8-heading">
-  <h2 id="top8-heading" class="section-heading module-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>
+<section class="section" aria-labelledby={titled ? undefined : 'top8-heading'}>
+  {!titled && <h2 id="top8-heading" class="section-heading module-heading">Khaylub's Top 8 <span class="as-of">as of {label}</span></h2>}
   {
     tiles.length > 0 ? (
-      <ol class="top8">
+      <ol class="top8" data-spare4={spare4 || undefined} data-spare2={spare2 || undefined}>
         {tiles.map((t) => (
           <li>
             <article class:list={['tile', { 'has-cover': !!t.cover }]}>
               <div class="tile-art">
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>
-                <h3>
+                <span class="tile-kind">{t.kind}</span>
+                <TileHeading>
                   <span class="visually-hidden">Rank {t.rank}. </span>
                   <a href={routeFor(t.entry)}>{t.entry.data.title}</a>
-                </h3>
+                </TileHeading>
               </div>
               <p class="tile-cap">
-                {t.reason} <span class="tile-meta"><span class:list={{ signal: t.live }}>{t.kind}</span> · {t.date}</span>
+                {t.reason}{' '}
+                <span class="tile-meta">
+                  {t.status && <span class:list={{ signal: t.live }}>{t.status} · </span>}
+                  {t.date}
+                </span>
               </p>
             </article>
           </li>

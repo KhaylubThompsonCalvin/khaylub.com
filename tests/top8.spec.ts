@@ -23,7 +23,10 @@ test.describe('top 8 archives', () => {
     const home = await page.locator('ol.top8 h3 a').allInnerTexts();
     await page.goto(`/top8/${newest.as_of}/`);
     await expect(page.getByRole('heading', { level: 1 })).toContainText(newest.as_of.slice(0, 4));
-    expect(await page.locator('ol.top8 h3 a').allInnerTexts()).toEqual(home);
+    // On the Top 8 pages the page's H1 names the set and the tile titles are H2s (one title).
+    expect(await page.locator('ol.top8 h2 a').allInnerTexts()).toEqual(home);
+    expect(await page.getByRole('heading', { level: 1 }).count(), 'one page title').toBe(1);
+    await expect(page.locator('main h2', { hasText: "Khaylub's Top 8" })).toHaveCount(0);
     const skipped = newest.items.length - home.length;
     if (skipped > 0) await expect(page.locator('main')).toContainText(`${skipped} ${skipped === 1 ? 'slot is' : 'slots are'} not published yet`);
   });

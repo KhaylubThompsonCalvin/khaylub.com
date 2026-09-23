@@ -11,12 +11,17 @@ interface Props {
   active?: string;
   /** True when the page is filtered by any bar, so only the unfiltered index marks "All". */
   filtered?: boolean;
+  /** How many items the unfiltered index lists; a single value carried by all of them filters nothing. */
+  total?: number;
 }
-const { label, allHref, options, active, filtered = false } = Astro.props;
+const { label, allHref, options, active, filtered = false, total } = Astro.props;
+// A bar is left out only when it could not narrow anything: one value, carried by every item, and
+// the page unfiltered. A filtered page always keeps its bars, so "All" is always a way back.
+const useless = !filtered && options.length === 1 && options[0].count === total;
 ---
 
 {
-  options.length > 0 && (
+  options.length > 0 && !useless && (
     <nav class="filter-bar" aria-label={label}>
       <span class="filter-label small muted">{label}</span>
       <ul>
@@ -53,20 +58,20 @@ const { label, allHref, options, active, filtered = false } = Astro.props;
     padding: 0;
     margin: 0;
   }
+  /* Filters are plain links, not pills: the current one carries the signal rule under it. */
   .filter-bar a {
     display: inline-flex;
     align-items: center;
     min-height: var(--target);
-    padding: var(--space-half) var(--space-1-5);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-pill);
+    padding: var(--space-half) var(--space-1);
     text-decoration: none;
+    border-bottom: 2px solid transparent;
   }
   .filter-bar a:hover {
-    border-color: var(--muted);
+    border-bottom-color: var(--muted);
   }
   .filter-bar a[aria-current='page'] {
-    border-color: var(--ink);
+    border-bottom-color: var(--signal);
     font-weight: 600;
   }
 </style>

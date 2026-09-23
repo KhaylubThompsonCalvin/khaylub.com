@@ -42,17 +42,19 @@ async function enter(page: Page, door: ReturnType<Page['getByRole']>) {
 }
 
 test.describe('the climb is opt-in', () => {
-  // Home carries no climb code at all: a plain link under the doors goes to /climb/, where the door lives
-  // (the owner's hero decision of 2026-09-20).
-  test('Home requests no climb bytes and links to /climb/ under the doors', async ({ page }) => {
+  // Home carries no climb code at all: the poster band under the hero (the visual redesign, document
+  // 65) names the climb and links to /climb/, where the door lives; its still is a cropped screenshot.
+  test('Home requests no climb bytes and the band links to /climb/ under the hero', async ({ page }) => {
     const w = watch(page);
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     expect(w.requests.filter((u) => CLIMB_ASSETS.test(u)), 'climb assets requested on Home').toEqual([]);
     expect(await page.locator('[data-climb-door], [data-climb-mount]').count(), 'no climb door or mount on Home').toBe(0);
-    const line = page.locator('.hero .climb-line');
-    await expect(line).toHaveText('Or enter the climb, the original 3D experience.');
-    await expect(line.getByRole('link', { name: 'enter the climb' })).toHaveAttribute('href', '/climb/');
+    const band = page.locator('.climb-band');
+    await expect(band.getByRole('heading', { level: 2 })).toHaveText('The climb');
+    await expect(band).toContainText('The original interactive version of this site');
+    await expect(band).toContainText('Optional. About 7 MB loads only when you enter');
+    await expect(band.getByRole('link', { name: 'Enter the climb' })).toHaveAttribute('href', '/climb/');
     expect(w.errors, 'console errors').toEqual([]);
   });
 
