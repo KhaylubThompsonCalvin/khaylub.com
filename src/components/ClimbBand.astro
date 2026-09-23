@@ -24,6 +24,7 @@ const { standalone = false } = Astro.props;
     formats={['avif', 'webp']}
     fallbackFormat="webp"
     loading="eager"
+    fetchpriority="low"
     decoding="async"
     class="climb-still"
   />
