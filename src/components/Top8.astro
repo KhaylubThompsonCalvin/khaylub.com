@@ -35,7 +35,7 @@ const tiles = await Promise.all(
               <div class="tile-art">
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>
-                <span class:list={['tile-kind', { signal: t.live }]} aria-hidden="true">{t.kind}</span>
+                <span class:list={['tile-kind', { signal: t.live }]}>{t.kind}</span>
                 <h3>
                   <span class="visually-hidden">Rank {t.rank}. </span>
                   <a href={routeFor(t.entry)}>{t.entry.data.title}</a>

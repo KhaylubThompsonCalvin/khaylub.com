@@ -578,12 +578,14 @@ small,
   object-fit: cover;
   border-radius: calc(var(--radius-sm) - 1px);
 }
+/* The scrim under the rank and the kind at the top and under the title at the foot, so the words
+   read on any cover; the middle of the still stays clear. */
 .has-cover .tile-art::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: calc(var(--radius-sm) - 1px);
-  background: linear-gradient(to bottom, transparent 30%, var(--scrim));
+  background: linear-gradient(to bottom, var(--scrim), transparent 38%, transparent 45%, var(--scrim));
 }
 .has-cover .tile-rank,
 .has-cover h3 a {

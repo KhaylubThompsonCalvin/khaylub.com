@@ -4,7 +4,8 @@
 // scene loads here: the still is a cropped screenshot (src/assets/climb/PROVENANCE.txt) served
 // through Astro's image pipeline; the models, plates, and code load only on /climb/ after the
 // press. On Home the band follows the hero; on /climb/ it is the page's head (`standalone`), with
-// the door rendered by the page below it.
+// the door rendered by the page below it. The still loads eagerly on both: the band is in the first
+// viewport at 1440 by 900, so a lazy still would be the page's late LCP element.
 import { Picture } from 'astro:assets';
 import still from '../assets/climb/spark-wakes.webp';
 
@@ -22,7 +23,7 @@ const { standalone = false } = Astro.props;
     sizes="(min-width: 1200px) 1104px, 100vw"
     formats={['avif', 'webp']}
     fallbackFormat="webp"
-    loading={standalone ? 'eager' : 'lazy'}
+    loading="eager"
     decoding="async"
     class="climb-still"
   />
