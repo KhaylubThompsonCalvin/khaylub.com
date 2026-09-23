@@ -44,7 +44,7 @@ test.describe('SEO and metadata', () => {
     let artifacts = 0;
     for (const route of builtRoutes()) {
       const html = await (await request.get(route)).text();
-      const isArtifact = /"@type":"BreadcrumbList"/.test(html) && /<article class="artifact"/.test(html);
+      const isArtifact = /"@type":"BreadcrumbList"/.test(html) && /<article class="artifact(?: [^"]*)?"/.test(html);
       if (!isArtifact) continue;
       const image = html.match(/property="og:image" content="([^"]+)"/)?.[1] ?? '';
       expect(image, route).toMatch(/^https:\/\/khaylub\.com\/og\/[a-z]+\/[a-z0-9-]+\.png$/);

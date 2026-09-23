@@ -87,8 +87,10 @@ footer remembered on the device; the typography is F3's Fraunces and KT Sans (D-
   line, availability, and both doors sit above the fold at 390x844 and 1440x900 (P2-FE-04).
 - Performance: `lighthouserc.json` requires performance 0.90 or better, accessibility 1.0,
   best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less, CLS 0.05 or less, TBT 150 ms or
-  less. `budget.json`: 900 KB total, 60 KB script, 30 KB CSS, 100 KB fonts, 300 KB images,
-  40 requests, zero third-party.
+  less. `budget.json`: 900 KB total, 60 KB script, 36 KB CSS, 100 KB fonts, 300 KB images,
+  40 requests, zero third-party. The CSS line was 30 KB until the owner raised it to 36 KiB on
+  2026-09-22 (the F5 visual completion; the file measured 31,486 bytes raw and about 6.8 KB
+  compressed); it stays a real ceiling and is never raised again without an owner decision.
 - SEO and content: every page's primary text is in the initial HTML and readable with JavaScript
   off (`tests/js-off.spec.ts`); title, description, canonical, sitemap, robots, and structured
   data per `tests/seo.spec.ts`; JSON-LD is the only inline script allowed.

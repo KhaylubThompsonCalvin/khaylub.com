@@ -202,7 +202,7 @@ if (hasDist) {
       if (levels[i] > levels[i - 1] + 1) fail(`heading level skipped (h${levels[i - 1]} to h${levels[i]}) in ${file}`);
     }
     for (const tag of ['<main', '<header', '<nav', '<footer']) if (!html.includes(tag)) fail(`${tag} missing in ${file}`);
-    if (!/<a[^>]+class="skip-link"[^>]+href="#main"/.test(html)) fail(`skip link missing in ${file}`);
+    if (!/<a[^>]+class="skip-link(?: [^"]*)?"[^>]+href="#main"/.test(html)) fail(`skip link missing in ${file}`);
     if (/<script(?![^>]*type="application\/ld\+json")(?![^>]*\ssrc=)[^>]*>/.test(html)) fail(`inline script (not JSON-LD) in ${file}`);
     if (/<style[\s>]/.test(html)) fail(`inline style element in ${file}`);
     // CSP style-src is 'self': no component, highlighter, or Markdown HTML may emit a style attribute.

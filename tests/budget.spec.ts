@@ -57,6 +57,12 @@ test.describe('the performance budget as asserted', () => {
       expect(level(a[key]), key).toBe('error');
       expect(value(a[key], 'maxNumericValue'), key).toBe(n);
     }
+    // The stylesheet line: 30 KB from Phase 15 until the owner raised it to 36 KiB on 2026-09-22 (the
+    // F5 visual completion: 31,486 bytes raw, about 6.8 KB compressed, 5,378 bytes of headroom). It
+    // stays a real ceiling: a later package that approaches it investigates the cause first, and no
+    // edit raises it again without an owner decision recorded in the vault.
+    const css = lines!.resourceSizes.find((l) => l.resourceType === 'stylesheet');
+    expect(css?.budget, 'the stylesheet line is the 36 KiB ceiling of 2026-09-22').toBe(36);
     // Thresholds from CLAUDE.md and doc 13; a later edit may tighten them, never loosen them.
     const atLeast: [string, string, string, number][] = [
       ['categories:performance', 'error', 'minScore', 0.9],

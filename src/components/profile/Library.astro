@@ -1,0 +1,30 @@
+---
+// The Library module of the Home profile (F5, document 65): every collection with its real count,
+// as rows, the way the Library page counts them.
+import { collectionCounts } from '@lib/catalog';
+
+const counts = (await collectionCounts()).filter((c) => c.count > 0);
+---
+
+<section class="module" aria-labelledby="library-heading">
+  <h2 id="library-heading" class="module-heading">Library</h2>
+  <ul class="row-list">
+    {
+      counts.map((c) => (
+        <li>
+          <a href={c.route}>{c.label}</a>
+          <span class="small muted">{c.count} {c.count === 1 ? 'item' : 'items'}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="small muted note">
+    Everything on this site lives in a collection; every number cites a source. <a href="/library/">The library entrance</a>.
+  </p>
+</section>
+
+<style>
+  .note {
+    margin: var(--space-2) 0 0;
+  }
+</style>

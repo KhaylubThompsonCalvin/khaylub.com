@@ -3,12 +3,19 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import IdentityCard from '@components/IdentityCard.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
-import { identity, interests, onRepeat } from '@lib/profile';
+import Details from '@components/profile/Details.astro';
+import Contact from '@components/profile/Contact.astro';
+import Writing from '@components/profile/Writing.astro';
+import Library from '@components/profile/Library.astro';
+import { identity, onRepeat } from '@lib/profile';
 import { published } from '@lib/catalog';
 import { personAndWebsite } from '@lib/seo';
 
+// The Home page is a profile (the design initiative's F5, vault document 65): the approved hero,
+// then a module column (Now, Details, Contact) beside an editorial column (the Top 8, Writing, the
+// Library). The DOM order is the reading order on a phone: hero, Now, the Top 8, Writing, the
+// Library, Details, Contact; at 900 px the grid places the modules in their columns.
 const id = identity();
-const groups = interests().groups.filter((g) => g.items.length > 0);
 const repeat = onRepeat();
 const journal = (await published('journal')).slice(0, 5);
 const jsonLd = await personAndWebsite();
@@ -21,31 +28,18 @@ const jsonLd = await personAndWebsite();
   jsonLd={jsonLd}
 >
   <IdentityCard />
-  <NowLine />
-  <Top8 />
-
-  {
-    groups.length > 0 && (
-      <section class="section" aria-labelledby="interests-heading">
-        <h2 id="interests-heading">Interests</h2>
-        <dl class="interests">
-          {groups.map((g) => (
-            <div>
-              <dt>{g.name}</dt>
-              <dd>
-                {g.items.map((it, i) => (
-                  <>
-                    <a href={it.url ?? `/tags/${it.tag}/`}>{it.label}</a>
-                    {i < g.items.length - 1 ? ' · ' : ''}
-                  </>
-                ))}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-    )
-  }
+  <div class="profile">
+    <div class="now"><NowLine /></div>
+    <div class="main">
+      <div class="top8-col"><Top8 /></div>
+      <div class="writing"><Writing /></div>
+      <div class="library"><Library /></div>
+    </div>
+    <div class="side">
+      <Details />
+      <Contact />
+    </div>
+  </div>
 
   {
     journal.length > 0 && (
@@ -77,16 +71,54 @@ const jsonLd = await personAndWebsite();
 </BaseLayout>
 
 <style>
-  .interests div {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
+  .profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: var(--space-section);
   }
-  .interests dt {
-    font-weight: 600;
-    min-width: 6rem;
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .interests dd {
-    margin: 0;
+  /* Every module keeps the section gap below it; the last one on the page gives it back. */
+  .side > :global(.module:last-child) {
+    margin-bottom: 0;
+  }
+  @media (min-width: 900px) {
+    /* Two columns: Now and the facts on the left, the work on the right. The right column spans
+       both rows; the second row takes the extra height so the facts sit right under Now. */
+    .profile {
+      grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      column-gap: var(--space-8);
+      align-items: start;
+    }
+    .now {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .side {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .main {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .library :global(.module) {
+      margin-bottom: 0;
+    }
+  }
+  @media (min-width: 1200px) {
+    .main {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: var(--space-8);
+    }
+    .top8-col {
+      grid-column: 1 / -1;
+    }
+    .writing :global(.module) {
+      margin-bottom: 0;
+    }
   }
 </style>

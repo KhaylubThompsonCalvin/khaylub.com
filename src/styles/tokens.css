@@ -67,6 +67,21 @@
   /* Between 1 and 2: the padding of buttons, nav items, chips, the search input, cards (F2). */
   --space-1-5: 0.75rem;
 
+  /* The semantic spacing roles (F5, document 65; the owner's direction B, "balanced"): the numeric
+     scale above is the vocabulary, these are the sentences. A page's rhythm changes here, not at
+     the use sites. --space-section steps up at 900 px (below). */
+  --space-page-top: var(--space-4);
+  --space-page-bottom: var(--space-6);
+  --space-section: var(--space-6);
+  --space-intro: var(--space-4);
+  --space-header-body: var(--space-4);
+  --space-module: var(--space-6);
+  --space-card: var(--space-2);
+  --space-grid: var(--space-2);
+  --space-footer: var(--space-4);
+  /* Text laid over an image (the Top 8's cover tiles) sits on --scrim in both schemes. */
+  --on-image: #f6f1e9;
+
   /* Targets: the WCAG 2.5.5 size for controls, and the 2.5.8 minimum for inline list links (F2). */
   --target: 44px;
   --target-min: 24px;
@@ -101,10 +116,18 @@
   --shadow-menu: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
 }
 
+@media (min-width: 900px) {
+  :root {
+    --space-section: var(--space-8);
+  }
+}
+
 /* Breakpoints (documented constants, not tokens: a custom property cannot drive an @media
    condition in plain CSS). A change is made in every file that names the value.
+   360px  the Top 8 tiles go two across (Top8)
    560px  the doors side by side; previous and next (Doors, PrevNext)
-   900px  the second hero column; section spacing (IdentityCard, base.css)
+   900px  the second hero column; the section gap steps up (IdentityCard, tokens.css); the Home
+          profile columns (index.astro)
    1024px the primary nav expands; the contents side column; the artifact two-column layout
           (PrimaryNav, TableOfContents, [collection]/[slug])
    1200px the 270 px portrait (IdentityCard)

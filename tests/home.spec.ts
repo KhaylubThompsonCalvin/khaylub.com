@@ -73,14 +73,16 @@ test.describe('home', () => {
   test('empty optional blocks are not rendered; present blocks are', async ({ page }) => {
     await page.goto('/');
     const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(' as of')[0].trim());
-    // Journal, On repeat, and Interests render only when their content files have entries.
+    // Journal and On repeat render only when their content files have entries; the profile modules
+    // (F5, document 65) are present: Details carries the filled interests groups as rows.
     expect(names).not.toContain('Latest from the journal');
     expect(names).not.toContain('On repeat');
-    expect(names).toContain('Interests');
+    for (const module of ['Details', 'Contact', 'Writing', 'Library']) expect(names).toContain(module);
+    await expect(page.locator('.details dt', { hasText: 'Building' })).toBeVisible();
     expect(await page.locator('main').innerText()).not.toMatch(/No entries yet/);
   });
 
-  test('Top 8 is an ordered list of linked cards', async ({ page }) => {
+  test('Top 8 is an ordered list of linked, ranked, captioned tiles', async ({ page }) => {
     await page.goto('/');
     const items = page.locator('ol.top8 > li');
     const n = await items.count();
@@ -89,6 +91,21 @@ test.describe('home', () => {
     for (let i = 0; i < n; i++) {
       const href = await items.nth(i).getByRole('link').first().getAttribute('href');
       expect(href).toMatch(/^\/[a-z]+\/[a-z0-9-]+\/$/);
+      // The rank is in the accessible name (the visually hidden prefix) and shown as a numeral.
+      await expect(items.nth(i).getByRole('heading', { level: 3 })).toContainText(`Rank ${i + 1}.`);
+      await expect(items.nth(i).locator('.tile-rank')).toHaveText(String(i + 1).padStart(2, '0'));
+      await expect(items.nth(i).locator('.tile-cap')).not.toBeEmpty();
     }
+  });
+
+  test('the profile modules follow the phone order in the DOM and sit in two columns at 1440', async ({ page }) => {
+    await page.goto('/');
+    const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(/\s+as of/)[0].trim());
+    expect(names.slice(0, 6)).toEqual(['Now', "Khaylub's Top 8", 'Writing', 'Library', 'Details', 'Contact']);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const [now, top8, details] = await Promise.all(['#now-heading', '#top8-heading', '#details-heading'].map((s) => page.locator(s).boundingBox()));
+    expect(now!.x, 'Now in the left column').toBeLessThan(top8!.x);
+    expect(details!.x, 'Details under Now').toBe(now!.x);
+    expect(Math.abs(now!.y - top8!.y), 'Now and the Top 8 start on the same row').toBeLessThan(8);
   });
 });

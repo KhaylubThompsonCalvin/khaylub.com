@@ -1,0 +1,61 @@
+---
+// The Details module of the Home profile (F5, document 65): labelled rows drawn from the profile
+// data that already exists (education, the roles sought, certifications, the interests groups).
+// Nothing here is new copy; a row renders only when its source has a value.
+import { availability, education, certifications, interests, periodLabel } from '@lib/profile';
+
+const edu = education().entries[0];
+const avail = availability();
+const certs = certifications();
+const groups = interests().groups.filter((g) => g.items.length > 0);
+const rows: { term: string; html?: string; text?: string; links?: { label: string; href: string }[] }[] = [];
+if (edu) rows.push({ term: 'Studying', text: `${edu.program}, ${edu.institution}, ${periodLabel(edu.start, edu.end)}` });
+if (avail.roles_sought.length) rows.push({ term: 'Looking for', text: avail.roles_sought.join('; ') });
+if (certs.items.length) rows.push({ term: 'Certified', text: `${certs.items[0].name}, ${certs.items[0].issuer}` });
+if (certs.planned.length) rows.push({ term: 'Planned', text: certs.planned.join(', ') });
+for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ label: it.label, href: it.url ?? `/tags/${it.tag}/` })) });
+---
+
+{
+  rows.length > 0 && (
+    <section class="module" aria-labelledby="details-heading">
+      <h2 id="details-heading" class="module-heading">Details</h2>
+      <dl class="details">
+        {rows.map((r) => (
+          <div>
+            <dt>{r.term}</dt>
+            <dd>
+              {r.text}
+              {r.links?.map((l, i) => (
+                <>
+                  <a href={l.href}>{l.label}</a>
+                  {i < r.links!.length - 1 ? ' · ' : ''}
+                </>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+<style>
+  .details {
+    margin: 0;
+    font-size: var(--size-card);
+  }
+  .details div {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: var(--space-1);
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .details dt {
+    color: var(--text-secondary);
+  }
+  .details dd {
+    margin: 0;
+  }
+</style>

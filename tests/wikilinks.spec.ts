@@ -26,7 +26,7 @@ test.describe('the wikilink resolver', () => {
     expect(flag.type).toBe('html');
     expect(flag.value).not.toContain('<img');
     expect(flag.value).toContain('&lt;img src=x onerror=alert(1)&gt;');
-    expect(flag.value).toMatch(/^<span class="unresolved-link"/);
+    expect(flag.value).toMatch(/^<span class="unresolved-link(?: [^"]*)?"/);
     const [draft] = splitTextNode('[[beta]]', targets, true, 'x.md') as any[];
     expect(draft.type).toBe('link');
   });
