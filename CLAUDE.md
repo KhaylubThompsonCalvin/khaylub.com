@@ -61,11 +61,18 @@ authority; `src/styles/tokens.css` implements them (light and dark palettes, foc
 reduced-motion block). Use the tokens. Do not add colors, fonts, or motion outside them, and do not
 redesign: Phase 10 composes the existing components against the Phase 6 wireframes (W1 Home,
 W2 Work, W16 mobile navigation). A design skill may guide composition; it never overrides the
-tokens or the wireframes. Since the design initiative (vault documents 57 to 64): the palette is F4's
+tokens or the wireframes. Since the design initiative (vault documents 57 to 65): the palette is F4's
 warm paper with a working sienna accent in both schemes (decision D-32), with two link treatments on
 purpose (chrome links ink; links inside content sienna and underlined; colour never the only cue),
 the blue focus ring separate from the accent, and an Appearance control (Light, Dark, System) in the
-footer remembered on the device; the typography is F3's Fraunces and KT Sans (D-31).
+footer remembered on the device; the typography is F3's Fraunces and KT Sans (D-31); the spacing is
+F5's semantic layer in `tokens.css` (`--space-section`, `--space-intro`, `--space-header-body`,
+`--space-module`, `--space-card`, `--space-grid`, the page and footer roles; the owner's direction B,
+balanced), and the Home page below the hero is the profile composition of the Visual North Star
+(document 65): Now, the Top 8 as ranked captioned tiles (`Top8.astro`, the tile pattern in
+`base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
+that is the phone order, two columns from 900 px. Component styles are scoped by class
+(`scopedStyleStrategy: 'class'`) to keep the one stylesheet inside its 36 KiB line.
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 
