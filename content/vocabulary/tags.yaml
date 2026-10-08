@@ -18,3 +18,4 @@ terms:
   - { slug: tableau, label: Tableau, description: Tableau workbooks and public stories. }
   - { slug: estimating, label: Estimating, description: Turning measurements into defensible bids. }
   - { slug: writing, label: Writing, description: Essays, letters, and poems, as writing. }
+  - { slug: philosophy, label: Philosophy, description: Questions about knowledge, science, and what is real. }

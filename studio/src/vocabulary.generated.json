@@ -71,6 +71,10 @@
     {
       "label": "Writing",
       "value": "writing"
+    },
+    {
+      "label": "Philosophy",
+      "value": "philosophy"
     }
   ],
   "skills": [
