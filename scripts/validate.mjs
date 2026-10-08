@@ -244,7 +244,7 @@ if (hasDist && existsSync('dist/resume/index.html')) {
       'sql to python analytics pipeline',
       'production specialist, planar systems',
       'esd and calibration certified',
-      'planned: comptia a+ and comptia security+',
+      'associate of applied science, computer information systems',
     ];
     for (const p of probes) {
       if (!pdfText.includes(p)) warnings.push(`résumé probe not found in the PDF text: "${p}"`);

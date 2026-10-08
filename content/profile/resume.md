@@ -1,68 +1,68 @@
 ---
-revision: "2.2"
-as_of: 2026-09-09
+revision: "2.4"
+as_of: 2026-10-07
 pdf: /resume/Khaylub-Thompson-Calvin-Resume.pdf
 ---
 
 ## Khaylub Thompson-Calvin
 
-IT Support and Security Track · Computer Information Systems Student · Available now
+IT Support and Data Analysis | Computer Information Systems Student | Available now
 
-Hillsboro, OR · khaylubthompsoncalvin@gmail.com · linkedin.com/in/khaylub-thompson-calvin-40543b294 · khaylub.com · github.com/KhaylubThompsonCalvin
+Hillsboro, OR | khaylubthompsoncalvin@gmail.com | linkedin.com/in/khaylub-thompson-calvin-40543b294 | github.com/KhaylubThompsonCalvin | khaylub.com
 
 ## Summary
 
-Computer Information Systems student at Portland Community College with 7+ years of hands-on experience troubleshooting, repairing, and calibrating advanced display systems at Planar Systems. Methodical and documentation-driven, with a record of delivering finished work: a live portfolio website, two published Python data-analysis projects, and a data analytics course completed with full credit on every lab. Ready to bring that same discipline to an IT support team now, with cybersecurity as the long-term goal.
+Computer Information Systems student at Portland Community College with 7+ years of hands-on hardware troubleshooting, repair, and calibration at Planar Systems. Works from technical documentation, writes clear procedures, and has trained new employees on diagnostic and calibration work. Has published three data projects in Python, SQL, and Tableau. Seeking an IT support or help desk role, with cybersecurity as the long-term goal.
 
-## Core strengths
+## Skills
 
-Diagnosing and repairing hardware · Testing, calibration, and quality checks · Training new employees · Working from technical documentation · Python and SQL data analysis · Building and shipping websites
-
-## Technical skills
-
-- Systems and tools: Windows, Microsoft Excel, Git and GitHub, Tableau, Arena PLM
-- Programming and data: Python (pandas, scikit-learn, matplotlib), SQL (SQL Server), JupyterLab
+- Support and troubleshooting: hardware diagnostics and repair, testing and calibration, technical documentation, training and onboarding, quality inspection
+- Systems and tools: Windows, Microsoft Excel, Git and GitHub, Arena PLM, electrostatic discharge (ESD) safe handling
+- Data: SQL (SQL Server), Python (pandas, scikit-learn, matplotlib), JupyterLab, Tableau, data cleaning and validation, regression
 - Web: HTML, CSS, JavaScript, React, Three.js
-- Hardware and quality: electronics repair, calibration, high-voltage (Hipot) safety testing, ESD-safe handling, final quality inspection
 
 ## Experience
 
-### Production Specialist, Planar Systems Inc. · Hillsboro, OR · Dec 2017 to Aug 2025
+### Production Specialist, Planar Systems Inc. | Hillsboro, OR | Dec 2017 to Aug 2025
 
-- Diagnosed and repaired advanced display systems and electronic assemblies for 7+ years, returning units to specification through calibration and testing.
-- Performed high-voltage (Hipot) safety testing and precision calibration so each unit met product integrity and safety requirements before shipment.
-- Trained new employees on cabinet calibration, LED module assembly, and chassis troubleshooting, and led manufacturing projects.
-- Repaired to specification by working from Arena PLM engineering drawings and work instructions; maintained ESD safety standards.
+- Diagnosed and repaired faults in advanced display systems and electronic assemblies for 7+ years, testing and calibrating each unit back to specification.
+- Performed high-voltage (Hipot) safety testing and precision calibration so every unit met safety and quality requirements before shipment.
+- Provided internal technical training to new employees on cabinet calibration, LED module assembly, and chassis troubleshooting, and led manufacturing projects.
+- Repaired to specification from Arena PLM engineering drawings and work instructions, following ESD safety standards.
 - Partnered with engineering and production teams on process improvements.
 
 ## Projects
 
-### Fuel Economy Regression Case Study · Python · github.com/KhaylubThompsonCalvin/fuel-economy-analysis
+### Khaylub.com, personal portfolio and library | Live | khaylub.com
 
-- Analyzed 398 vehicles to find what predicts fuel economy; built regression models that explain 79% of the variation in unseen test data and documented what the model cannot claim.
-- Cleaned and corrected the raw data before modeling, including fixing 8 misspelled manufacturer names that would have split brands across the results.
+- Directed and implemented the Khaylub.com rebuild using Astro, GitHub-based workflows, automated testing, and AI-assisted development.
+- Verified the September 2026 rebuild with more than 1,200 automated tests, continuous integration on GitHub Actions, WCAG 2.2 AA accessibility checks, and security headers; the first version launched in June 2026, three months ahead of its target date.
 
-### SQL to Python Analytics Pipeline · Python, SQL · github.com/KhaylubThompsonCalvin/sql-python-analytics-pipeline
+### Fuel Economy Regression Case Study | Python | github.com/KhaylubThompsonCalvin/fuel-economy-analysis
 
-- Built a reproducible analysis of 146 years of public Social Security name data (1880 to 2025) in Python and Jupyter, from download to charts, so anyone can re-run it without database access.
-- Kept the original SQL Server integration as working evidence of database connectivity, with credentials handled through environment variables.
+- Analyzed 398 vehicles to find what predicts fuel economy; the regression model explains 79% of the variation in unseen test data, and its limits are documented.
+- Cleaned and validated the data first, correcting misspelled manufacturer names so 37 apparent makes became the 29 real ones.
 
-### Khaylub.com, personal portfolio site · Live · khaylub.com
+### SQL to Python Analytics Pipeline | Python, SQL | github.com/KhaylubThompsonCalvin/sql-python-analytics-pipeline
 
-- Designed, built, and launched a portfolio site three months ahead of its target date using React, Three.js, and Blender 3D models.
-- Set up and fixed the full build-and-deploy pipeline and documented each fix for reuse.
+- Built a reproducible analysis of 146 years of public Social Security name data (1880 to 2025), from download to charts, runnable without database access.
+- Kept the original SQL Server connection as working evidence, with credentials held in environment variables.
+
+### Data Science Salary Story | Tableau | public.tableau.com/app/profile/khaylub.thompson
+
+- Published a four-point Tableau story on 6,599 salary records comparing pay by location, role, experience, and year, with the data's limits stated.
 
 ## Education
 
-### Computer Information Systems, Portland Community College · Portland, OR · Dec 2023 to present, full-time
+### Associate of Applied Science, Computer Information Systems | Dec 2023 to present
 
-- Data Analytics (CIS277A): completed Summer 2026 with full credit on all ten labs.
+Portland Community College, Portland, OR
+
+- Completed Data Analytics (CIS 277A), Summer 2026, with full credit on all ten labs; in progress: Advanced SQL (CIS 276), Technical Writing (WR 227).
 - PCC AI Hackathon (Mar 2026): trained a JetBot robot with a collision-detection model.
 
-### Law Studies (attended), University of Arizona · Tucson, AZ · 2016 to 2017
+### Law Studies (attended), University of Arizona | Tucson, AZ | 2016 to 2017
 
-## Certifications and training
+## Certifications and Training
 
-ESD and Calibration Certified (Planar Systems, 2017 to 2025) · Hipot Testing Calibration Procedures · Final Quality Check and First Turn-On Processes · Lean Manufacturing and Continuous Improvement
-
-Planned: CompTIA A+ and CompTIA Security+
+ESD and Calibration Certified, Planar Systems (2017 to 2025) | Hipot Testing Calibration Procedures | Final Quality Check and First Turn-On Processes | Lean Manufacturing and Continuous Improvement
