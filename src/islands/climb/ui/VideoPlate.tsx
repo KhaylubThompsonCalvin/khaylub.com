@@ -1,4 +1,4 @@
-// A Higgsfield atmosphere plate washed over the live scene, ported from V1
+// A generated atmosphere plate washed over the live scene, ported from V1
 // (src/ui/VideoAtmosphere.jsx): a muted loop whose opacity is driven by scroll so it fades in and
 // out with its beat. Under prefers-reduced-motion it is paused and hidden. A plate whose beat is
 // deep in the scroll arms (gets its src) only once scroll crosses `deferUntil`. These plates are

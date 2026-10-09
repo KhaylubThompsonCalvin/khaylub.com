@@ -32,9 +32,9 @@ images:
     caption: 6. The Summit, from the ported climb on this site, 2026-09-12.
 related: [khaylub-com-v1, the-climb, the-16-mb-front-door]
 provenance:
-  source: The author's own screenshots of the author's own site. The first five show the live first version at khaylub.com on 2026-09-09 (the Phase 2 audit, Playwright at 1440 by 900); the sixth shows the ported climb on this site on 2026-09-12. The scenes contain the Wanderer and the Phoenix (Tripo base meshes finished in Blender by the author) and Higgsfield atmosphere plates, each recorded in public/climb/provenance.yaml.
+  source: The author's own screenshots of the author's own site. The first five show the live first version at khaylub.com on 2026-09-09 (the Phase 2 audit, Playwright at 1440 by 900); the sixth shows the ported climb on this site on 2026-09-12. The scenes contain the Wanderer and the Phoenix (generated base meshes finished in Blender by the author) and generated atmosphere plates, each recorded in public/climb/provenance.yaml.
   license: All rights reserved; the author's own screenshots of the author's own site
-  generator: Tripo and Higgsfield for the assets in frame, as recorded; the screenshots themselves are plain captures
+  generator: A 3D generation service and a video generation service for the assets in frame, as recorded; the screenshots themselves are plain captures
   date: 2026-09-09
 ---
 
@@ -56,8 +56,8 @@ distant ridges procedurally, so its summit frame carries only assets with a prov
 
 ## What is in frame
 
-The Wanderer and the Phoenix began as Tripo generations and were finished in Blender by the
-author; the grass, fog, embers, and summit clouds are Higgsfield atmosphere plates generated from
+The Wanderer and the Phoenix began as 3D generations and were finished in Blender by the
+author; the grass, fog, embers, and summit clouds are atmosphere plates generated with a video generation service from
 the author's prompts (the [[khaylub-com-v1|V1 case study]] states both). Each still is
 the author's own screenshot at 1440 by 900, served through the image pipeline at the size your
 screen needs.

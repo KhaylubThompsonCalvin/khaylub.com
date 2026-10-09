@@ -8,7 +8,7 @@ date: 2026-06-24
 updated: 2026-09-12
 summary: A scroll-driven 3D portfolio built with React Three Fiber and Blender, launched in June 2026 and kept as the opt-in front door of this site.
 problem: A first portfolio that showed who I am and what I can build, on a shipping deadline, before I had a body of public work to point at.
-role: "Sole author of the concept, site design, scene assembly, Blender finishing, copy, deployment, and preservation; AI-assisted code, with Tripo-generated 3D bases and Higgsfield-generated atmosphere plates."
+role: "Sole author of the concept, site design, scene assembly, Blender finishing, copy, deployment, and preservation; AI-assisted code, with generated 3D bases and generated atmosphere plates."
 tags: [three-js, react, blender, performance, portfolio]
 skills: [web-development, 3d-pipeline, performance-analysis]
 technologies: [react-three-fiber, three-js, vite, blender, lenis, zustand]
@@ -86,14 +86,14 @@ because it would not have taught me the pipeline I wanted to learn.
 
 The concept, the scene composition, the six-beat copy and its per-word reveal, the project dialog,
 the scroll and state wiring, the Render deployment, and later the preservation (tag, locked branch,
-release). The assets, stated plainly: the Wanderer's base mesh and auto-rig were generated in Tripo
+release). The assets, stated plainly: the Wanderer's base mesh and auto-rig were generated
 from a reference image, then cleaned, re-rigged where the generation failed (the glasses had fused
 into the head mesh and were rebuilt as a separate object), and finished by me in Blender; the
-Phoenix began as a Tripo generation, was retopologized in Tripo and kept its Tripo auto-rig, and I
+Phoenix began as a 3D generation, was retopologized and auto-rigged by the same service, and I
 authored its wing flap in Blender on that rig (a Rigify rebuild was documented as a fallback, not
 the rig that shipped); its origin record is still marked for confirmation in my media inventory
 (Phoenix SOP and integration notes of 2026-06-20 and 2026-06-21); the four atmosphere video plates were
-generated with Higgsfield from my prompts (session records of 2026-06-18 and 2026-06-21). The code
+generated with a video generation service from my prompts (session records of 2026-06-18 and 2026-06-21). The code
 was written with AI assistance in Claude Code, working from my own specifications, checkpoints, and
 review; the repository's `CLAUDE.md` and the dated checkpoint notes in my vault record that
 working method. The design decisions, the direction of every asset, and the testing are mine.
