@@ -18,9 +18,9 @@ images:
     caption: The Wanderer on the trail, rendered in Blender, June 2026.
 related: [khaylub-com-v1, wanderer-pipeline]
 provenance:
-  source: Blender render by the author of the Wanderer character, whose base mesh and auto-rig were generated in Tripo from the author's reference image and then cleaned, re-rigged where needed, and finished in Blender by the author. Taken from the V1 repository (website/assets/wanderer-hero.png, 1920 by 1080) and resized to 1600 px.
+  source: Blender render by the author of the Wanderer character, whose base mesh and auto-rig were generated from the author's reference image and then cleaned, re-rigged where needed, and finished in Blender by the author. Taken from the V1 repository (website/assets/wanderer-hero.png, 1920 by 1080) and resized to 1600 px.
   license: All rights reserved
-  generator: Tripo (base mesh and auto-rig); Blender render by the author
+  generator: A 3D generation service (base mesh and auto-rig); Blender render by the author
   date: 2026-06-18
 ---
 
@@ -34,7 +34,7 @@ the hero image of the first version's no-WebGL fallback page, the static site ke
 
 ## How it was made
 
-The character's base mesh and auto-rig came out of Tripo from my own reference image; I cleaned
+The character's base mesh and auto-rig was generated from my own reference image; I cleaned
 the mesh, re-rigged the parts the generation got wrong (the glasses had fused to the head), and
 finished the materials and the pose in Blender before exporting the web version with meshopt
 compression (source: the V1 case study, "Technology choices" and "What I built"). The rocks,

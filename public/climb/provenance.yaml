@@ -18,22 +18,22 @@ files:
     generator: A 3D generation service (base mesh, retopology, auto-rig); Blender finishing by the author
     date: 2026-06-20
   dawn-grass.mp4:
-    source: Atmosphere video plate for the V1 climb, generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
-    license: Generated output under the author's Higgsfield account; the service terms apply.
-    generator: Higgsfield
+    source: Atmosphere video plate for the V1 climb, generated with a video generation service from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's account with that service; its terms apply.
+    generator: A video generation service
     date: 2026-06-21
   fog-trail.mp4:
-    source: Atmosphere video plate for the V1 climb (ground fog), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1920 by 1080, 7.0 s.
-    license: Generated output under the author's Higgsfield account; the service terms apply.
-    generator: Higgsfield
+    source: Atmosphere video plate for the V1 climb (ground fog), generated with a video generation service from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1920 by 1080, 7.0 s.
+    license: Generated output under the author's account with that service; its terms apply.
+    generator: A video generation service
     date: 2026-06-21
   embers.mp4:
-    source: Atmosphere video plate for the V1 climb (embers), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
-    license: Generated output under the author's Higgsfield account; the service terms apply.
-    generator: Higgsfield
+    source: Atmosphere video plate for the V1 climb (embers), generated with a video generation service from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's account with that service; its terms apply.
+    generator: A video generation service
     date: 2026-06-21
   summit-clouds.mp4:
-    source: Atmosphere video plate for the V1 climb (summit clouds), generated with Higgsfield from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
-    license: Generated output under the author's Higgsfield account; the service terms apply.
-    generator: Higgsfield
+    source: Atmosphere video plate for the V1 climb (summit clouds), generated with a video generation service from the author's prompts (the V1 case study cites session records of 2026-06-18 and 2026-06-21 without dating each plate); re-encoded for V2 with ffmpeg (H.264 CRF 23, 5 Mbps cap, audio track removed), 1280 by 720, 5.0 s.
+    license: Generated output under the author's account with that service; its terms apply.
+    generator: A video generation service
     date: 2026-06-21

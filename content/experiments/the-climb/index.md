@@ -18,9 +18,9 @@ entry_url: /climb/
 payload_mb: 7.4
 related: [khaylub-com-v1, the-16-mb-front-door, preserving-v1, the-climb-recording, the-climb-beat-by-beat]
 provenance:
-  source: The author's own screenshot of the ported climb on this site (the Spark Wakes beat at 1440 by 900), taken with Playwright on 2026-09-12. The scene contains the Wanderer and the Phoenix (Tripo base meshes finished in Blender by the author) and a Higgsfield atmosphere plate, each recorded in public/climb/provenance.yaml.
+  source: The author's own screenshot of the ported climb on this site (the Spark Wakes beat at 1440 by 900), taken with Playwright on 2026-09-12. The scene contains the Wanderer and the Phoenix (generated base meshes finished in Blender by the author) and a generated atmosphere plate, each recorded in public/climb/provenance.yaml.
   license: All rights reserved; the author's own screenshot of the author's own site
-  generator: Tripo and Higgsfield for the assets in frame, as recorded; the screenshot itself is a plain capture
+  generator: A 3D generation service and a video generation service for the assets in frame, as recorded; the screenshot itself is a plain capture
   date: 2026-09-12
 ---
 
@@ -75,7 +75,7 @@ them.
 
 ## Where the assets come from
 
-The Wanderer and the Phoenix began as Tripo generations and were finished in Blender by the
-author; the four plates were generated with Higgsfield from the author's prompts. Each file under
+The Wanderer and the Phoenix began as 3D generations and were finished in Blender by the
+author; the four plates were generated with a video generation service from the author's prompts. Each file under
 `public/climb/` has an entry in `public/climb/provenance.yaml`, and the build fails if one is
 missing.

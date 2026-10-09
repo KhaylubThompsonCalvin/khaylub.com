@@ -16,9 +16,9 @@ poster: poster.webp
 files: [the-climb-recording.mp4]
 related: [the-climb, khaylub-com-v1, the-climb-beat-by-beat]
 provenance:
-  source: The author's own screen recording of the ported climb on this site, made with Playwright at 1440 by 900 on 2026-09-12 (a scripted scroll of 24 seconds with a pause at each end), encoded with ffmpeg. The scene contains the Wanderer and the Phoenix (Tripo base meshes finished in Blender by the author) and Higgsfield atmosphere plates, each recorded in public/climb/provenance.yaml.
+  source: The author's own screen recording of the ported climb on this site, made with Playwright at 1440 by 900 on 2026-09-12 (a scripted scroll of 24 seconds with a pause at each end), encoded with ffmpeg. The scene contains the Wanderer and the Phoenix (generated base meshes finished in Blender by the author) and generated atmosphere plates, each recorded in public/climb/provenance.yaml.
   license: All rights reserved; the author's own recording of the author's own site
-  generator: Tripo and Higgsfield for the assets in frame, as recorded; the recording itself is a plain screen capture
+  generator: A 3D generation service and a video generation service for the assets in frame, as recorded; the recording itself is a plain screen capture
   date: 2026-09-12
 ---
 
