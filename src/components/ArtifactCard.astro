@@ -37,10 +37,10 @@ const call = { kind: entry.collection, fact: tag ? labelFor('tags', tag) : Strin
   {detail && <ProjectFacts entry={entry} compact />}
   {
     chips.length > 0 && (
-      <ul class="chips" aria-label="Technologies">
+      <><span class="visually-hidden">Technologies:</span><ul class="chips">
         {chips.map((c) => <li>{c.href ? <a class="chip" href={c.href}>{c.label}</a> : <span class="chip">{c.label}</span>}</li>)}
         {more > 0 && <li class="chip">+{more}</li>}
-      </ul>
+      </ul></>
     )
   }
   {/* Callers may add a line under the summary (the related rail's one-line reason). */}
