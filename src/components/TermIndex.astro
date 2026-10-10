@@ -1,0 +1,38 @@
+---
+// The index of a vocabulary (tags, skills, technologies; the 2026-10-10 polish): the address a
+// visitor edits by hand (/tags/) answers with every term that has published work, its count, and a
+// link to its page, so no level of the URL is a dead end.
+import Breadcrumb from './Breadcrumb.astro';
+import { termPages } from '@lib/catalog';
+
+interface Props {
+  kind: 'tags' | 'skills' | 'technologies';
+  title: string;
+  lead: string;
+}
+const { kind, title, lead } = Astro.props;
+const terms = (await termPages(kind)).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+const route = `/${kind}/`;
+---
+
+<Breadcrumb trail={[{ name: 'Home', path: '/' }, { name: 'Library', path: '/library/' }, { name: title, path: route }]} />
+<header class="page-intro measure-reading">
+  <h1>{title}</h1>
+  <p>{lead} {terms.length} in all.</p>
+</header>
+{
+  terms.length > 0 ? (
+    <ul class="row-list measure-reading">
+      {terms.map((t) => (
+        <li>
+          <a href={`${route}${t.slug}/`}>{t.label}</a>
+          <span class="small muted">
+            {t.count} {t.count === 1 ? 'item' : 'items'}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="muted">Nothing is published under these yet.</p>
+  )
+}
