@@ -61,7 +61,7 @@ test.describe('home', () => {
   test('blocks appear in the required DOM order', async ({ page }) => {
     await page.goto('/');
     const order = await page.locator('main h1, main h2').evaluateAll((els) => els.map((e) => e.textContent?.trim().split(' as of')[0] ?? ''));
-    expect(order.slice(0, 4)).toEqual(['Khaylub Thompson-Calvin', 'The climb', 'Now', "Khaylub's Top 8"]);
+    expect(order.slice(0, 4)).toEqual(['Khaylub Thompson-Calvin', 'The climb', 'Now', 'Looking for']);
     const recruiter = page.getByRole('navigation', { name: 'Quick links' }).getByRole('link');
     await expect(recruiter).toHaveText(['About', 'GitHub', 'Résumé', 'Contact']);
   });
@@ -79,7 +79,8 @@ test.describe('home', () => {
 
   test('empty optional blocks are not rendered; present blocks are', async ({ page }) => {
     await page.goto('/');
-    const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(' as of')[0].trim());
+    // textContent, not innerText: a block's label is set in capitals by CSS, the words are not.
+    const names = (await page.locator('main h2').allTextContents()).map((h) => h.split(' as of')[0].trim());
     // Journal and On repeat render only when their content files have entries; the profile modules
     // (F5, document 65) are present: Details carries the filled interests groups as rows.
     expect(names).not.toContain('Latest from the journal');
@@ -105,19 +106,47 @@ test.describe('home', () => {
     }
   });
 
-  test('the profile modules follow the phone order in the DOM and sit in two columns at 1440', async ({ page }) => {
+  test('the blocks follow the phone order in the DOM and form the grid at 1440: identity full width, the climb beside Now and Looking for, the Top 8 full width', async ({ page }) => {
     await page.goto('/');
-    const names = (await page.locator('main h2').allInnerTexts()).map((h) => h.split(/\s+as of/)[0].trim());
-    expect(names.slice(0, 7)).toEqual(['The climb', 'Now', "Khaylub's Top 8", 'Writing', 'Library', 'Details', 'Contact']);
+    const names = (await page.locator('main h2').allTextContents()).map((h) => h.split(/\s+as of/)[0].trim());
+    expect(names.slice(0, 8)).toEqual(['The climb', 'Now', 'Looking for', "Khaylub's Top 8", 'Writing', 'Library', 'Details', 'Contact']);
     await page.setViewportSize({ width: 1440, height: 900 });
-    const [now, top8, details] = await Promise.all(['#now-heading', '#top8-heading', '#details-heading'].map((s) => page.locator(s).boundingBox()));
-    expect(now!.x, 'Now in the left column').toBeLessThan(top8!.x);
-    expect(details!.x, 'Details under Now').toBe(now!.x);
-    // The identity column's modules sit in plates (the redesign), so the modules' boxes, not their
-    // headings, share the row.
-    const [nowBox, top8Box] = await Promise.all(['.profile .now .module', '.profile .top8-col .section'].map((s) => page.locator(s).boundingBox()));
-    expect(Math.abs(nowBox!.y - top8Box!.y), 'Now and the Top 8 start on the same row').toBeLessThan(8);
+    const box = (s: string) => page.locator(s).first().boundingBox();
+    const [hero, band, now, looking, top8, grid] = await Promise.all(['.bento > .hero', '.bento > .climb-band', '.bento > [aria-labelledby="now-heading"]', '.bento > [aria-labelledby="looking-heading"]', '.bento > [aria-labelledby="top8-heading"]', '.bento'].map(box));
+    expect(Math.abs(hero!.width - grid!.width), 'the identity block runs the full width').toBeLessThan(2);
+    expect(band!.y, 'the climb under the identity block').toBeGreaterThan(hero!.y + hero!.height - 1);
+    for (const b of [now!, looking!]) {
+      expect(Math.abs(b.y - band!.y), 'Now and Looking for on the climb row').toBeLessThan(2);
+      expect(Math.abs(b.height - band!.height), 'equal heights on the row, no hole').toBeLessThan(2);
+    }
+    expect(now!.x, 'Now to the right of the climb').toBeGreaterThan(band!.x + band!.width - 1);
+    // The portrait is large on a laptop (about the live site's size) and never upscaled.
+    const photo = await page.locator('.hero .id-photo img').boundingBox();
+    expect(photo!.width, 'a large portrait at 1440').toBeGreaterThanOrEqual(260);
+    expect(Math.abs(top8!.width - grid!.width), 'the Top 8 runs the full width').toBeLessThan(2);
   });
+
+  test('the portrait opens the identity block above the name at 390 wide, large and sharp, and the doors are above the fold', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    const hero = page.locator('.bento > .hero');
+    const img = hero.locator('.id-photo img');
+    await expect(img).toHaveCount(1);
+    const [name, photo, heroBox] = await Promise.all([hero.locator('h1').boundingBox(), img.boundingBox(), hero.boundingBox()]);
+    expect(photo!.width, 'a large portrait on a phone').toBeGreaterThanOrEqual(160);
+    expect(photo!.y + photo!.height, 'the portrait above the name, never between the statement and the doors').toBeLessThanOrEqual(name!.y);
+    expect(photo!.y, 'inside the block').toBeGreaterThanOrEqual(heroBox!.y);
+    for (const n of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
+      const door = await page.getByRole('link', { name: n }).boundingBox();
+      expect(door!.y + door!.height, n + ' above the fold').toBeLessThanOrEqual(844);
+      expect(door!.y, n + ' after the portrait').toBeGreaterThan(photo!.y + photo!.height);
+    }
+    // Never upscaled: the chosen file is at least the rendered width times the device pixel ratio.
+    await img.evaluate((e: HTMLImageElement) => (e.complete ? null : new Promise((r) => (e.onload = r))));
+    const fit = await img.evaluate((e: HTMLImageElement) => ({ natural: e.naturalWidth, need: e.getBoundingClientRect().width * devicePixelRatio }));
+    expect(fit.natural, 'the file covers the rendered pixels').toBeGreaterThanOrEqual(Math.floor(fit.need));
+  });
+
   test('the climb band leads to the remastered climb; every Top 8 tile shows a picture or a typographic tile; Search has its magnifier', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');

@@ -84,7 +84,7 @@ test.describe('design tokens', () => {
       '--muted': '#574c3b',
       '--accent': '#8a4b1f',
       '--card': '#f6f1e9',
-      '--line': '#cbbfae',
+      '--line': '#957f60',
       '--focus': '#1d4ed8',
       '--notice': '#7a5b15',
       '--surface': 'var(--card)',

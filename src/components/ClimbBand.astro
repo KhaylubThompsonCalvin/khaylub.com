@@ -21,7 +21,7 @@ const { standalone = false } = Astro.props;
     src={standalone ? june : wheat}
     alt={standalone ? '' : 'A traveller with a pack walks a trodden lane through golden wheat toward a lone tree and a low sun.'}
     widths={[480, 720, 960]}
-    sizes="(min-width: 1200px) 1104px, 100vw"
+    sizes={standalone ? '(min-width: 1200px) 1104px, 100vw' : '(min-width: 1024px) 560px, 100vw'}
     formats={['avif', 'webp']}
     fallbackFormat="webp"
     loading="eager"

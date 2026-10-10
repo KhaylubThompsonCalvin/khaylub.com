@@ -8,17 +8,19 @@ import Details from '@components/profile/Details.astro';
 import Contact from '@components/profile/Contact.astro';
 import Writing from '@components/profile/Writing.astro';
 import Library from '@components/profile/Library.astro';
-import { identity, onRepeat } from '@lib/profile';
+import { identity, onRepeat, availability } from '@lib/profile';
 import { published } from '@lib/catalog';
 import { personAndWebsite } from '@lib/seo';
 
-// The Home page is a profile (the visual redesign, vault document 65): the approved hero, then the
-// climb's poster band (the creative door, prominent and optional), then a module column (Now,
-// Details, Contact, boxed) beside an editorial column (the Top 8, Writing, the Library). The DOM
-// order is the phone order: hero, the climb, Now, the Top 8, Writing, the Library, Details,
-// Contact; at 900 px the grid places the modules in their columns.
+// The Home page is a grid of blocks (the owner's request of 2026-10-10, the developer-portfolio
+// convention): each block a card with its small label and one action. The DOM order is the phone
+// order: the identity block, the climb, Now, Looking for, the Top 8, Writing, the Library, Details,
+// Contact. Two columns from 640 px; four from 1024 px. The identity block and the Top 8 run the full
+// width; the climb takes two columns beside Now and Looking for; the rest pair up two by two, so no
+// row leaves a hole at any width.
 const id = identity();
 const repeat = onRepeat();
+const avail = availability();
 const journal = (await published('journal')).slice(0, 5);
 const jsonLd = await personAndWebsite();
 ---
@@ -29,19 +31,20 @@ const jsonLd = await personAndWebsite();
   current="home"
   jsonLd={jsonLd}
 >
-  <IdentityCard />
-  <ClimbBand />
-  <div class="profile">
-    <div class="now"><NowLine boxed /></div>
-    <div class="main">
-      <div class="top8-col"><Top8 /></div>
-      <div class="writing"><Writing /></div>
-      <div class="library"><Library /></div>
-    </div>
-    <div class="side">
-      <Details />
-      <Contact />
-    </div>
+  <div class="bento">
+    <IdentityCard />
+    <ClimbBand />
+    <NowLine />
+    <section class="module" aria-labelledby="looking-heading">
+      <h2 id="looking-heading" class="module-heading">Looking for</h2>
+      <ul class="row-list">{avail.roles_sought.map((r) => <li>{r}</li>)}</ul>
+      <p class="block-go"><a href="/resume/">Read the résumé</a></p>
+    </section>
+    <Top8 />
+    <Writing />
+    <Library />
+    <Details />
+    <Contact />
   </div>
 
   {
@@ -74,56 +77,82 @@ const jsonLd = await personAndWebsite();
 </BaseLayout>
 
 <style is:global>
-  .profile {
+  .bento {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-grid);
     margin-bottom: var(--space-section);
   }
-  .profile > .main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+  /* Every block is a card: the plate, its radius, one padding; it lifts a little under the pointer
+     (not under reduced motion). */
+  .bento > * {
+    margin: 0;
+    padding: var(--space-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: translate var(--motion-page), box-shadow var(--motion-page);
   }
-  /* Every module keeps the section gap below it; the last one on the page gives it back. */
-  .profile > .side > .module:last-child {
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .bento > :hover {
+      translate: 0 -2px;
+      box-shadow: var(--shadow-card);
+    }
+  }
+  .bento > * > :last-child {
     margin-bottom: 0;
   }
-  @media (min-width: 900px) {
-    /* Two columns: Now and the facts on the left, the work on the right. The right column spans
-       both rows; the second row takes the extra height so the facts sit right under Now. */
-    /* The identity column at 20rem (measured in owner design mode on 2026-09-23 against 17rem and
-       22rem): the Details rows read in two to three lines, the Top 8 tiles keep about 172 px. */
-    .profile {
-      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
-      grid-template-rows: auto 1fr;
-      column-gap: var(--space-6);
-      align-items: start;
+  .bento > .climb-band {
+    padding: 0;
+  }
+  /* A block's head is its small kind label (the as-of date beside it), not a second title. */
+  .bento .module-heading {
+    font: 600 var(--size-sm) / var(--leading-body) var(--font-body);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border: 0;
+    padding: 0;
+    margin-bottom: var(--space-1-5);
+  }
+  /* The climb's words keep to the left on their scrim, so the sun and the Wanderer stay clear. */
+  @media (min-width: 640px) {
+    .bento .climb-words {
+      background: linear-gradient(to right, var(--scrim) 60%, transparent 85%);
     }
-    .profile > .now {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    .profile > .side {
-      grid-column: 1;
-      grid-row: 2;
-    }
-    .profile > .main {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
-    .library .module {
-      margin-bottom: 0;
+    .bento .climb-words > * {
+      max-width: 20rem;
     }
   }
-  @media (min-width: 1200px) {
-    .profile > .main {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      column-gap: var(--space-8);
+  .bento .top8 {
+    max-width: none;
+  }
+  .block-go {
+    margin-top: var(--space-1);
+  }
+  @media (min-width: 640px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .top8-col {
+    .bento > * {
+      padding: var(--space-3);
+    }
+    .bento > :is(.hero, .climb-band, [aria-labelledby='top8-heading']) {
+      grid-column: span 2;
+    }
+  }
+  @media (min-width: 1024px) {
+    .bento {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .bento > * {
+      grid-column: span 2;
+    }
+    .bento > :is(.hero, [aria-labelledby='top8-heading']) {
       grid-column: 1 / -1;
     }
-    .writing .module {
-      margin-bottom: 0;
+    .bento > :is([aria-labelledby='now-heading'], [aria-labelledby='looking-heading']) {
+      grid-column: span 1;
     }
   }
 </style>

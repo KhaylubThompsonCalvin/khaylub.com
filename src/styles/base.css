@@ -523,16 +523,16 @@ small,
   padding: var(--space-1) 0;
   border-bottom: 1px solid var(--border);
 }
-.boxed .fact-table > div:last-child {
+.bento .fact-table > div:last-child {
   border-bottom: 0;
 }
 /* In a plate the label sits above its value, so the value keeps the plate's full width; the value
    text keeps its size, only the label is small. */
-.boxed .fact-table > div {
+.bento .fact-table > div {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
 }
-.boxed .fact-table dt {
+.bento .fact-table dt {
   font-size: var(--size-sm);
 }
 .fact-table dt {
@@ -616,7 +616,10 @@ small,
 .climb-band.standalone {
   margin-bottom: var(--space-4);
 }
-@media (min-width: 900px) {
+/* From 640 px the still fills the band and the words sit on the scrim at its foot: on Home the band
+   is a two-column block of the grid; on /climb/ (standalone) it is the page's head, and from 900 px
+   its first column stays empty so the Wanderer stands clear at the left of the still. */
+@media (min-width: 640px) {
   .climb-band {
     min-height: 21rem;
   }
@@ -628,19 +631,20 @@ small,
   .climb-band img {
     object-position: 0% 28%;
   }
-  /* The first column stays empty so the Wanderer stands clear at the left of the still. */
   .climb-words {
     align-self: end;
-    grid-template-columns: minmax(10rem, 1fr) minmax(0, 36rem) auto;
     align-items: end;
+    padding: var(--space-8) var(--space-3) var(--space-3);
+    background: linear-gradient(to top right, var(--scrim) 45%, transparent 80%);
+  }
+}
+@media (min-width: 900px) {
+  .standalone .climb-words {
+    grid-template-columns: minmax(10rem, 1fr) minmax(0, 36rem);
     padding: var(--space-4);
-    background: linear-gradient(to top, var(--scrim) 55%, transparent);
   }
-  .climb-words > div {
+  .standalone .climb-words > div {
     grid-column: 2;
-  }
-  .climb-go {
-    justify-items: end;
   }
 }
 
@@ -792,9 +796,6 @@ small,
   font-size: var(--size-sm);
   line-height: var(--leading-body);
   color: var(--text-secondary);
-}
-.tile-meta {
-  white-space: nowrap;
 }
 .signal {
   color: var(--signal);
@@ -950,7 +951,7 @@ figcaption {
   font-weight: 600;
 }
 
-/* Motion (the 2026-10-10 polish): pages cross-fade on a change and the content rises into place,
+/* Motion (the 2026-10-10 polish): pages cross-fade on a change and the content fades in,
    both over --motion-page, which is 0 s under reduced motion. The reveal starts from a trace of
    opacity, never zero, so the first paint still counts as content. */
 @view-transition {
@@ -961,12 +962,11 @@ figcaption {
   animation-duration: var(--motion-page);
 }
 .site-main {
-  animation: reveal var(--motion-page) both;
+  animation: reveal var(--motion-page) backwards;
 }
 @keyframes reveal {
   from {
     opacity: 0.01;
-    translate: 0 0.5rem;
   }
 }
 

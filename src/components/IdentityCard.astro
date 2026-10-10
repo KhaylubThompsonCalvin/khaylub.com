@@ -1,9 +1,11 @@
 ---
-// The Home hero (the identity card): the name, the role line, the availability statement, the
-// portrait, the recruiter row, the two primary doors, and the quiet line to the climb. One grid
-// at every width: a single column on a phone (the portrait after the availability statement and
-// before the recruiter links), two columns from 900 px with the portrait in the second, top
-// aligned with the name (the owner's composite hero decision of 2026-09-20, vault document 60).
+// The Home identity block (the first and widest block of the Home grid; the owner's requests of
+// 2026-10-10): the name, the role line and the place, the availability statement with its date, the
+// quick links, and the two doors, with the portrait large in the block's right column (280 px from
+// 1024 px, 240 px from 640 px). On a phone the portrait (160 px) opens the block above the name,
+// never between the statement and the doors, so the name, the role, the availability, and both doors
+// are on the first screen at 390 by 844 and 1440 by 900. The widths cover 1x to 3x of each displayed size, up to
+// the source; sizes states the displayed width exactly.
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { identity, availability, monthLabel } from '@lib/profile';
@@ -21,64 +23,51 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
 ---
 
 <section class="hero" aria-labelledby="site-name">
-  <h1 id="site-name">{id.name}</h1>
+  <div class="id-head">
+    <h1 id="site-name">{id.name}</h1>
+    {
+      photo && (
+        <span class="id-photo">
+          <Picture
+            src={photo}
+            alt={id.photo_alt}
+            widths={[160, 240, 280, 320, 480, 560, 840, 972]}
+            sizes="(min-width: 1024px) 280px, (min-width: 640px) 240px, 160px"
+            formats={['avif', 'webp']}
+            fallbackFormat="webp"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </span>
+      )
+    }
+  </div>
   <p class="role muted">{id.role_line} · {id.location}</p>
   <p class="availability">
     {avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
   </p>
-  {
-    photo && (
-      <div class="hero-photo">
-        <Picture
-          src={photo}
-          alt={id.photo_alt}
-          widths={[160, 225, 270, 320, 450, 540]}
-          sizes="(min-width: 1200px) 270px, (min-width: 900px) 225px, 160px"
-          formats={['avif', 'webp']}
-          fallbackFormat="webp"
-          loading="eager"
-          decoding="async"
-          fetchpriority="high"
-        />
-      </div>
-    )
-  }
   <RecruiterRow />
   <Doors />
 </section>
 
 <style is:global>
-  .hero {
+  /* On a phone the portrait comes first, then the name. */
+  .id-head {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
-    column-gap: var(--space-3);
-    /* The climb band follows at once: a section gap from 900 px, a tighter one on a phone so the
-       band begins on the first screen at 390 by 844. */
-    margin-bottom: var(--space-4);
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
   }
-  @media (min-width: 900px) {
-    .hero {
-      margin-bottom: var(--space-6);
-    }
+  .hero h1 {
+    grid-row: 2;
+    font-size: clamp(1.875rem, 4vw, 3.25rem);
+    margin: 0;
   }
-  .hero > :not(.hero-photo) {
-    grid-column: 1;
-  }
-  .hero .role {
-    margin: 0 0 var(--space-1);
-  }
-  .hero .availability {
-    font-weight: 600;
-    margin: 0 0 var(--space-2);
-  }
-  /* The portrait: 3:4, the face kept in frame as the box changes, 160 px wide and centred on a phone. */
-  .hero-photo {
+  /* The portrait: 3 by 4, cropped on the face, rounded; centred on a phone. */
+  .id-photo {
     justify-self: center;
-    margin: var(--space-1) 0 var(--space-2);
   }
-  .hero-photo img {
-    display: block;
+  .id-photo img {
     width: 160px;
     height: auto;
     aspect-ratio: 3 / 4;
@@ -86,27 +75,46 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
     object-position: 50% 18%;
     border-radius: var(--radius-photo);
   }
-  @media (min-width: 900px) {
-    /* Two columns: the text in the first, the portrait in the second, spanning the text's rows.
-       The last row takes any extra height so the text rows stay tight when the portrait is taller. */
+  /* From 640 px the words take the first column and the portrait the second, top aligned. */
+  @media (min-width: 640px) {
     .hero {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       grid-template-rows: repeat(4, auto) 1fr;
-      align-items: start;
+      column-gap: var(--space-4);
     }
-    .hero-photo {
+    /* The rows stay tight under the name; the doors keep to the foot, level with the portrait's. */
+    .hero .doors {
+      align-self: end;
+    }
+    .id-head {
+      display: contents;
+    }
+    .hero > *,
+    .hero h1 {
+      grid-column: 1;
+    }
+    .hero h1 {
+      grid-row: auto;
+      margin-bottom: var(--space-2);
+    }
+    .hero .id-photo {
       grid-column: 2;
       grid-row: 1 / span 5;
-      justify-self: end;
-      margin: 0;
     }
-    .hero-photo img {
-      width: 225px;
+    .id-photo img {
+      width: 240px;
     }
   }
-  @media (min-width: 1200px) {
-    .hero-photo img {
-      width: 270px;
+  @media (min-width: 1024px) {
+    .id-photo img {
+      width: 280px;
     }
+  }
+  .hero .role {
+    margin: 0 0 var(--space-1);
+  }
+  .hero .availability {
+    margin: 0 0 var(--space-1);
   }
 </style>

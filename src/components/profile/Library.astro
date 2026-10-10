@@ -35,19 +35,23 @@ const rows = await Promise.all(
 </section>
 
 <style is:global>
-  .library .note {
+  .bento .shelf + .note {
     margin: var(--space-2) 0 0;
   }
   /* The count keeps the working face here: the module's rows are small. */
-  .library .shelf .count {
+  .bento .shelf .count {
     font-family: var(--font-body);
     font-weight: 400;
     font-size: var(--size-sm);
   }
-  .library .shelf li > a:first-child {
+  .bento .shelf li > a:first-child {
     font-size: var(--size-body);
   }
-  .library .shelf li {
-    padding: var(--space-1) 0;
+  .bento .shelf li {
+    padding: var(--space-half) 0;
+  }
+  /* A compact list in its block: each collection and its count; the newest item lives on the shelf. */
+  .bento .shelf p {
+    display: none;
   }
 </style>
