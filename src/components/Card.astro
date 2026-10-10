@@ -12,12 +12,14 @@ interface Props {
   rank?: number;
   thumb?: { src: string; alt: string; width?: number; height?: number };
   headingLevel?: 'h3' | 'h2';
+  /** A project's status (concept, live, ...); a concept draws a dashed rule. */
+  status?: string;
 }
-const { href, title, summary, badge, meta = [], rank, thumb, headingLevel = 'h3' } = Astro.props;
+const { href, title, summary, badge, meta = [], rank, thumb, headingLevel = 'h3', status } = Astro.props;
 const Heading = headingLevel;
 ---
 
-<article class="card">
+<article class="card" data-status={status}>
   {thumb && <div class="thumb"><img src={thumb.src} alt={thumb.alt} loading="lazy" decoding="async" width={thumb.width ?? 400} height={thumb.height ?? 250} /></div>}
   <Heading>
     {rank && <span class="visually-hidden">Rank {rank}. </span>}<a href={href}>{title}</a>

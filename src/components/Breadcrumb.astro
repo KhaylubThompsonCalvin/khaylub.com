@@ -27,6 +27,7 @@ const { trail } = Astro.props;
   .breadcrumb ol {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0 var(--space-1);
     list-style: none;
     padding: 0;
@@ -37,10 +38,10 @@ const { trail } = Astro.props;
     margin-right: var(--space-1);
     color: var(--muted);
   }
-  /* Breadcrumb links are a list, not prose: keep the 24 px target floor (WCAG 2.5.8). */
+  /* Breadcrumb links are a list, not prose: each is a 44 px target. */
   .breadcrumb a {
-    display: inline-block;
-    padding: var(--space-half) 0;
-    min-height: var(--target-min);
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target);
   }
 </style>

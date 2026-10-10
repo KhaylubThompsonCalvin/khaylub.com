@@ -99,8 +99,9 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
     text-decoration: none;
   }
   .sort-links a {
-    display: inline-block;
-    padding: var(--space-1) 0;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target);
   }
   .feed-link {
     margin-top: var(--space-2);

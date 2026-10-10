@@ -98,18 +98,25 @@ a:hover {
 .climb-line a {
   color: var(--link-content);
 }
+/* A link that leaves the site carries a north-east arrow (the convention visitors expect). The
+   arrow has empty alt text, so it never joins the link's accessible name. */
+a[href^='http']:not([href*='//khaylub.com'])::after {
+  content: '\2197' / '';
+  display: inline-block;
+  margin-left: var(--space-quarter);
+}
 
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 
-/* A link that stands alone in a list item is its own target (WCAG 2.5.8): 24 px tall wherever
-   it appears, from the search fallback lists to the graph. Links inside running text are exempt. */
+/* A link that stands alone in a list item is its own target: 44 px tall wherever it appears, from
+   the search fallback lists to the Contact links. Links inside running text are exempt. */
 li > a {
-  display: inline-block;
-  min-height: var(--target-min);
-  padding: var(--space-quarter) 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
 }
 
 /* Native players keep focus inside their own controls; the ring still shows around the player. */
@@ -268,6 +275,10 @@ small,
   border-top: 2px solid var(--ink);
   transition: border-color var(--ease);
 }
+/* A concept is not built yet: its rule is dashed, so the card reads as such before its badge. */
+.card[data-status='concept'] {
+  border-top-style: dashed;
+}
 .card:hover {
   border-top-color: var(--accent);
 }
@@ -295,6 +306,19 @@ small,
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
+}
+/* The arrow cue after a card or tile title says the whole entry opens; it moves on hover. A
+   no-break space keeps it on the title's last line. */
+.card h3::after,
+.tile :is(h2, h3)::after {
+  content: '\a0\2192' / '';
+  position: relative;
+  left: 0;
+  transition: left var(--ease);
+}
+.card:hover h3::after,
+.tile:hover :is(h2, h3)::after {
+  left: var(--space-half);
 }
 /* The whole card or tile is the target; keyboard focus stays on the link. */
 .card h3 a::after,
@@ -425,6 +449,7 @@ small,
 .counts {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-1) var(--space-3);
   list-style: none;
   padding: 0;
@@ -442,6 +467,9 @@ small,
   margin-right: var(--space-half);
 }
 .counts a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
   text-decoration: none;
 }
 .counts a:hover b {
@@ -469,11 +497,11 @@ small,
   color: var(--text-secondary);
   font-size: var(--size-card);
 }
-/* The newest item's link is a target of its own (WCAG 2.5.8), clear of the title link above it. */
+/* The newest item's link is a 44 px target of its own, clear of the title link above it. */
 .shelf p a {
-  display: inline-block;
-  min-height: var(--target-min);
-  padding: var(--space-quarter) 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
 }
 /* A fact table: labelled rows with a rule under each (Details on Home, the facts of a case study). */
 .fact-table {
