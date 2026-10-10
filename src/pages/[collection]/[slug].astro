@@ -119,6 +119,8 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
           </p>
         )
       }
+      {/* The way back to the collection, where visitors expect it: at the foot of the page. */}
+      <p class="back-link"><a href={meta.route}>Back to {meta.label}</a></p>
     </footer>
   </article>
 </BaseLayout>

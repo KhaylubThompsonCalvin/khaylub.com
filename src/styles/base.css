@@ -123,7 +123,8 @@ li > a,
 .sort-links a,
 .tag-links a,
 .proof-links a,
-.climb-go a {
+.climb-go a,
+.back-link a {
   display: inline-flex;
   align-items: center;
   min-height: var(--target);
@@ -316,6 +317,11 @@ small,
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
+}
+/* The way back to a collection, at the foot of an entry, leads with the left arrow (decorative). */
+.back-link a::before {
+  content: '\2190\a0' / '';
+  font-family: system-ui;
 }
 /* The arrow cue after a card or tile title says the whole entry opens; it moves on hover. A
    no-break space keeps it on the title's last line. */
@@ -962,4 +968,17 @@ figcaption {
     opacity: 0.01;
     translate: 0 0.5rem;
   }
+}
+
+/* The availability line and a page's primary-action row (Contact's email, the résumé's PDF): the
+   filled button first, its quiet note beside it. */
+.availability {
+  font-weight: 600;
+}
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-3);
 }

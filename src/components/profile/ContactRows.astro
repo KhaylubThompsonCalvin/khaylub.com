@@ -1,0 +1,79 @@
+---
+// The ways to reach the owner as rows, each a 44 px target with an icon, a label, and a quiet note,
+// from identity.yaml and the résumé record (the Home Contact block and the Contact page). The icons
+// are generic line drawings (a letter, code brackets, a briefcase, a page, a download), decorative:
+// the label is the name.
+import { identity, resumeMeta } from '@lib/profile';
+
+interface Props {
+  /** The Contact page lists the rows without their notes (the address sits above them). */
+  plain?: boolean;
+}
+const { plain = false } = Astro.props;
+const id = identity();
+const resume = resumeMeta();
+const icons: Record<string, string> = {
+  mail: 'M2 4h14v10H2zM2 4l7 6 7-6',
+  code: 'M6 4 1 9l5 5M12 4l5 5-5 5',
+  work: 'M2 6h14v9H2zM6 6V3h6v3M2 10h14',
+  page: 'M4 1h7l4 4v12H4zM11 1v4h4M7 9h5M7 12h5',
+  down: 'M9 2v10M5 8l4 4 4-4M3 16h12',
+};
+const rows = [
+  { icon: 'mail', label: 'Email', href: `mailto:${id.email}` },
+  { icon: 'code', label: 'GitHub', href: id.github, note: plain ? undefined : id.github.replace(/^https?:\/\/github\.com\//, ''), external: true },
+  { icon: 'work', label: 'LinkedIn', href: id.linkedin, external: true },
+  { icon: 'page', label: 'Résumé', href: '/resume/', note: plain ? undefined : `revision ${resume.revision}` },
+  { icon: 'down', label: 'Résumé (PDF)', href: resume.pdf },
+];
+---
+
+<ul class="contact">
+  {
+    rows.map((r) => (
+      <li>
+        <a href={r.href} rel={r.external ? 'me noopener noreferrer' : undefined}>
+          <span>
+            <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d={icons[r.icon]} /></svg>
+            {r.label}
+          </span>
+          {r.note && <span class="note">{r.note}</span>}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style is:global>
+  .contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .contact li {
+    border-bottom: 1px solid var(--border);
+  }
+  .contact li:last-child {
+    border-bottom: 0;
+  }
+  .contact a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--target);
+    padding: var(--space-1) 0;
+  }
+  .contact a > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    white-space: nowrap;
+  }
+  .contact .note {
+    font-size: var(--size-sm);
+    color: var(--text-secondary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+</style>

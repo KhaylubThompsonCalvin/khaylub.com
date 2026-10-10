@@ -3,6 +3,7 @@
 // render in a list with the count announced in a live region. The links below are the
 // no-JavaScript fallback and stay in place forever.
 import BaseLayout from '@layouts/BaseLayout.astro';
+import SearchForm from '@components/SearchForm.astro';
 import { COLLECTIONS, termPages } from '@lib/catalog';
 const tags = await termPages('tags');
 ---
@@ -10,14 +11,9 @@ const tags = await termPages('tags');
 <BaseLayout title="Search" description="Search every published item on the site by title, summary, tag, or text, or browse by collection, tag, and date." current="search">
   <div class="measure-reading">
     <h1>Search</h1>
-    <form id="search-form" role="search" action="/search/" method="get">
-      <label for="search-input">Search the library</label>
-      <div class="search-row">
-        <input id="search-input" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="regression, Blender, preservation" />
-        <button class="btn" type="submit">Search</button>
-      </div>
+    <SearchForm>
       <p id="search-status" class="small muted" aria-live="polite" role="status"></p>
-    </form>
+    </SearchForm>
     <ol id="search-results" class="search-results"></ol>
 
     <h2>Browse instead</h2>
@@ -34,27 +30,6 @@ const tags = await termPages('tags');
 <script src="../scripts/search.ts"></script>
 
 <style is:global>
-  #search-form label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: var(--space-1);
-  }
-  .search-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-  }
-  .search-row input[type='search'] {
-    flex: 1 1 16rem;
-    min-height: var(--target);
-    padding: var(--space-1) var(--space-1-5);
-    font: inherit;
-    color: var(--ink);
-    background: var(--card);
-    /* The border is the field's only boundary, so it needs 3:1 (WCAG 1.4.11); --line is decorative. */
-    border: 1px solid var(--muted);
-    border-radius: var(--radius-sm);
-  }
   #search-status {
     min-height: var(--space-3);
     margin: var(--space-1) 0 0;
