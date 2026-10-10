@@ -43,8 +43,9 @@ async function enter(page: Page, door: ReturnType<Page['getByRole']>) {
 
 test.describe('the climb is opt-in', () => {
   // Home carries no climb code at all: the poster band under the hero (the visual redesign, document
-  // 65) names the climb and links to /climb/, where the door lives; its still is a cropped screenshot.
-  test('Home requests no climb bytes and the band links to /climb/ under the hero', async ({ page }) => {
+  // 65) names the climb and links to the remastered climb at v1.khaylub.com (a plain link: nothing is
+  // requested from it) and to the June version on /climb/, where the door lives.
+  test('Home requests no climb bytes and the band links to v1.khaylub.com and /climb/', async ({ page }) => {
     const w = watch(page);
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -52,9 +53,14 @@ test.describe('the climb is opt-in', () => {
     expect(await page.locator('[data-climb-door], [data-climb-mount]').count(), 'no climb door or mount on Home').toBe(0);
     const band = page.locator('.climb-band');
     await expect(band.getByRole('heading', { level: 2 })).toHaveText('The climb');
-    await expect(band).toContainText('The original interactive version of this site');
-    await expect(band).toContainText('Optional. About 7 MB loads only when you enter');
-    await expect(band.getByRole('link', { name: 'Enter the climb' })).toHaveAttribute('href', '/climb/');
+    await expect(band).toContainText('One scroll through six climates and times of day, from a desert night to golden wheat');
+    await expect(band).toContainText('Opens v1.khaylub.com. About 0.8 MB before the first picture');
+    const enter = band.getByRole('link', { name: 'Enter the climb' });
+    const june = band.getByRole('link', { name: 'The original June 2026 version' });
+    await expect(enter).toHaveAttribute('href', 'https://v1.khaylub.com/');
+    await expect(june).toHaveAttribute('href', '/climb/');
+    for (const link of [enter, june]) expect((await link.boundingBox())!.height, 'a 44 px target').toBeGreaterThanOrEqual(44);
+    expect(w.requests.filter((u) => u.includes('v1.khaylub.com')), 'nothing loads from v1 on Home').toEqual([]);
     expect(w.errors, 'console errors').toEqual([]);
   });
 
@@ -133,7 +139,7 @@ test.describe('the climb is opt-in', () => {
     await ctx.close();
   });
 
-  test('/climb/ ends with the Work and Library doors and a link to the frozen original', async ({ page }) => {
+  test('/climb/ ends with the Work and Library doors and a link to the remastered climb', async ({ page }) => {
     await page.goto('/climb/');
     await expect(page.getByRole('link', { name: 'VIEW MY WORK' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'ENTER THE LIBRARY' })).toBeVisible();

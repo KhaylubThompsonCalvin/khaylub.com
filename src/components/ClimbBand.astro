@@ -1,13 +1,14 @@
 ---
 // The climb's entrance (the visual redesign, vault document 65): a poster band that names the
-// original interactive version of this site, says what it is, and offers one link. Nothing of the
-// scene loads here: the still is a cropped screenshot (src/assets/climb/PROVENANCE.txt) served
-// through Astro's image pipeline; the models, plates, and code load only on /climb/ after the
-// press. On Home the band follows the hero; on /climb/ it is the page's head (`standalone`), with
-// the door rendered by the page below it. The still loads eagerly on both: the band is in the first
-// viewport at 1440 by 900, so a lazy still would be the page's late LCP element.
+// climb, says what it is, and offers its links. On Home it leads to the remastered climb at
+// v1.khaylub.com (a plain link: nothing from that site loads here) and, below it, to the original
+// June 2026 version kept on /climb/. On /climb/ it is the page's head (`standalone`) for that June
+// version, with the door rendered by the page below it. Each still is served through Astro's image
+// pipeline (src/assets/climb/PROVENANCE.txt). The still loads eagerly on both: the band is in the
+// first viewport at 1440 by 900, so a lazy still would be the page's late LCP element.
 import { Picture } from 'astro:assets';
-import still from '../assets/climb/spark-wakes.webp';
+import june from '../assets/climb/spark-wakes.webp';
+import wheat from '../assets/climb/wheat-lane.webp';
 
 interface Props {
   standalone?: boolean;
@@ -17,8 +18,8 @@ const { standalone = false } = Astro.props;
 
 <section class:list={['climb-band', { standalone }]} aria-labelledby="climb-band-heading">
   <Picture
-    src={still}
-    alt=""
+    src={standalone ? june : wheat}
+    alt={standalone ? '' : 'A traveller with a pack walks a trodden lane through golden wheat toward a lone tree and a low sun.'}
     widths={[480, 720, 960]}
     sizes="(min-width: 1200px) 1104px, 100vw"
     formats={['avif', 'webp']}
@@ -29,20 +30,34 @@ const { standalone = false } = Astro.props;
     class="climb-still"
   />
   <div class="climb-words">
-    <div>
-      {
-        standalone ? (
+    {
+      standalone ? (
+        <div>
           <h1 id="climb-band-heading">The climb</h1>
-        ) : (
-          <h2 id="climb-band-heading">The climb</h2>
-        )
-      }
-      <p class="climb-what">
-        The original interactive version of this site: one scroll from night into day, a Wanderer, and a
-        Phoenix. The June 2026 release, kept as it shipped.
-      </p>
-      <p class="climb-line small">Optional. About 7 MB loads only when you enter; nothing of it loads on this page.</p>
-    </div>
-    {!standalone && <a class="btn btn-on-image" href="/climb/">Enter the climb</a>}
+          <p class="climb-what">
+            The original interactive version of this site: one scroll from night into day, a Wanderer, and a
+            Phoenix. The June 2026 release, kept as it shipped.
+          </p>
+          <p class="climb-line small">Optional. About 7 MB loads only when you enter; nothing of it loads on this page.</p>
+        </div>
+      ) : (
+        <>
+          <div>
+            <h2 id="climb-band-heading">The climb</h2>
+            <p class="climb-what">
+              One scroll through six climates and times of day, from a desert night to golden wheat, with the
+              Wanderer and the Phoenix.
+            </p>
+            <p class="climb-line small">
+              Opens v1.khaylub.com. About 0.8 MB before the first picture; each scene loads as you near it.
+            </p>
+          </div>
+          <p class="climb-go">
+            <a class="btn btn-on-image" href="https://v1.khaylub.com/" rel="noopener noreferrer">Enter the climb</a>
+            <a class="small" href="/climb/">The original June 2026 version</a>
+          </p>
+        </>
+      )
+    }
   </div>
 </section>
