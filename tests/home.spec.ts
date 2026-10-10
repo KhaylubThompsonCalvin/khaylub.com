@@ -23,7 +23,7 @@ test.describe('home', () => {
         const climb = await page.getByRole('link', { name: 'Enter the climb' }).boundingBox();
         expect(climb!.y + climb!.height, 'the climb link above the fold').toBeLessThanOrEqual(h);
       }
-      await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
+      await expect(page.locator('main').getByText('Available now for IT support roles')).toBeInViewport();
     });
   }
 
@@ -41,7 +41,7 @@ test.describe('home', () => {
       expect(box!.x + box!.width, 'right edge').toBeLessThanOrEqual(375);
     }
     await expect(page.getByRole('heading', { level: 1, name: 'Khaylub Thompson-Calvin' })).toBeInViewport();
-    await expect(page.getByText('Available now for IT support roles')).toBeInViewport();
+    await expect(page.locator('main').getByText('Available now for IT support roles')).toBeInViewport();
     // The controls are reachable and work: the primary doors, the quick links, the mobile menu.
     for (const name of ['VIEW MY WORK', 'ENTER THE LIBRARY']) {
       const door = page.getByRole('link', { name });

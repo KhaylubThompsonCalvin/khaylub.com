@@ -173,5 +173,16 @@ const links = [
     .utility:first-of-type {
       margin-left: var(--space-1-5);
     }
+    /* The search shortcut's key beside Search on a keyboard-sized screen (drawn, not read). */
+    .nav-list [href='/search/']::after {
+      content: '/' / '';
+      align-self: center;
+      margin-left: var(--space-1);
+      padding: 0 var(--space-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font: var(--size-sm) / 1.6 var(--font-body);
+      color: var(--text-secondary);
+    }
   }
 </style>

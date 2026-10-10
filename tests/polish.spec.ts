@@ -114,3 +114,46 @@ test.describe('primary actions and motion', () => {
     }
   });
 });
+
+test.describe('pictures, About, and the search shortcut (round two)', () => {
+  test('every card on every index leads with a picture or a calling card, never an empty frame', async ({ page }) => {
+    for (const path of ['/projects/', '/data/', '/notes/', '/writing/', '/video/', '/gallery/', '/experiments/', '/work/', '/tags/python/', '/notes/preserving-v1/']) {
+      await page.goto(path);
+      const cards = page.locator('main .card');
+      const n = await cards.count();
+      expect(n, `${path} has cards`).toBeGreaterThan(0);
+      for (let i = 0; i < n; i++) {
+        const pictured = await cards.nth(i).locator('.thumb img, .thumb.call').count();
+        expect(pictured, `${path} card ${i + 1}`).toBe(1);
+      }
+    }
+  });
+
+  test('an entry opens with its picture, or a calling card when it has none', async ({ page }) => {
+    for (const path of ['/projects/khaylub-com-v1/', '/data/fuel-economy-regression/', '/notes/preserving-v1/']) {
+      await page.goto(path);
+      await expect(page.locator('main .entry-hero'), path).toHaveCount(1);
+    }
+  });
+
+  test('About is the block language: the identity block, the words, and the blocks after it', async ({ page }) => {
+    await page.goto('/about/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('About');
+    await expect(page.locator('.about > .hero .id-photo img')).toHaveCount(1);
+    const labels = (await page.locator('.about .module-heading').allTextContents()).map((t) => t.split(/\s+as of/)[0].trim());
+    for (const l of ['In my words', 'How I work', 'Now', 'Education', 'Certified and planned', 'Skills and technologies', 'Contact']) expect(labels).toContain(l);
+    expect(await page.locator('.about a.chip').count()).toBeGreaterThan(5);
+    await expect(page.locator('.about .contact li svg')).toHaveCount(5);
+  });
+
+  test('"/" and Ctrl+K open the search with the field focused', async ({ page, isMobile }) => {
+    test.skip(!!isMobile, 'a keyboard shortcut');
+    await page.goto('/work/');
+    await page.keyboard.press('/');
+    await expect(page).toHaveURL(/\/search\/#search$/);
+    await expect(page.locator('#search-input')).toBeFocused();
+    await page.locator('#search-input').blur();
+    await page.keyboard.press('Control+k');
+    await expect(page.locator('#search-input')).toBeFocused();
+  });
+});

@@ -3,7 +3,9 @@
 import { setupNavDisclosure } from './nav-disclosure';
 import { setupTheme } from './theme';
 import { setupHeaderScroll } from './header-scroll';
+import { setupSearchShortcut } from './search-shortcut';
 
 setupNavDisclosure();
 setupTheme();
 setupHeaderScroll();
+setupSearchShortcut();

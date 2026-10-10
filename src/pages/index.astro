@@ -92,6 +92,10 @@ const jsonLd = await personAndWebsite();
     display: flex;
     flex-direction: column;
   }
+  /* Writing and the Library differ in length: each keeps its own height on the row. */
+  .bento > :is([aria-labelledby='writing-heading'], [aria-labelledby='library-heading']) {
+    align-self: start;
+  }
   .bento > * > :last-child {
     margin-bottom: 0;
   }

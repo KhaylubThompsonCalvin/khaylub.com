@@ -83,3 +83,29 @@ export async function mediaForJsonLd(entry: AnyEntry): Promise<{ thumbnailUrl?: 
   }
   return out;
 }
+
+/** A picture for a card or an entry's head (the 2026-10-10 polish), in the order the owner set: the
+    x Undefined means the caller draws a
+    calling card. A cover keeps its own alt text; a borrowed picture is decorative beside the title. `pale` marks a light chart, which a tile
+    dims under its scrim. */
+export async function pictureFor(entry: AnyEntry, width = 400): Promise<(Thumb & { pale?: boolean }) | undefined> {
+  // The first climb is pictured by the Home band's golden-wheat still wherever it appears.
+  if (entry.data.slug === 'khaylub-com-v1') {
+    const { default: wheat } = await import('../assets/climb/wheat-lane.webp');
+    const img = await getImage({ src: wheat, width: Math.min(width, 960), format: 'webp', quality: 70 });
+    return { src: img.src, alt: '', width: Number(img.attributes.width), height: Number(img.attributes.height) };
+  }
+  const data = entry.data as { cover?: string; cover_alt?: string };
+  const meta = data.cover ? resolveRaster(entry, data.cover) : undefined;
+  if (meta) {
+    const img = await getImage({ src: meta, width: Math.min(width, meta.width), format: 'webp', quality: 70 });
+    return { src: img.src, alt: data.cover_alt ?? '', width: Number(img.attributes.width), height: Number(img.attributes.height) };
+  }
+  if (data.cover) return { src: mediaUrl(entry, data.cover), alt: data.cover_alt ?? '', width: 400, height: 250 };
+  const tag = (entry.body ?? '').match(/<img\b[^>]*\bsrc="(\/media\/[^"]+)"[^>]*>/);
+  if (tag) {
+    const num = (name: string) => Number(tag[0].match(new RegExp(`\b${name}="(\d+)"`))?.[1] ?? 0);
+    return { src: tag[1], alt: '', width: num('width') || 1200, height: num('height') || 750, pale: entry.collection === 'data' };
+  }
+  return undefined;
+}

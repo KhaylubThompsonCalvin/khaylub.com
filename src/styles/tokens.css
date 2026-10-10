@@ -17,6 +17,8 @@
   --notice: #7a5b15;
   --scrim: rgba(34, 26, 17, 0.85);
   --shade: #221a11;
+  /* The status light beside the availability statement: the one colour outside the accent. */
+  --status: #2e7d32;
 
   /* The semantic roles (F4). --interactive is the chrome's normal interaction role and resolves to
      the ink treatment; it is not a generic name for every interactive colour. --link-content is the
@@ -167,6 +169,7 @@
     --notice: #d9b060;
     --scrim: rgba(21, 18, 13, 0.85);
     --shade: #000;
+    --status: #6cc070;
   }
 }
 :root[data-theme='dark'] {
@@ -181,6 +184,7 @@
   --notice: #d9b060;
   --scrim: rgba(21, 18, 13, 0.85);
   --shade: #000;
+  --status: #6cc070;
 }
 :root[data-theme='light'] {
   color-scheme: light;

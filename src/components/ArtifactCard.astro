@@ -2,8 +2,8 @@
 // Maps a catalog entry onto the Card pattern.
 import Card from './Card.astro';
 import ProjectFacts from './ProjectFacts.astro';
-import { badgeFor, routeFor, type AnyEntry } from '@lib/catalog';
-import { coverThumb } from '@lib/media';
+import { badgeFor, labelFor, routeFor, type AnyEntry } from '@lib/catalog';
+import { pictureFor } from '@lib/media';
 
 interface Props {
   entry: AnyEntry;
@@ -18,12 +18,16 @@ const date = entry.data.date.toLocaleDateString('en-US', { month: 'short', year:
 const meta = [date];
 const plain = showCollection && entry.collection !== 'projects' && entry.collection !== 'data';
 if (plain) meta.unshift(badge.text);
-// Media collections lead with their cover (Journey 2 step 2); a 400 px WebP from the pipeline.
+// Every card leads with a picture (the 2026-10-10 polish): the entry's cover or the first picture it
+// publishes (pictureFor, a 400 px WebP), else a calling card with the kind and one fact of its own:
+// its first technology, else its date.
 const status = entry.collection === 'projects' ? (entry.data as { project_status?: string }).project_status : undefined;
-const thumb = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
+const thumb = await pictureFor(entry);
+const tech = (entry.data as { technologies?: string[] }).technologies?.[0];
+const call = { kind: entry.collection, fact: tech ? labelFor('technologies', tech) : date };
 ---
 
-<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb} status={status}>
+<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb} call={call} status={status}>
   {detail && <ProjectFacts entry={entry} compact />}
   {/* Callers may add a line under the summary (the related rail's one-line reason). */}
   <slot />

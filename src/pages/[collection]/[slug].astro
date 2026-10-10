@@ -13,7 +13,8 @@ import Withdrawn from '@components/Withdrawn.astro';
 import RelatedRail from '@components/relations/RelatedRail.astro';
 import Backlinks from '@components/relations/Backlinks.astro';
 import PrevNext from '@components/relations/PrevNext.astro';
-import { mediaForJsonLd } from '@lib/media';
+import { mediaForJsonLd, pictureFor } from '@lib/media';
+import CallingCard from '@components/CallingCard.astro';
 import { ogAlt } from '@lib/og';
 import { identity } from '@lib/profile';
 import TableOfContents, { TOC_MIN_HEADINGS } from '@components/TableOfContents.astro';
@@ -47,6 +48,12 @@ const jsonLd = [creativeWork(entry, path, await mediaForJsonLd(entry)), breadcru
 // The artifact's own Open Graph card (SEO-3), built by src/pages/og/[collection]/[slug].png.ts.
 const ogImage = `/og/${entry.collection}/${data.slug}.png`;
 const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
+// The entry's head picture (the 2026-10-10 polish) for the collections without a media block: its
+// picture (pictureFor) at 1200 px, or a calling card at the large size. Decorative: the title follows.
+const MEDIA = ['music', 'video', 'gallery', 'experiments'];
+const heroPicture = withdrawn || MEDIA.includes(entry.collection) ? undefined : await pictureFor(entry, 1200);
+const heroCall = !withdrawn && !MEDIA.includes(entry.collection) && !heroPicture;
+const firstTech: string | undefined = data.technologies?.[0];
 ---
 
 {
@@ -68,6 +75,9 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
         </p>
       )
     }
+
+    {heroPicture && <img class="entry-hero" src={heroPicture.src} alt="" width={heroPicture.width} height={heroPicture.height} loading="eager" decoding="async" />}
+    {heroCall && <CallingCard class="entry-hero" title={data.title} kind={entry.collection} fact={firstTech ? labelFor('technologies', firstTech) : data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} />}
 
     <ArtifactHeader entry={entry} />
 
@@ -153,6 +163,18 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
   }
   .layout .body h2 {
     margin-top: var(--space-4);
+  }
+  /* The head picture or calling card: one wide frame above the title, cropped to 2 by 1. */
+  .entry-hero {
+    width: 100%;
+    max-width: var(--measure-longform);
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+    border-radius: var(--radius-block);
+    margin-bottom: var(--space-3);
+  }
+  .entry-hero b {
+    font-size: var(--size-h2);
   }
   .artifact-footer {
     margin-top: var(--space-4);

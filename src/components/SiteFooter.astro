@@ -1,9 +1,10 @@
 ---
-import { identity, blogroll, resumeMeta } from '@lib/profile';
+import { identity, blogroll, resumeMeta, availability } from '@lib/profile';
 const id = identity();
 const roll = blogroll();
 const resume = resumeMeta();
 const year = new Date().getUTCFullYear();
+const avail = availability();
 ---
 
 <footer class="site-footer">
@@ -65,6 +66,8 @@ const year = new Date().getUTCFullYear();
         </p>
       )
     }
+    {/* The sign-off: the site's one availability sentence, with its status light. */}
+    <p class="availability"><span class="status-dot" aria-hidden="true"></span>{avail.statement}</p>
     <p class="small muted">
       {year} {id.name}. Code under the MIT license; writing and media all rights reserved unless a
       page says otherwise.

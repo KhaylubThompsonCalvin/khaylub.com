@@ -195,6 +195,7 @@ small,
    slightly lighter surface on the page, a hairline edge, a soft warm shadow, and one radius, so
    nothing reads as an outlined box. A whole-card link lifts it on hover and focus (below). */
 .bento > *,
+.resume-body,
 .module.boxed,
 .plate,
 .card,
@@ -777,9 +778,36 @@ small,
 .pale img {
   filter: brightness(0.5);
 }
-/* No picture: a typographic tile on a sienna tint of the plate, never an empty frame. */
+/* No picture: a typographic tile, the calling card's tint with the rank large and lighter, the
+   title at the foot like the pictured tiles, never an empty frame. */
+.call,
 .type-tile .tile-art {
-  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--surface)), color-mix(in srgb, var(--accent) 5%, var(--surface)));
+}
+.type-tile .tile-rank {
+  font-size: 3rem;
+  color: color-mix(in srgb, var(--accent) 70%, var(--surface));
+}
+/* A calling card (CallingCard): in a picture's place, the kind's icon, the title large, one fact. */
+.call {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  padding: var(--space-1-5);
+  border-left: 3px solid var(--accent);
+  color: var(--signal);
+}
+.call b {
+  margin-top: auto;
+  font: 700 var(--size-h3) / var(--leading-heading) var(--font-display);
+  color: var(--text);
+}
+.call small {
+  color: var(--text-secondary);
+}
+/* A calling card grows with its words (wider text spacing) instead of clipping them. */
+.thumb.call {
+  overflow: visible;
 }
 .has-cover .tile-rank,
 .has-cover :is(h2, h3) a {
@@ -962,4 +990,13 @@ figcaption {
   align-items: center;
   gap: var(--space-1) var(--space-2);
   margin-bottom: var(--space-3);
+}
+
+/* A row of chips (About's certifications, skills, technologies, interests). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
 }

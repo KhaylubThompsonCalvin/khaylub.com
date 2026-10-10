@@ -8,18 +8,15 @@
 import { getImage } from 'astro:assets';
 import { top8Entries, badgeFor, routeFor } from '@lib/catalog';
 import type { top8Revisions } from '@lib/profile';
-import { coverThumb, type Thumb } from '@lib/media';
+import { pictureFor, type Thumb } from '@lib/media';
 import wheat from '../assets/climb/wheat-lane.webp';
 
 const wheatThumb = await getImage({ src: wheat, width: 640, format: 'webp', quality: 70 });
-// The pictures already published for entries without a cover: the climb's golden-wheat still (the
-// home band's picture) and the charts on the two data case studies, whose pale charts are dimmed on
-// the scrim (`pale`) so the rank and title keep their contrast. Decorative beside the title.
-const PALE = new Set(['fuel-economy-regression', 'sql-python-analytics-pipeline']);
+// The tile's picture comes from pictureFor (the entry's cover, else the first picture its body
+// publishes, a pale chart dimmed on the scrim so the rank and title keep their contrast); the first
+// climb keeps the Home band's golden-wheat still. Decorative beside the title.
 const PICTURES: Record<string, Thumb> = {
   'khaylub-com-v1': { src: wheatThumb.src, alt: '', width: Number(wheatThumb.attributes.width), height: Number(wheatThumb.attributes.height) },
-  'fuel-economy-regression': { src: '/media/fuel-economy-regression/residuals.webp', alt: '', width: 1200, height: 462 },
-  'sql-python-analytics-pipeline': { src: '/media/sql-python-analytics-pipeline/names-trend-chart.webp', alt: '', width: 1200, height: 655 },
 };
 
 interface Props {
@@ -41,7 +38,7 @@ const tiles = await Promise.all(
   entries.map(async ({ entry, reason }, i) => {
     const badge = badgeFor(entry);
     const status = entry.collection === 'projects' && badge.text !== 'Published' ? badge.text : undefined;
-    const cover = (await coverThumb(entry)) ?? PICTURES[entry.data.slug];
+    const cover = PICTURES[entry.data.slug] ?? (await pictureFor(entry));
     return { entry, reason, rank: i + 1, kind: KINDS[entry.collection] ?? entry.collection, status, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
   })
 );
@@ -59,7 +56,7 @@ const spare2 = tiles.length % 2;
       <ol class="top8" data-spare4={spare4 || undefined} data-spare2={spare2 || undefined}>
         {tiles.map((t) => (
           <li>
-            <article class:list={['tile', t.cover ? 'has-cover' : 'type-tile', { pale: PALE.has(t.entry.data.slug) }]}>
+            <article class:list={['tile', t.cover ? 'has-cover' : 'type-tile', { pale: (t.cover as { pale?: boolean } | undefined)?.pale }]}>
               <div class="tile-art">
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>

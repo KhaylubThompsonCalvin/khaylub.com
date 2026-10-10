@@ -12,6 +12,12 @@ import { identity, availability, monthLabel } from '@lib/profile';
 import RecruiterRow from './RecruiterRow.astro';
 import Doors from './Doors.astro';
 
+interface Props {
+  /** Home names the owner in its h1; About keeps "About" as the h1 and names the owner in an h2. */
+  level?: 'h1' | 'h2';
+}
+const { level = 'h1' } = Astro.props;
+const Name = level;
 const id = identity();
 const avail = availability();
 
@@ -24,7 +30,7 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
 
 <section class="hero" aria-labelledby="site-name">
   <div class="id-head">
-    <h1 id="site-name">{id.name}</h1>
+    <Name id="site-name">{id.name}</Name>
     {
       photo && (
         <span class="id-photo">
@@ -45,7 +51,7 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
   </div>
   <p class="role muted">{id.role_line} · {id.location}</p>
   <p class="availability">
-    {avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
+    <span class="status-dot" aria-hidden="true"></span>{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small>
   </p>
   <RecruiterRow />
   <Doors />
@@ -58,7 +64,7 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
     gap: var(--space-2);
     margin-bottom: var(--space-1);
   }
-  .hero h1 {
+  .hero #site-name {
     grid-row: 2;
     font-size: clamp(1.875rem, 4vw, 3.25rem);
     margin: 0;
@@ -83,18 +89,19 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
       grid-template-rows: repeat(4, auto) 1fr;
       column-gap: var(--space-4);
     }
-    /* The rows stay tight under the name; the doors keep to the foot, level with the portrait's. */
+    /* The rows stay tight under the name, the doors right after the links; the portrait sets the
+       block's height and the last row takes what is left. */
     .hero .doors {
-      align-self: end;
+      align-self: start;
     }
     .id-head {
       display: contents;
     }
     .hero > *,
-    .hero h1 {
+    .hero #site-name {
       grid-column: 1;
     }
-    .hero h1 {
+    .hero #site-name {
       grid-row: auto;
       margin-bottom: var(--space-2);
     }
@@ -116,5 +123,24 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
   }
   .hero .availability {
     margin: 0 0 var(--space-1);
+  }
+  /* The status light (the convention recruiters know): green, pulsing softly, still under reduced
+     motion. Green is the one colour outside the accent, a status token. */
+  .status-dot {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    margin-right: var(--space-1);
+    border-radius: 50%;
+    background: var(--status);
+    animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--status) 50%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 0.5em transparent;
+    }
   }
 </style>
