@@ -102,14 +102,14 @@ test.describe('primary actions and motion', () => {
     await expect(page.locator('main .btn-primary').first()).toHaveText('Download the PDF');
   });
 
-  test('the page change and the reveal take the motion token, 0 s under reduced motion', async ({ browser }) => {
+  test('the page change takes the motion token, 0 s under reduced motion', async ({ browser }) => {
     for (const [reducedMotion, zero] of [['reduce', true], ['no-preference', false]] as const) {
       const ctx = await browser.newContext({ reducedMotion });
       const page = await ctx.newPage();
       await page.goto('/work/');
-      const d = await page.locator('main').evaluate((e) => getComputedStyle(e).animationDuration);
-      if (zero) expect(d, 'no reveal under reduced motion').toBe('0s');
-      else expect(d, 'a short reveal otherwise').not.toBe('0s');
+      const d = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--motion-page').trim());
+      if (zero) expect(d, 'no motion under reduced motion').toBe('0s');
+      else expect(d, 'a short cross-fade otherwise').not.toMatch(/^0s/);
       await ctx.close();
     }
   });

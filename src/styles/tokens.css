@@ -16,6 +16,7 @@
   --focus: #1d4ed8;
   --notice: #7a5b15;
   --scrim: rgba(34, 26, 17, 0.85);
+  --shade: #221a11;
 
   /* The semantic roles (F4). --interactive is the chrome's normal interaction role and resolves to
      the ink treatment; it is not a generic name for every interactive colour. --link-content is the
@@ -119,11 +120,24 @@
   --tint-active: 16%;
   --shadow-card: 0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
   --shadow-menu: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
+
+  /* Surfaces (the 2026-10-10 polish, soft depth): a block or card is --surface on the page with a
+     hairline edge about 7 percent toward the ink (a dark edge in light, a light edge in dark), a
+     soft two-layer shadow in --shade (warm ink in light, black in dark), one radius, one padding,
+     and one gap between blocks (16 px, 24 px from 900 px). */
+  --hairline: color-mix(in srgb, var(--surface) 93%, var(--ink));
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--shade) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--shade) 7%, transparent);
+  --shadow-md: 0 2px 4px color-mix(in srgb, var(--shade) 10%, transparent), 0 14px 32px color-mix(in srgb, var(--shade) 14%, transparent);
+  --radius-block: 14px;
+  --pad-block: 1.25rem;
+  --gap-block: var(--space-2);
 }
 
 @media (min-width: 900px) {
   :root {
     --space-section: var(--space-8);
+    --pad-block: var(--space-3);
+    --gap-block: var(--space-3);
   }
 }
 
@@ -152,6 +166,7 @@
     --focus: #8ab6e2;
     --notice: #d9b060;
     --scrim: rgba(21, 18, 13, 0.85);
+    --shade: #000;
   }
 }
 :root[data-theme='dark'] {
@@ -165,6 +180,7 @@
   --focus: #8ab6e2;
   --notice: #d9b060;
   --scrim: rgba(21, 18, 13, 0.85);
+  --shade: #000;
 }
 :root[data-theme='light'] {
   color-scheme: light;

@@ -80,24 +80,17 @@ const jsonLd = await personAndWebsite();
   .bento {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-grid);
+    gap: var(--gap-block);
     margin-bottom: var(--space-section);
   }
-  /* Every block is a card: the plate, its radius, one padding; it lifts a little under the pointer
-     (not under reduced motion). */
+  /* Every block is a surface (base.css); blocks are not whole links, so they do not lift. A module
+     is a column whose last action keeps to the foot, so a shorter block on a row ends level. */
   .bento > * {
     margin: 0;
-    padding: var(--space-2);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    transition: translate var(--motion-page), box-shadow var(--motion-page);
   }
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    .bento > :hover {
-      translate: 0 -2px;
-      box-shadow: var(--shadow-card);
-    }
+  .bento > .module {
+    display: flex;
+    flex-direction: column;
   }
   .bento > * > :last-child {
     margin-bottom: 0;
@@ -105,15 +98,11 @@ const jsonLd = await personAndWebsite();
   .bento > .climb-band {
     padding: 0;
   }
-  /* A block's head is its small kind label (the as-of date beside it), not a second title. */
+  /* A block's head is its kind label (base.css, .kind), not a second title. */
   .bento .module-heading {
-    font: 600 var(--size-sm) / var(--leading-body) var(--font-body);
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
-    color: var(--text-secondary);
     border: 0;
     padding: 0;
-    margin-bottom: var(--space-1-5);
+    margin-bottom: var(--space-2);
   }
   /* The climb's words keep to the left on their scrim, so the sun and the Wanderer stay clear. */
   @media (min-width: 640px) {
@@ -128,14 +117,12 @@ const jsonLd = await personAndWebsite();
     max-width: none;
   }
   .block-go {
-    margin-top: var(--space-1);
+    margin-top: auto;
+    padding-top: var(--space-1);
   }
   @media (min-width: 640px) {
     .bento {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .bento > * {
-      padding: var(--space-3);
     }
     .bento > :is(.hero, .climb-band, [aria-labelledby='top8-heading']) {
       grid-column: span 2;
