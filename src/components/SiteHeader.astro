@@ -23,12 +23,17 @@ const id = identity();
     z-index: 40;
     background: var(--bg);
     border-bottom: 1px solid var(--line);
-    transition: transform var(--ease);
   }
   /* On a long page the header steps away while reading down and returns on any scroll up
-     (header-scroll.ts); never while the menu is open or the header has focus. */
+     (header-scroll.ts); never while the menu is open or the header has focus. It leaves at once,
+     so it never half-covers the content, and slides back over --ease. While away it is hidden
+     outright, so nothing above the viewport counts as covering a target at its edge. */
   .site-header[data-hidden] {
     transform: translateY(-100%);
+    visibility: hidden;
+  }
+  .site-header:not([data-hidden]) {
+    transition: transform var(--ease);
   }
   .navbar {
     display: flex;

@@ -99,11 +99,17 @@ a:hover {
   color: var(--link-content);
 }
 /* A link that leaves the site carries a north-east arrow (the convention visitors expect). The
-   arrow has empty alt text, so it never joins the link's accessible name. */
+   arrow has empty alt text, so it never joins the link's accessible name. The arrows are drawn in
+   the system face of the body stack, so they never pull the extension font files onto a page. */
 a[href^='http']:not([href*='//khaylub.com'])::after {
   content: '\2197' / '';
   display: inline-block;
   margin-left: var(--space-quarter);
+}
+a[href^='http']:not([href*='//khaylub.com'])::after,
+.card h3::after,
+.tile :is(h2, h3)::after {
+  font-family: system-ui, sans-serif;
 }
 
 :focus-visible {

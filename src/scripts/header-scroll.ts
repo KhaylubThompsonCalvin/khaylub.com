@@ -29,5 +29,7 @@ export function setupHeaderScroll(): void {
     },
     { passive: true }
   );
-  header.addEventListener('focusin', show);
+  // Focus moving down the page scrolls it before the scroll event arrives: settle the header at
+  // once so it never covers the newly focused control. Focus inside the header always shows it.
+  document.addEventListener('focusin', update);
 }
