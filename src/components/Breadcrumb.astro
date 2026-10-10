@@ -38,10 +38,5 @@ const { trail } = Astro.props;
     margin-right: var(--space-1);
     color: var(--muted);
   }
-  /* Breadcrumb links are a list, not prose: each is a 44 px target. */
-  .breadcrumb a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--target);
-  }
+  /* Breadcrumb links are a list, not prose: each is a 44 px target (the global li > a rule). */
 </style>

@@ -105,11 +105,7 @@ a[href^='http']:not([href*='//khaylub.com'])::after {
   content: '\2197' / '';
   display: inline-block;
   margin-left: var(--space-quarter);
-}
-a[href^='http']:not([href*='//khaylub.com'])::after,
-.card h3::after,
-.tile :is(h2, h3)::after {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui;
 }
 
 :focus-visible {
@@ -118,8 +114,15 @@ a[href^='http']:not([href*='//khaylub.com'])::after,
 }
 
 /* A link that stands alone in a list item is its own target: 44 px tall wherever it appears, from
-   the search fallback lists to the Contact links. Links inside running text are exempt. */
-li > a {
+   the breadcrumbs and the search fallback lists to the Contact links; so are the link rows that act
+   as lists (the Work counts, a shelf's newest item, the sort links, the search tags, the proof
+   links). Links inside running text are exempt. One rule, to keep the stylesheet inside its line. */
+li > a,
+.counts a,
+.shelf p a,
+.sort-links a,
+.tag-links a,
+.proof-links a {
   display: inline-flex;
   align-items: center;
   min-height: var(--target);
@@ -318,6 +321,7 @@ small,
 .card h3::after,
 .tile :is(h2, h3)::after {
   content: '\a0\2192' / '';
+  font-family: system-ui;
   position: relative;
   left: 0;
   transition: left var(--ease);
@@ -473,9 +477,6 @@ small,
   margin-right: var(--space-half);
 }
 .counts a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target);
   text-decoration: none;
 }
 .counts a:hover b {
@@ -502,12 +503,6 @@ small,
   margin: var(--space-half) 0 0;
   color: var(--text-secondary);
   font-size: var(--size-card);
-}
-/* The newest item's link is a 44 px target of its own, clear of the title link above it. */
-.shelf p a {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target);
 }
 /* A fact table: labelled rows with a rule under each (Details on Home, the facts of a case study). */
 .fact-table {
