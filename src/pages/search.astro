@@ -33,8 +33,8 @@ const tags = await termPages('tags');
 
 <script src="../scripts/search.ts"></script>
 
-<style>
-  label {
+<style is:global>
+  #search-form label {
     display: block;
     font-weight: 600;
     margin-bottom: var(--space-1);
@@ -44,7 +44,7 @@ const tags = await termPages('tags');
     flex-wrap: wrap;
     gap: var(--space-1);
   }
-  input[type='search'] {
+  .search-row input[type='search'] {
     flex: 1 1 16rem;
     min-height: var(--target);
     padding: var(--space-1) var(--space-1-5);
@@ -68,17 +68,17 @@ const tags = await termPages('tags');
     padding: var(--space-1-5) 0;
     border-bottom: 1px solid var(--line);
   }
-  .search-results :global(.result-head) {
+  .search-results .result-head {
     margin: 0 0 var(--space-half);
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: var(--space-1);
   }
-  .search-results :global(.result-excerpt) {
+  .search-results .result-excerpt {
     margin: 0;
   }
-  .search-results :global(mark) {
+  .search-results mark {
     background: transparent;
     color: var(--ink);
     font-weight: 600;

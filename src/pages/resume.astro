@@ -17,7 +17,7 @@ const id = identity();
 >
   <article class="measure-reading resume">
     <h1>Résumé</h1>
-    <p class="meta">
+    <p class="resume-meta">
       Revision {entry.data.revision}, {entry.data.as_of.toISOString().slice(0, 10)}.
       <a class="btn" href={entry.data.pdf}>Download the PDF</a>
     </p>
@@ -28,22 +28,19 @@ const id = identity();
   </article>
 </BaseLayout>
 
-<style>
-  .meta {
+<style is:global>
+  .resume-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
   }
-  .availability {
-    font-weight: 600;
-  }
-  .resume-body :global(h2) {
+  .resume-body h2 {
     margin-top: var(--space-4);
     padding-bottom: var(--space-half);
     border-bottom: 1px solid var(--line);
   }
-  .resume-body :global(h3) {
+  .resume-body h3 {
     margin-top: var(--space-3);
   }
 </style>

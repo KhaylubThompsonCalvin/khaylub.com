@@ -16,7 +16,7 @@ const id = identity();
   </div>
 </header>
 
-<style>
+<style is:global>
   .site-header {
     position: sticky;
     top: 0;
@@ -56,7 +56,7 @@ const id = identity();
        (WCAG 1.4.12); at 390 px it still fits on one line. */
     overflow-wrap: anywhere;
   }
-  .navbar > :global(nav) {
+  .navbar > nav {
     flex: 0 0 auto;
   }
 </style>

@@ -31,7 +31,7 @@ const scope = seq.series ? `the series ${seriesLabel(seq.series.name)}` : collec
   )
 }
 
-<style>
+<style is:global>
   .prev-next {
     display: grid;
     grid-template-columns: 1fr;
@@ -42,7 +42,7 @@ const scope = seq.series ? `the series ${seriesLabel(seq.series.name)}` : collec
     .prev-next {
       grid-template-columns: 1fr 1fr;
     }
-    .next {
+    .prev-next .next {
       grid-column: 2;
       text-align: right;
     }

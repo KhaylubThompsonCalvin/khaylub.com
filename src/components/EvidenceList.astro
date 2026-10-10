@@ -30,7 +30,7 @@ const { kind, items, idPrefix } = Astro.props;
   }
 </ul>
 
-<style>
+<style is:global>
   .evidence {
     list-style: none;
     padding: 0;
@@ -49,7 +49,7 @@ const { kind, items, idPrefix } = Astro.props;
     font-weight: 600;
     min-width: var(--width-tile);
   }
-  .count {
+  .evidence .count {
     min-width: 9rem;
   }
   /* Every link is its own target (WCAG 2.5.8, 24 px): the labels and the comma-separated proofs. */

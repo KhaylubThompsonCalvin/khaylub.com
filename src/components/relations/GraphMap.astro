@@ -58,7 +58,7 @@ const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
   <figcaption class="small muted">Lines are curated relations and wikilinks; columns are collections. The list above carries the same relationships.</figcaption>
 </figure>
 
-<style>
+<style is:global>
   .graph-map {
     margin: var(--space-2) 0 0;
     overflow-x: auto;
@@ -76,35 +76,35 @@ const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t);
     font-family: var(--font-body);
     font-size: 13px;
   }
-  .edge {
+  .graph-map .edge {
     stroke: var(--line);
     stroke-width: 1.5;
   }
-  .column {
+  .graph-map .column {
     fill: var(--muted);
     font-size: 12px;
     letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
   }
   /* The invisible hit area gives each node link the site's 44 px target. */
-  .node .hit {
+  .graph-map .node .hit {
     fill: transparent;
   }
-  .node circle {
+  .graph-map .node circle {
     fill: var(--card);
     stroke: var(--ink);
     stroke-width: 2;
   }
-  .node text {
+  .graph-map .node text {
     fill: var(--ink);
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .node:hover circle,
-  .node:focus circle {
+  .graph-map .node:hover circle,
+  .graph-map .node:focus circle {
     fill: var(--accent);
   }
-  .node:focus {
+  .graph-map .node:focus {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }

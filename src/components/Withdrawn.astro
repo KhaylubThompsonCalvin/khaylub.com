@@ -20,7 +20,7 @@ const meta = COLLECTIONS.find((c) => c.name === collection)!;
   <p><a href={meta.route}>Back to {meta.label}</a></p>
 </section>
 
-<style>
+<style is:global>
   /* An informational notice (F4): the amber rule and lead line mean "pay attention", never danger. */
   .withdrawn {
     padding-block: var(--space-4);

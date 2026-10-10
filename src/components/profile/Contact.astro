@@ -31,7 +31,7 @@ const rows = [
   </ul>
 </section>
 
-<style>
+<style is:global>
   .contact {
     list-style: none;
     padding: 0;
@@ -54,7 +54,7 @@ const rows = [
   .contact a > span:first-child {
     white-space: nowrap;
   }
-  .note {
+  .contact .note {
     font-size: var(--size-sm);
     color: var(--text-secondary);
     text-align: right;

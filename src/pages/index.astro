@@ -73,18 +73,18 @@ const jsonLd = await personAndWebsite();
   }
 </BaseLayout>
 
-<style>
+<style is:global>
   .profile {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     margin-bottom: var(--space-section);
   }
-  .main {
+  .profile > .main {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
   /* Every module keeps the section gap below it; the last one on the page gives it back. */
-  .side > :global(.module:last-child) {
+  .profile > .side > .module:last-child {
     margin-bottom: 0;
   }
   @media (min-width: 900px) {
@@ -98,31 +98,31 @@ const jsonLd = await personAndWebsite();
       column-gap: var(--space-6);
       align-items: start;
     }
-    .now {
+    .profile > .now {
       grid-column: 1;
       grid-row: 1;
     }
-    .side {
+    .profile > .side {
       grid-column: 1;
       grid-row: 2;
     }
-    .main {
+    .profile > .main {
       grid-column: 2;
       grid-row: 1 / span 2;
     }
-    .library :global(.module) {
+    .library .module {
       margin-bottom: 0;
     }
   }
   @media (min-width: 1200px) {
-    .main {
+    .profile > .main {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       column-gap: var(--space-8);
     }
     .top8-col {
       grid-column: 1 / -1;
     }
-    .writing :global(.module) {
+    .writing .module {
       margin-bottom: 0;
     }
   }

@@ -34,7 +34,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
   ))
 }
 
-<style>
+<style is:global>
   .events {
     list-style: none;
     padding: 0 0 0 var(--space-2);
@@ -44,7 +44,7 @@ const iso = (d: Date) => d.toISOString().slice(0, 10);
     padding: var(--space-1) 0;
     border-bottom: 1px solid var(--line);
   }
-  time {
+  .events time {
     font-variant-numeric: tabular-nums;
     color: var(--muted);
     margin-right: var(--space-1);

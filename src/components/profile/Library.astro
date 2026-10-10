@@ -34,20 +34,20 @@ const rows = await Promise.all(
   </p>
 </section>
 
-<style>
-  .note {
+<style is:global>
+  .library .note {
     margin: var(--space-2) 0 0;
   }
   /* The count keeps the working face here: the module's rows are small. */
-  .shelf .count {
+  .library .shelf .count {
     font-family: var(--font-body);
     font-weight: 400;
     font-size: var(--size-sm);
   }
-  .shelf li > a:first-child {
+  .library .shelf li > a:first-child {
     font-size: var(--size-body);
   }
-  .shelf li {
+  .library .shelf li {
     padding: var(--space-1) 0;
   }
 </style>
