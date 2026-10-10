@@ -64,3 +64,39 @@ test('every scene skin has its four cover widths in AVIF and WebP, each under it
         expect(size, `${s} ${w} ${f}`).toBeLessThanOrEqual(max[w]);
       }
 });
+
+test('every non-Paper skin file exists, is at most 6 KB, and holds no url() outside /skins/', async () => {
+  const { readFileSync, statSync } = await import('node:fs');
+  for (const s of ['desert-night', 'arizona-made', 'golden-hour', 'above-the-clouds', 'profile-2006']) {
+    const p = `public/skins/${s}.css`;
+    expect(statSync(p).size, s).toBeLessThanOrEqual(6144);
+    for (const m of readFileSync(p, 'utf8').matchAll(/url\(([^)]+)\)/g)) expect(m[1], s).toMatch(/^["']?\/skins\//);
+  }
+});
+
+test('reduced motion stops every skin animation', async ({ browser }) => {
+  for (const id of ['tech', 'creative', 'exploring', 'youtube', 'nostalgia']) {
+    const ctx = await browser.newContext({ reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
+    await page.addInitScript((v) => localStorage.setItem('khaylub-audience', v), id);
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    const running = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
+    expect(running, id).toBe(0);
+    await ctx.close();
+  }
+});
+
+test('the skin motion layer is in the markup, hidden from assistive technology', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('body > .skin-motion[aria-hidden="true"]')).toHaveCount(1);
+});
+
+test('a skin changes the page colours (the palette tokens follow the semantic ones)', async ({ page }) => {
+  await page.addInitScript((v) => localStorage.setItem('khaylub-audience', v), 'tech');
+  await page.goto('/work/');
+  await page.waitForFunction(() => !document.documentElement.classList.contains('skin-wait'));
+  const [bg, ink] = await page.evaluate(() => [getComputedStyle(document.documentElement).backgroundColor, getComputedStyle(document.querySelector('h1')!).color]);
+  expect(bg).toBe('rgb(13, 17, 36)');
+  expect(ink).toBe('rgb(236, 233, 255)');
+});

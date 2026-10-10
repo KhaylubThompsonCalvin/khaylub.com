@@ -92,6 +92,7 @@ const structured = jsonLd ?? {
     <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
   </head>
   <body>
+    <div class="skin-motion" aria-hidden="true"></div>
     <SkipLink />
     <SiteHeader current={current} />
     {
