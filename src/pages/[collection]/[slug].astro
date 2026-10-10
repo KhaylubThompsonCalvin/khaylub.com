@@ -53,7 +53,6 @@ const ogImageAlt = ogAlt(entry, meta.label, identity().site_name);
 const MEDIA = ['music', 'video', 'gallery', 'experiments'];
 const heroPicture = withdrawn || MEDIA.includes(entry.collection) ? undefined : await pictureFor(entry, 1200);
 const heroCall = !withdrawn && !MEDIA.includes(entry.collection) && !heroPicture;
-const firstTech: string | undefined = data.technologies?.[0];
 ---
 
 {
@@ -77,7 +76,7 @@ const firstTech: string | undefined = data.technologies?.[0];
     }
 
     {heroPicture && <img class="entry-hero" src={heroPicture.src} alt="" width={heroPicture.width} height={heroPicture.height} loading="eager" decoding="async" />}
-    {heroCall && <CallingCard class="entry-hero" title={data.title} kind={entry.collection} fact={firstTech ? labelFor('technologies', firstTech) : data.date.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })} />}
+    {heroCall && <CallingCard class="entry-hero" kind={entry.collection} fact={data.tags?.[0] ? labelFor('tags', data.tags[0]) : String(data.date.getUTCFullYear())} />}
 
     <ArtifactHeader entry={entry} />
 

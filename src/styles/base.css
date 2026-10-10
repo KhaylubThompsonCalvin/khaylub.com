@@ -274,9 +274,10 @@ small,
 }
 
 /* Cards */
+/* A grid of cards fills its row (auto-fit), each card as tall as the row with its meta at the foot. */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--width-card-min), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--width-card-min), 1fr));
   gap: var(--gap-block);
   list-style: none;
   padding: 0;
@@ -358,11 +359,13 @@ small,
   border-radius: var(--radius);
   overflow: hidden;
 }
-/* An index lists its entries as rows in one column at the reading measure, a media entry with its
-   cover at the left; Work keeps the grid for its three featured projects. */
+.card-grid li {
+  display: grid;
+}
+/* An index lists its entries as full-width rows, the picture at the left, the summary at a
+   readable measure. */
 .card-grid.list {
   grid-template-columns: minmax(0, 1fr);
-  max-width: var(--measure-reading);
 }
 @media (min-width: 560px) {
   .card-grid.list .card:has(.thumb) {
@@ -380,6 +383,7 @@ small,
   object-fit: cover;
 }
 .card .summary {
+  max-width: var(--measure-reading);
   margin: 0;
   color: var(--muted);
   font-size: var(--size-card);
@@ -728,6 +732,7 @@ small,
 /* A kind label (the 2026-10-10 polish): what a block or tile is (NOW, PROJECT, DATA), the one place
    the accent names things: small capitals, letter-spaced, sienna. */
 .bento .module-heading,
+.call small,
 .tile-kind {
   font: 600 var(--size-sm) / var(--leading-body) var(--font-body);
   letter-spacing: var(--tracking-eyebrow);
@@ -788,7 +793,8 @@ small,
   font-size: 3rem;
   color: color-mix(in srgb, var(--accent) 70%, var(--surface));
 }
-/* A calling card (CallingCard): in a picture's place, the kind's icon, the title large, one fact. */
+/* A calling card (CallingCard): in a picture's place, the kind's icon and label (a kind label),
+   and one line of the entry's own, large. */
 .call {
   display: flex;
   flex-direction: column;
@@ -803,7 +809,9 @@ small,
   color: var(--text);
 }
 .call small {
-  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 /* A calling card grows with its words (wider text spacing) instead of clipping them. */
 .thumb.call {
@@ -992,11 +1000,16 @@ figcaption {
   margin-bottom: var(--space-3);
 }
 
-/* A row of chips (About's certifications, skills, technologies, interests). */
+/* A row of chips (About's certifications, skills, technologies, interests; a card's technologies,
+   raised above the card's whole-card link). */
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
   list-style: none;
   padding: 0;
+}
+.card .chips {
+  position: relative;
+  margin: 0;
 }
