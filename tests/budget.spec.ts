@@ -117,3 +117,12 @@ test.describe('the performance budget as asserted', () => {
     expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1);
   });
 });
+
+test('the bundled stylesheet leaves room under the 36 KiB line (headers counted as 810 bytes)', async () => {
+  const { readFileSync, statSync } = await import('node:fs');
+  // The island's own climb.*.css is not the bundle; the bundle is the one the pages link.
+  const href = /<link rel="stylesheet" href="(\/_astro\/[^"]+\.css)"/.exec(readFileSync('dist/about/index.html', 'utf8'))?.[1];
+  expect(href, 'a bundled stylesheet link').toBeTruthy();
+  const bytes = statSync(`dist${href}`).size;
+  expect(bytes + 810, 'bundle plus headers').toBeLessThanOrEqual(36864);
+});

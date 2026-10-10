@@ -116,6 +116,35 @@ export const top8Schema = z
   })
   .strict();
 
+export const AUDIENCES = ['hiring', 'tech', 'creative', 'exploring', 'youtube', 'nostalgia'] as const;
+export type Audience = (typeof AUDIENCES)[number];
+export const SKINS = ['paper', 'desert-night', 'arizona-made', 'golden-hour', 'above-the-clouds', 'profile-2006'] as const;
+export type Skin = (typeof SKINS)[number];
+export type Tier = 'lean' | 'standard' | 'full';
+
+const linkSchema = z.object({ label: z.string().min(2), href: z.string().regex(/^(\/|https:\/\/)/) }).strict();
+export const audiencesSchema = z
+  .object({
+    audiences: z
+      .array(
+        z
+          .object({
+            id: z.enum(AUDIENCES),
+            label: z.string().min(3),
+            skin: z.enum(SKINS),
+            tier: z.enum(['lean', 'standard', 'full']),
+            greeting: z.string().max(140).refine((s) => !s.includes('\u2014'), 'no em dashes'),
+            start_here: z.array(linkSchema).length(3),
+            top8: z.object({ as_of: yearMonth, items: z.array(z.string()).min(1).max(8) }).strict(),
+          })
+          .strict()
+      )
+      .length(6),
+  })
+  .strict();
+export type AudienceConfig = z.infer<typeof audiencesSchema>['audiences'][number];
+export const audiences = () => parse('profile/audiences.yaml', audiencesSchema).audiences;
+
 export const EVENT_KINDS = ['launch', 'publication', 'course-completed', 'milestone', 'top8-revision'] as const;
 
 export const timelineSchema = z

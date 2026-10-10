@@ -4,7 +4,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { readFileSync } from 'node:fs';
 import { load } from 'js-yaml';
-import { isPreview, currentTop8, timelineEvents, top8Revisions } from './profile';
+import { isPreview, currentTop8, audiences, type Audience, timelineEvents, top8Revisions } from './profile';
 import { vocabulary, contentPath } from '../content/schemas';
 
 export type ArtifactCollection =
@@ -156,6 +156,13 @@ export async function top8Entries(revision?: Top8Revision): Promise<{ asOf: stri
     .filter((x): x is { entry: AnyEntry; reason: string } => !!x.entry)
     .slice(0, 8);
   return { asOf: rev.as_of, entries, skipped: rev.items.length - entries.length };
+}
+
+/** One audience's Top 8, resolved like the site Top 8: unpublished slots skipped, at most eight. */
+export async function top8For(a: Audience) {
+  const cfg = audiences().find((x) => x.id === a)!;
+  const { asOf, entries } = await top8Entries({ as_of: cfg.top8.as_of, items: cfg.top8.items.map((slug) => ({ slug, reason: '' })) } as Top8Revision);
+  return { asOf, entries };
 }
 
 /* ---------- Collection browsing (Phase 11): sorts and filters as pre-rendered pages ---------- */

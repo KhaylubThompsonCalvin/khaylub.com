@@ -1,0 +1,78 @@
+# What brings a visitor here (Profile Themes spec, 2026-10-10). Each audience picks a skin, a weight
+# tier, a Start-here row of exactly three links, the owner's own one-line greeting (empty until the
+# owner writes it; an empty greeting renders nothing), and its own ranked, dated Top 8 of published
+# slugs. OWNER GATE: the Top 8 orders below are Claude's proposal from the owner's published work;
+# the owner approves or reorders them before the PR is opened.
+audiences:
+  - id: hiring
+    label: Hiring
+    skin: paper
+    tier: lean
+    greeting: ""
+    start_here:
+      - { label: "Résumé", href: "/resume/" }
+      - { label: "Contact", href: "/contact/" }
+      - { label: "Work", href: "/work/" }
+    top8:
+      as_of: "2026-10"
+      items: [fuel-economy-regression, sql-python-analytics-pipeline, tableau-salary-story, manors-ai, khaylub-com-v1, the-16-mb-front-door, preserving-v1]
+  - id: tech
+    label: Tech and security
+    skin: desert-night
+    tier: standard
+    greeting: ""
+    start_here:
+      - { label: "Projects", href: "/projects/" }
+      - { label: "Data", href: "/data/" }
+      - { label: "Field Notes", href: "/notes/" }
+    top8:
+      as_of: "2026-10"
+      items: [sql-python-analytics-pipeline, fuel-economy-regression, manors-ai, the-16-mb-front-door, preserving-v1, tableau-salary-story, khaylub-com-v1]
+  - id: creative
+    label: Creative and 3D
+    skin: arizona-made
+    tier: full
+    greeting: ""
+    start_here:
+      - { label: "The climb", href: "/climb/" }
+      - { label: "Gallery", href: "/gallery/" }
+      - { label: "Experiments", href: "/experiments/" }
+    top8:
+      as_of: "2026-10"
+      items: [khaylub-com-v1, wanderer-hero, the-climb-beat-by-beat, the-climb, the-16-mb-front-door, preserving-v1, manors-ai]
+  - id: exploring
+    label: Just exploring
+    skin: golden-hour
+    tier: full
+    greeting: ""
+    start_here:
+      - { label: "Library", href: "/library/" }
+      - { label: "Field Notes", href: "/notes/" }
+      - { label: "Timeline", href: "/timeline/" }
+    top8:
+      as_of: "2026-09"
+      items: [khaylub-com-v1, fuel-economy-regression, sql-python-analytics-pipeline, the-16-mb-front-door, preserving-v1, wanderer-hero, manors-ai]
+  - id: youtube
+    label: Here from YouTube
+    skin: above-the-clouds
+    tier: full
+    greeting: ""
+    start_here:
+      - { label: "The Summit", href: "https://v1.khaylub.com/summit/" }
+      - { label: "Films", href: "https://www.youtube.com/@KhaylubThompson-Calvin/playlists" }
+      - { label: "Questions Worth Keeping", href: "https://www.youtube.com/@KhaylubThompson-Calvin/playlists" }
+    top8:
+      as_of: "2026-10"
+      items: [khaylub-com-v1, the-climb-recording, the-climb-beat-by-beat, wanderer-hero, the-16-mb-front-door, preserving-v1, fuel-economy-regression]
+  - id: nostalgia
+    label: Nostalgia
+    skin: profile-2006
+    tier: standard
+    greeting: ""
+    start_here:
+      - { label: "Khaylub's Top 8", href: "/top8/" }
+      - { label: "About", href: "/about/" }
+      - { label: "Timeline", href: "/timeline/" }
+    top8:
+      as_of: "2026-09"
+      items: [khaylub-com-v1, fuel-economy-regression, sql-python-analytics-pipeline, the-16-mb-front-door, preserving-v1, wanderer-hero, manors-ai]
