@@ -143,6 +143,6 @@ test.describe('the climb is opt-in', () => {
     await page.goto('/climb/');
     await expect(page.getByRole('link', { name: 'VIEW MY WORK' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'ENTER THE LIBRARY' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'v1.khaylub.com' })).toHaveAttribute('rel', /noopener/);
+    await expect(page.getByRole('link', { name: 'v1.khaylub.com', exact: true })).toHaveAttribute('rel', /noopener/);
   });
 });
