@@ -26,7 +26,7 @@ const items = Astro.props.headings.filter((h) => h.depth === 2);
   )
 }
 
-<style>
+<style is:global>
   /* The contents (the redesign's evidence room): a head on an ink rule and a plain list with a quiet
      rule under each entry, like the fact tables above it. No card, no capitals. */
   .toc {

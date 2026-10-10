@@ -2,15 +2,13 @@
 // The Details module of the Home profile (F5, document 65): labelled rows drawn from the profile
 // data that already exists (education, the roles sought, certifications, the interests groups).
 // Nothing here is new copy; a row renders only when its source has a value.
-import { availability, education, certifications, interests, periodLabel } from '@lib/profile';
+import { education, certifications, interests, periodLabel } from '@lib/profile';
 
 const edu = education().entries[0];
-const avail = availability();
 const certs = certifications();
 const groups = interests().groups.filter((g) => g.items.length > 0);
 const rows: { term: string; html?: string; text?: string; links?: { label: string; href: string }[] }[] = [];
 if (edu) rows.push({ term: 'Studying', text: `${edu.program}, ${edu.institution}, ${periodLabel(edu.start, edu.end)}` });
-if (avail.roles_sought.length) rows.push({ term: 'Looking for', text: avail.roles_sought.join('; ') });
 if (certs.items.length) rows.push({ term: 'Certified', text: `${certs.items[0].name}, ${certs.items[0].issuer}` });
 if (certs.planned.length) rows.push({ term: 'Planned', text: certs.planned.join(', ') });
 for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ label: it.label, href: it.url ?? `/tags/${it.tag}/` })) });
@@ -18,7 +16,7 @@ for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ 
 
 {
   rows.length > 0 && (
-    <section class="module boxed" aria-labelledby="details-heading">
+    <section class="module" aria-labelledby="details-heading">
       <h2 id="details-heading" class="module-heading">Details</h2>
       <dl class="fact-table details">
         {rows.map((r) => (
@@ -36,6 +34,7 @@ for (const g of groups) rows.push({ term: g.name, links: g.items.map((it) => ({ 
           </div>
         ))}
       </dl>
+      <p class="block-go"><a href="/about/">More about me</a></p>
     </section>
   )
 }

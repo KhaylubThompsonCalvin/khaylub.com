@@ -3,6 +3,7 @@ import { identity } from '@lib/profile';
 const id = identity();
 // The Home hero's quick links: verification and contact only (About, GitHub, Résumé, Contact; the
 // owner's decision of 2026-09-20). Skills and Projects keep their routes and their place in the nav.
+const here = Astro.url.pathname;
 const links = [
   { href: '/about/', label: 'About' },
   { href: id.github, label: 'GitHub', external: true },
@@ -16,7 +17,7 @@ const links = [
     {
       links.map((l) => (
         <li>
-          <a href={l.href} rel={l.external ? 'noopener noreferrer' : undefined}>
+          <a href={l.href} rel={l.external ? 'noopener noreferrer' : undefined} aria-current={l.href === here ? 'page' : undefined}>
             {l.label}
           </a>
         </li>
@@ -25,7 +26,7 @@ const links = [
   </ul>
 </nav>
 
-<style>
+<style is:global>
   .recruiter-row {
     display: flex;
     flex-wrap: wrap;

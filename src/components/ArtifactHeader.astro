@@ -71,7 +71,7 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   <ProjectFacts entry={entry} />
 </header>
 
-<style>
+<style is:global>
   /* The title block keeps a gap of its own before the body (F5): the last line's margin is not it. */
   .artifact-header {
     margin-bottom: var(--space-header-body);
@@ -79,7 +79,7 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   .artifact-header > :last-child {
     margin-bottom: 0;
   }
-  .meta {
+  .artifact-header .meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -88,11 +88,11 @@ const seriesRoute = entry.collection === 'notes' && seq.series ? `/notes/series/
   /* The facts of a case study read as one table under one ink rule: a data entry's Question, Data,
      and Result continue the Problem and My role rows. */
   .summary-card,
-  .facts {
+  dl.facts {
     font-size: var(--size-body);
     border-top: 2px solid var(--ink);
   }
-  .summary-card + .facts {
+  .summary-card + dl.facts {
     border-top: 0;
     margin-top: calc(-1 * var(--space-2));
   }

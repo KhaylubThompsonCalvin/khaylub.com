@@ -71,8 +71,9 @@ F5's semantic layer in `tokens.css` (`--space-section`, `--space-intro`, `--spac
 balanced), and the Home page below the hero is the profile composition of the Visual North Star
 (document 65): Now, the Top 8 as ranked captioned tiles (`Top8.astro`, the tile pattern in
 `base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
-that is the phone order, two columns from 900 px. Component styles are scoped by class
-(`scopedStyleStrategy: 'class'`) to keep the one stylesheet inside its 36 KiB line.
+that is the phone order, two columns from 900 px. Component styles are global under each
+component's own root class (`<style is:global>`; a generic name is prefixed by its root) since the
+2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its 36 KiB line.
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 

@@ -1,0 +1,55 @@
+---
+// The search field (W13; the 2026-10-10 polish): a labelled field with the magnifier inside it and
+// a Search button, the shape visitors know from every other site. A plain GET form to /search/, so
+// it works without JavaScript; on /search/ the script reads the same field (its ids) and runs the
+// index in place. The 404 page carries it too (the owner's decision held back from PR #99).
+interface Props {
+  label?: string;
+}
+const { label = 'Search the library' } = Astro.props;
+---
+
+<form id="search-form" class="search-form" role="search" action="/search/" method="get">
+  <label for="search-input">{label}</label>
+  <div class="search-row">
+    <span class="search-field">
+      <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="5" /><path d="M10.5 10.5 15 15" /></svg>
+      <input id="search-input" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="regression, Blender, preservation" />
+    </span>
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+  <slot />
+</form>
+
+<style is:global>
+  .search-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+  }
+  .search-row {
+    display: flex;
+    gap: var(--space-1);
+  }
+  .search-field {
+    position: relative;
+    flex: 1;
+    color: var(--muted);
+  }
+  .search-field svg {
+    position: absolute;
+    left: var(--space-1-5);
+    top: calc(50% - 8px);
+  }
+  .search-row input {
+    height: 100%;
+    width: 100%;
+    min-height: var(--target);
+    padding: var(--space-1) var(--space-1-5) var(--space-1) var(--space-6);
+    font: inherit;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--muted);
+    border-radius: var(--radius-sm);
+  }
+</style>

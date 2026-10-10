@@ -2,6 +2,7 @@
 // One card pattern for projects, data projects, Field Notes, and library items.
 // The title link is the accessible name and the whole card is its target.
 import Badge from './Badge.astro';
+import CallingCard from './CallingCard.astro';
 
 interface Props {
   href: string;
@@ -14,13 +15,16 @@ interface Props {
   headingLevel?: 'h3' | 'h2';
   /** A project's status (concept, live, ...); a concept draws a dashed rule. */
   status?: string;
+  /** No picture: a calling card in the picture's place (CallingCard). */
+  call?: { kind: string; fact?: string };
 }
-const { href, title, summary, badge, meta = [], rank, thumb, headingLevel = 'h3', status } = Astro.props;
+const { href, title, summary, badge, meta = [], rank, thumb, headingLevel = 'h3', status, call } = Astro.props;
 const Heading = headingLevel;
 ---
 
 <article class="card" data-status={status}>
   {thumb && <div class="thumb"><img src={thumb.src} alt={thumb.alt} loading="lazy" decoding="async" width={thumb.width ?? 400} height={thumb.height ?? 250} /></div>}
+  {!thumb && call && <CallingCard class="thumb" kind={call.kind} fact={call.fact} />}
   <Heading>
     {rank && <span class="visually-hidden">Rank {rank}. </span>}<a href={href}>{title}</a>
   </Heading>

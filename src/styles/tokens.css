@@ -1,7 +1,8 @@
 /* Design tokens. The palette is the design initiative's F4 (vault document 64, decision D-32), a
    warm paper palette with a working sienna accent: light on :root, dark under prefers-color-scheme
    and, since F4, under the Appearance control's data-theme attribute (light and dark force a scheme;
-   no attribute means the system decides). Text on --bg: ink 13.61:1 light and 14.78:1 dark, muted
+   no attribute means the system decides). The divider --line is 3.04:1 light and 3.03:1 dark on
+   --bg since the 2026-10-10 polish (same hue, lightness only; it was 1.44:1 and 1.51:1). Text on --bg: ink 13.61:1 light and 14.78:1 dark, muted
    6.66:1 and 8.35:1; the accent 5.36:1 and 8.68:1, so it may be text; the notice 4.99:1 and 9.19:1.
    The palette tokens are values; the semantic aliases below them carry the roles components use. */
 :root {
@@ -11,10 +12,13 @@
   --muted: #574c3b;
   --accent: #8a4b1f;
   --card: #f6f1e9;
-  --line: #cbbfae;
+  --line: #957f60;
   --focus: #1d4ed8;
   --notice: #7a5b15;
   --scrim: rgba(34, 26, 17, 0.85);
+  --shade: #221a11;
+  /* The status light beside the availability statement: the one colour outside the accent. */
+  --status: #2e7d32;
 
   /* The semantic roles (F4). --interactive is the chrome's normal interaction role and resolves to
      the ink treatment; it is not a generic name for every interactive colour. --link-content is the
@@ -36,7 +40,8 @@
   --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif;
   --font-body: 'KT Sans', 'KT Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  --size-sm: 0.8rem;
+  /* 0.875rem since the 2026-10-10 polish (was 0.8rem): meta lines and captions read at 14 px. */
+  --size-sm: 0.875rem;
   --size-body: 1rem;
   --size-h3: 1.25rem;
   --size-h2: 1.75rem;
@@ -76,7 +81,6 @@
   --space-intro: var(--space-4);
   --space-header-body: var(--space-4);
   --space-module: var(--space-6);
-  --space-card: var(--space-2);
   --space-grid: var(--space-2);
   --space-footer: var(--space-4);
   /* Text laid over an image (the Top 8's cover tiles) sits on --scrim in both schemes. */
@@ -107,6 +111,9 @@
   --radius-pill: 999px;
   --radius-photo: 12px;
   --ease: 150ms ease;
+  /* The page change and the content reveal (the 2026-10-10 polish): a short fade, 0 s under reduced
+     motion (below). */
+  --motion-page: 240ms ease-out;
 
   /* Interaction tints and elevation (F2): the button hover and active mixes; the card and the
      open menu shadows. The primary nav keeps its own 6% hover until F4. */
@@ -114,17 +121,30 @@
   --tint-active: 16%;
   --shadow-card: 0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
   --shadow-menu: 0 8px 24px color-mix(in srgb, var(--ink) 15%, transparent);
+
+  /* Surfaces (the 2026-10-10 polish, soft depth): a block or card is --surface on the page with a
+     hairline edge about 7 percent toward the ink (a dark edge in light, a light edge in dark), a
+     soft two-layer shadow in --shade (warm ink in light, black in dark), one radius, one padding,
+     and one gap between blocks (16 px, 24 px from 900 px). */
+  --hairline: color-mix(in srgb, var(--surface) 93%, var(--ink));
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--shade) 8%, transparent), 0 8px 24px color-mix(in srgb, var(--shade) 7%, transparent);
+  --shadow-md: 0 2px 4px color-mix(in srgb, var(--shade) 10%, transparent), 0 14px 32px color-mix(in srgb, var(--shade) 14%, transparent);
+  --radius-block: 14px;
+  --pad-block: 1.25rem;
+  --gap-block: var(--space-2);
 }
 
 @media (min-width: 900px) {
   :root {
     --space-section: var(--space-8);
+    --pad-block: var(--space-3);
+    --gap-block: var(--space-3);
   }
 }
 
 /* Breakpoints (documented constants, not tokens: a custom property cannot drive an @media
    condition in plain CSS). A change is made in every file that names the value.
-   360px  the Top 8 tiles go two across (Top8)
+   360px  the Top 8 tiles go two across; 900px four across (Top8)
    560px  the doors side by side; previous and next (Doors, PrevNext)
    900px  the second hero column; the section gap steps up (IdentityCard, tokens.css); the Home
           profile columns (index.astro)
@@ -143,10 +163,12 @@
     --muted: #b7ac9b;
     --accent: #e0a56a;
     --card: #1f1a14;
-    --line: #3b332a;
+    --line: #6e5f4e;
     --focus: #8ab6e2;
     --notice: #d9b060;
     --scrim: rgba(21, 18, 13, 0.85);
+    --shade: #000;
+    --status: #6cc070;
   }
 }
 :root[data-theme='dark'] {
@@ -156,10 +178,12 @@
   --muted: #b7ac9b;
   --accent: #e0a56a;
   --card: #1f1a14;
-  --line: #3b332a;
+  --line: #6e5f4e;
   --focus: #8ab6e2;
   --notice: #d9b060;
   --scrim: rgba(21, 18, 13, 0.85);
+  --shade: #000;
+  --status: #6cc070;
 }
 :root[data-theme='light'] {
   color-scheme: light;
@@ -168,6 +192,7 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     --ease: 0s;
+    --motion-page: 0s;
   }
   *,
   *::before,

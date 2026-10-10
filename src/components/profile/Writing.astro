@@ -38,11 +38,11 @@ const line = lead ? openingLine(lead.body) : undefined;
   )
 }
 
-<style>
+<style is:global>
   .lead-line {
     margin: 0 0 var(--space-2);
   }
-  .row-list .small {
+  .lead ~ .row-list .small {
     white-space: nowrap;
   }
 </style>

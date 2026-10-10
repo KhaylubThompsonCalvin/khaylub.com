@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import SearchForm from '@components/SearchForm.astro';
 import { COLLECTIONS } from '@lib/catalog';
 ---
 
@@ -7,6 +8,7 @@ import { COLLECTIONS } from '@lib/catalog';
   <article class="measure-reading">
     <h1>Page not found</h1>
     <p>There is nothing at this address. Nothing is broken on your side; the page may have moved or never existed.</p>
+    <SearchForm label="Search for it instead" />
     <h2>Try one of these</h2>
     <ul>
       <li><a href="/">Home</a></li>
@@ -17,3 +19,9 @@ import { COLLECTIONS } from '@lib/catalog';
     </ul>
   </article>
 </BaseLayout>
+
+<style is:global>
+  .search-form + h2 {
+    margin-top: var(--space-4);
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+// The ways to reach the owner as rows, each a 44 px target with an icon, a label, and a quiet note,
+// from identity.yaml and the résumé record (the Home Contact block, About, and the Contact page), or
+// the rows a page passes (the résumé's own contact line). The icons are generic line drawings
+// (src/lib/icons.ts), decorative: the label starts the name.
+import { identity, resumeMeta } from '@lib/profile';
+import { ICONS as icons } from '@lib/icons';
+
+export type Row = { icon: string; label: string; href?: string; note?: string; external?: boolean };
+interface Props {
+  /** The Contact page shows each way's value: the address, the GitHub handle, the LinkedIn name. */
+  values?: boolean;
+  rows?: Row[];
+}
+const { values = false } = Astro.props;
+const id = identity();
+const resume = resumeMeta();
+const rows: Row[] = Astro.props.rows ?? [
+  { icon: 'mail', label: 'Email', href: `mailto:${id.email}`, note: values ? id.email : undefined },
+  { icon: 'code', label: 'GitHub', href: id.github, note: id.github.replace(/^https?:\/\/github\.com\//, ''), external: true },
+  { icon: 'work', label: 'LinkedIn', href: id.linkedin, note: values ? id.name : undefined, external: true },
+  { icon: 'page', label: 'Résumé', href: '/resume/', note: `revision ${resume.revision}` },
+  { icon: 'down', label: 'Résumé (PDF)', href: resume.pdf },
+];
+---
+
+<ul class="contact">
+  {
+    rows.map((r) => (
+      <li>
+        {r.href ? (
+          <a href={r.href} rel={r.external ? 'me noopener noreferrer' : undefined}>
+            <span>
+              <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d={icons[r.icon]} /></svg>
+              {r.label}
+            </span>
+            {r.note && <span class="note">{r.note}</span>}
+          </a>
+        ) : (
+          <p>
+            <span>
+              <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d={icons[r.icon]} /></svg>
+              {r.label}
+            </span>
+            {r.note && <span class="note">{r.note}</span>}
+          </p>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style is:global>
+  .contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .contact li {
+    border-bottom: 1px solid var(--border);
+  }
+  .contact li:last-child {
+    border-bottom: 0;
+  }
+  .contact :is(a, p) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--target);
+    margin: 0;
+    padding: var(--space-1) 0;
+  }
+  .contact :is(a, p) > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    white-space: nowrap;
+    flex: none;
+  }
+  .contact .note {
+    font-size: var(--size-sm);
+    color: var(--text-secondary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+</style>

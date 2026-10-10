@@ -1,6 +1,7 @@
 // Mobile menu disclosure. Astro bundles this as an external module script (no inline script),
 // which keeps the Content Security Policy strict. Behavior: the button toggles aria-expanded;
-// Escape closes and returns focus to the button; clicking outside closes; no focus trap.
+// Escape closes and returns focus to the button; clicking outside closes; no focus trap; the page
+// behind is held still while the menu is open (the class on <html>, read by PrimaryNav's style).
 export function setupNavDisclosure(): void {
   const button = document.getElementById('primary-nav-button');
   const list = document.getElementById('primary-nav-list');
@@ -9,6 +10,7 @@ export function setupNavDisclosure(): void {
   const setOpen = (open: boolean): void => {
     button.setAttribute('aria-expanded', String(open));
     list.dataset.open = String(open);
+    document.documentElement.classList.toggle('menu-open', open);
   };
 
   button.addEventListener('click', () => {

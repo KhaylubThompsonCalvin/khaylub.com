@@ -13,8 +13,8 @@ test.describe('marked external links', () => {
     expect(await afterContent(page, 'main a[href^="https://github.com"]')).toContain('↗');
     expect(await afterContent(page, 'main a[href^="mailto:"]')).toBe('none');
     expect(await afterContent(page, 'main a[href="/resume/"]')).toBe('none');
-    // The arrow has empty alt text: the accessible name stays the link's words.
-    await expect(page.getByRole('main').getByRole('link', { name: 'GitHub', exact: true })).toHaveCount(1);
+    // The arrow has empty alt text: the accessible name stays the link's words (label and value).
+    await expect(page.getByRole('main').getByRole('link', { name: 'GitHub KhaylubThompsonCalvin', exact: true })).toHaveCount(1);
   });
 });
 

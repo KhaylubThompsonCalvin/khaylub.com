@@ -122,7 +122,9 @@ li > a,
 .shelf p a,
 .sort-links a,
 .tag-links a,
-.proof-links a {
+.proof-links a,
+.climb-go a,
+.back-link a {
   display: inline-flex;
   align-items: center;
   min-height: var(--target);
@@ -189,20 +191,55 @@ small,
 .module {
   margin-bottom: var(--space-module);
 }
-/* The identity column's modules sit in light plates (the profile grammar: the owner's facts in a
-   box); the wide column's modules stay open on the paper. */
-.module.boxed {
+/* A surface (the 2026-10-10 polish, soft depth): every block, card, plate, and section of the
+   résumé and Contact is one slightly lighter surface on the page, a hairline edge, a soft warm
+   shadow, and one radius, so nothing reads as an outlined box. A whole-card link lifts it on hover
+   and focus (below). */
+.bento > *,
+.surface,
+.plate,
+.card,
+.banner {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1-5) var(--space-2) var(--space-2);
-  margin-bottom: var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-block);
+  box-shadow: var(--shadow-sm);
+  padding: var(--pad-block);
 }
-.module.boxed .module-heading {
-  font-size: var(--size-h3);
-}
-.module.boxed > :last-child {
+.surface > :last-child,
+.bento > * > :last-child {
   margin-bottom: 0;
+}
+/* Page layouts (Contact, the résumé): a column of surfaces (.stack); from 1024 px two columns, the
+   first the wider (.split); a line whose ends sit apart, wrapping on a phone (.spread). */
+.split,
+.stack {
+  display: grid;
+  gap: var(--gap-block);
+  align-content: start;
+}
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}
+.spread {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+/* On paper: the page's words without the site's chrome, shadows, or actions. */
+@media print {
+  .site-header,
+  .site-footer,
+  .cta-row {
+    display: none;
+  }
+  .surface {
+    box-shadow: none;
+  }
 }
 .module-heading {
   display: flex;
@@ -263,10 +300,11 @@ small,
 }
 
 /* Cards */
+/* A grid of cards fills its row (auto-fit), each card as tall as the row with its meta at the foot. */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--width-card-min), 1fr));
-  gap: var(--space-grid);
+  grid-template-columns: repeat(auto-fit, minmax(var(--width-card-min), 1fr));
+  gap: var(--gap-block);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -280,19 +318,17 @@ small,
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-2) 0;
-  border-top: 2px solid var(--ink);
-  transition: border-color var(--ease);
+  transition: translate var(--motion-page), box-shadow var(--motion-page);
 }
-/* A concept is not built yet: its rule is dashed, so the card reads as such before its badge. */
+/* A concept is not built yet: its edge is dashed, so the card reads as such before its badge. */
 .card[data-status='concept'] {
-  border-top-style: dashed;
+  border: 1px dashed var(--border);
 }
-.card:hover {
-  border-top-color: var(--accent);
-}
-.card:focus-within {
-  border-top-color: var(--focus);
+@media (prefers-reduced-motion: no-preference) {
+  .card:is(:hover, :focus-within) {
+    translate: 0 -2px;
+    box-shadow: var(--shadow-md);
+  }
 }
 .card h3 {
   font-family: var(--font-display);
@@ -315,6 +351,11 @@ small,
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
+}
+/* The way back to a collection, at the foot of an entry, leads with the left arrow (decorative). */
+.back-link a::before {
+  content: '\2190\a0' / '';
+  font-family: system-ui;
 }
 /* The arrow cue after a card or tile title says the whole entry opens; it moves on hover. A
    no-break space keeps it on the title's last line. */
@@ -340,30 +381,17 @@ small,
 }
 .card .thumb {
   aspect-ratio: 16 / 10;
-  background: var(--line);
-  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border-radius: var(--radius);
   overflow: hidden;
 }
-/* An index lists its entries as rows in one column at the reading measure, a media entry with its
-   cover at the left; Work keeps the grid for its three featured projects. */
+.card-grid li {
+  display: grid;
+}
+/* An index lists its entries as full-width rows, the picture at the left, the summary at a
+   readable measure. */
 .card-grid.list {
   grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  max-width: var(--measure-reading);
-}
-.card-grid.list .card {
-  border-top-width: 1px;
-  border-top-color: var(--line);
-}
-.card-grid.list li:first-child .card {
-  border-top-width: 2px;
-  border-top-color: var(--ink);
-}
-.card-grid.list .card:hover {
-  border-top-color: var(--accent);
-}
-.card-grid.list .card:focus-within {
-  border-top-color: var(--focus);
 }
 @media (min-width: 560px) {
   .card-grid.list .card:has(.thumb) {
@@ -381,6 +409,7 @@ small,
   object-fit: cover;
 }
 .card .summary {
+  max-width: var(--measure-reading);
   margin: 0;
   color: var(--muted);
   font-size: var(--size-card);
@@ -428,10 +457,6 @@ small,
    same plate: Work an ink rule and the availability; the Library the shelf lines; Writing the
    display face for its sentence. One language, different rooms. */
 .plate {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3) var(--space-3) var(--space-2);
   margin-bottom: var(--space-intro);
 }
 .plate > :last-child {
@@ -439,12 +464,6 @@ small,
 }
 .plate h1 {
   margin-bottom: var(--space-1);
-}
-.plate.room-work {
-  border-top: 4px solid var(--ink);
-}
-.plate.room-library {
-  border-bottom: 6px solid var(--border);
 }
 /* The reading room is one column at the reading measure, its plate included. */
 .plate.room-writing {
@@ -516,16 +535,16 @@ small,
   padding: var(--space-1) 0;
   border-bottom: 1px solid var(--border);
 }
-.boxed .fact-table > div:last-child {
+.bento .fact-table > div:last-child {
   border-bottom: 0;
 }
 /* In a plate the label sits above its value, so the value keeps the plate's full width; the value
    text keeps its size, only the label is small. */
-.boxed .fact-table > div {
+.bento .fact-table > div {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
 }
-.boxed .fact-table dt {
+.bento .fact-table dt {
   font-size: var(--size-sm);
 }
 .fact-table dt {
@@ -552,8 +571,8 @@ small,
   position: relative;
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-block);
+  box-shadow: var(--shadow-sm);
   margin-bottom: var(--space-section);
   color: var(--on-image);
 }
@@ -588,8 +607,15 @@ small,
 .climb-band .climb-line {
   margin: 0;
 }
+/* Home: the button, and under it the June version's link (light on the scrim through the chrome's
+   link role; 44 px by the rule above). */
+.climb-go {
+  display: grid;
+  justify-items: start;
+  margin: 0;
+  --interactive: var(--on-image);
+}
 .btn-on-image {
-  justify-self: start;
   min-height: 56px;
   padding-inline: var(--space-3);
   border-color: var(--on-image);
@@ -602,7 +628,10 @@ small,
 .climb-band.standalone {
   margin-bottom: var(--space-4);
 }
-@media (min-width: 900px) {
+/* From 640 px the still fills the band and the words sit on the scrim at its foot: on Home the band
+   is a two-column block of the grid; on /climb/ (standalone) it is the page's head, and from 900 px
+   its first column stays empty so the Wanderer stands clear at the left of the still. */
+@media (min-width: 640px) {
   .climb-band {
     min-height: 21rem;
   }
@@ -614,19 +643,20 @@ small,
   .climb-band img {
     object-position: 0% 28%;
   }
-  /* The first column stays empty so the Wanderer stands clear at the left of the still. */
   .climb-words {
     align-self: end;
-    grid-template-columns: minmax(10rem, 1fr) minmax(0, 36rem) auto;
     align-items: end;
+    padding: var(--space-8) var(--space-3) var(--space-3);
+    background: linear-gradient(to top right, var(--scrim) 45%, transparent 80%);
+  }
+}
+@media (min-width: 900px) {
+  .standalone .climb-words {
+    grid-template-columns: minmax(10rem, 1fr) minmax(0, 36rem);
     padding: var(--space-4);
-    background: linear-gradient(to top, var(--scrim) 55%, transparent);
   }
-  .climb-words > div {
+  .standalone .climb-words > div {
     grid-column: 2;
-  }
-  .btn-on-image {
-    justify-self: end;
   }
 }
 
@@ -645,7 +675,7 @@ small,
 }
 
 /* The Top 8 tiles (document 65): a set of squares, the rank at the top and the title at the foot,
-   the owner's reason under each. Four across from 700 px, two across from 360 px, rows below;
+   the owner's reason under each. Four across from 900 px, two across from 360 px, rows below;
    on a full-width page the grid stops growing at about 200 px a tile. */
 .top8 {
   list-style: none;
@@ -659,7 +689,7 @@ small,
 }
 /* The first-ranked tile takes the spare columns when the count leaves a gap (a set of seven), at
    the height of a square tile, so the rows stay whole. */
-@media (min-width: 360px) and (max-width: 699px) {
+@media (min-width: 360px) and (max-width: 899px) {
   .top8[data-spare2] > li:first-child {
     grid-column: span 2;
   }
@@ -668,7 +698,7 @@ small,
     min-height: calc((100cqw - var(--space-grid)) / 2);
   }
 }
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .top8 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -701,13 +731,17 @@ small,
   column-gap: var(--space-1);
   padding: var(--space-1-5);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  transition: border-color var(--ease), box-shadow var(--ease);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  transition: translate var(--motion-page), box-shadow var(--motion-page);
 }
 .tile:hover .tile-art {
-  border-color: var(--muted);
   box-shadow: var(--shadow-card);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tile:is(:hover, :focus-within) .tile-art {
+    translate: 0 -2px;
+  }
 }
 .tile:focus-within .tile-art {
   border-color: var(--focus);
@@ -721,14 +755,24 @@ small,
   color: var(--signal);
   position: relative;
 }
-/* What the thing is (Project, Data, Field Note, Gallery), quiet, on the rank's line. */
+/* A kind label (the 2026-10-10 polish): what a block or tile is (NOW, PROJECT, DATA), the one place
+   the accent names things: small capitals, letter-spaced, sienna. */
+.bento .module-heading,
+.call small,
+.tile-kind {
+  font: 600 var(--size-sm) / var(--leading-body) var(--font-body);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+.bento .module-heading .as-of {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
 .tile-kind {
   grid-area: kind;
   justify-self: end;
   text-align: right;
-  font-size: var(--size-sm);
-  line-height: var(--leading-body);
-  color: var(--text-secondary);
   position: relative;
 }
 .has-cover .tile-kind {
@@ -750,7 +794,7 @@ small,
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: calc(var(--radius-sm) - 1px);
+  border-radius: calc(var(--radius) - 1px);
 }
 /* The scrim under the rank and the kind at the top and under the title at the foot, so the words
    read on any cover; the middle of the still stays clear. */
@@ -758,8 +802,46 @@ small,
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--radius-sm) - 1px);
+  border-radius: calc(var(--radius) - 1px);
   background: linear-gradient(to bottom, var(--scrim), transparent 38%, transparent 45%, var(--scrim));
+}
+/* A pale picture (a chart) is dimmed by half; the scrim at the foot keeps the title at large-text contrast. */
+.pale img {
+  filter: brightness(0.5);
+}
+/* No picture: a typographic tile, the calling card's tint with the rank large and lighter, the
+   title at the foot like the pictured tiles, never an empty frame. */
+.call,
+.type-tile .tile-art {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--surface)), color-mix(in srgb, var(--accent) 5%, var(--surface)));
+}
+.type-tile .tile-rank {
+  font-size: 3rem;
+  color: color-mix(in srgb, var(--accent) 70%, var(--surface));
+}
+/* A calling card (CallingCard): in a picture's place, the kind's icon and label (a kind label),
+   and one line of the entry's own, large. */
+.call {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  padding: var(--space-1-5);
+  border-left: 3px solid var(--accent);
+  color: var(--signal);
+}
+.call b {
+  margin-top: auto;
+  font: 700 var(--size-h3) / var(--leading-heading) var(--font-display);
+  color: var(--text);
+}
+.call small {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+/* A calling card grows with its words (wider text spacing) instead of clipping them. */
+.thumb.call {
+  overflow: visible;
 }
 .has-cover .tile-rank,
 .has-cover :is(h2, h3) a {
@@ -770,9 +852,6 @@ small,
   font-size: var(--size-sm);
   line-height: var(--leading-body);
   color: var(--text-secondary);
-}
-.tile-meta {
-  white-space: nowrap;
 }
 .signal {
   color: var(--signal);
@@ -829,11 +908,7 @@ small,
 
 /* An informational notice (F4): the amber rule means "pay attention", never danger. */
 .banner {
-  background: var(--surface);
-  border: 1px solid var(--border);
   border-left: 4px solid var(--notice);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
   margin-bottom: var(--space-3);
 }
 
@@ -882,4 +957,85 @@ figcaption {
   margin-top: var(--space-1);
   font-size: var(--size-sm);
   color: var(--muted);
+}
+
+/* Controls (the 2026-10-10 polish, Jakob's Law): a segmented control (the Appearance choice, a
+   list's sort order) and a filter chip share one shape, a 44 px pill; the pressed or current choice
+   is filled with ink, so the state never rests on colour alone. */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+.seg > *,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--target);
+  min-width: var(--target);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--size-sm);
+  text-decoration: none;
+  cursor: pointer;
+}
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.seg > :hover,
+.chip:hover {
+  background: color-mix(in srgb, var(--ink) var(--tint-hover), var(--surface));
+}
+.seg [aria-pressed='true'],
+.seg [aria-current='page'],
+.chip[aria-current='page'] {
+  background: var(--interactive);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* Motion (the 2026-10-10 polish): pages cross-fade on a change over --motion-page, which is 0 s
+   under reduced motion. No fade on first load: the accessibility audit would read text mid-fade. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-page);
+}
+
+/* The availability line and a page's primary-action row (Contact's email, the résumé's PDF): the
+   filled button first, its quiet note beside it. */
+.availability {
+  font-weight: 600;
+}
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* A row of chips (About's certifications, skills, technologies, interests; a card's technologies,
+   raised above the card's whole-card link). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
+}
+.card .chips {
+  position: relative;
+  margin: 0;
 }

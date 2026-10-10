@@ -7,3 +7,10 @@ spark-wakes.webp
   with sharp on 2026-09-23 (WebP, quality 82). Same license as the source: all rights reserved, the
   author's own screenshot of the author's own site; the models and plates in frame are recorded in
   public/climb/provenance.yaml (generated base meshes finished in Blender by the author; generated video plates).
+
+wheat-lane.webp
+  A frame of the remastered climb at v1.khaylub.com (the golden-wheat scene: the Wanderer on a
+  trodden lane toward a lone tree and a low sun, the Phoenix above), the author's own capture of the
+  author's own site at 1200 by 630, the same frame that site uses as its link preview. Converted to
+  WebP with sharp on 2026-10-10 (quality 82). Same license: all rights reserved. Used on the Home
+  climb band and the first Top 8 tile.

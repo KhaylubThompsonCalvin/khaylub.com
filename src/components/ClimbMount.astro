@@ -11,7 +11,7 @@ const { class: className } = Astro.props;
 
 <div class:list={['climb-mount', className]} data-climb-mount></div>
 
-<style>
+<style is:global>
   .climb-mount:empty {
     display: none;
   }

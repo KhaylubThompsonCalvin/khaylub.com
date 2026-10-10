@@ -2,10 +2,22 @@
 // Khaylub's Top 8: eight things ranked and dated, as a set of captioned tiles (the design
 // initiative's F5, vault document 65: the profile-page grammar, set like a publication). Each tile
 // carries its rank, its title in the display face, and, under the tile, the owner's one-line reason
-// with the kind and the date. A media entry's cover fills its tile under the scrim.
+// with the kind and the date. An entry's picture fills its tile under the scrim: its cover, or for an
+// entry with no cover a picture it already shows (PICTURES); a tile with no picture at all is a
+// typographic tile on the tint, never an empty frame.
+import { getImage } from 'astro:assets';
 import { top8Entries, badgeFor, routeFor } from '@lib/catalog';
 import type { top8Revisions } from '@lib/profile';
-import { coverThumb } from '@lib/media';
+import { pictureFor, type Thumb } from '@lib/media';
+import wheat from '../assets/climb/wheat-lane.webp';
+
+const wheatThumb = await getImage({ src: wheat, width: 640, format: 'webp', quality: 70 });
+// The tile's picture comes from pictureFor (the entry's cover, else the first picture its body
+// publishes, a pale chart dimmed on the scrim so the rank and title keep their contrast); the first
+// climb keeps the Home band's golden-wheat still. Decorative beside the title.
+const PICTURES: Record<string, Thumb> = {
+  'khaylub-com-v1': { src: wheatThumb.src, alt: '', width: Number(wheatThumb.attributes.width), height: Number(wheatThumb.attributes.height) },
+};
 
 interface Props {
   /** An archived revision; the newest revision when omitted. */
@@ -26,13 +38,13 @@ const tiles = await Promise.all(
   entries.map(async ({ entry, reason }, i) => {
     const badge = badgeFor(entry);
     const status = entry.collection === 'projects' && badge.text !== 'Published' ? badge.text : undefined;
-    const cover = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
+    const cover = PICTURES[entry.data.slug] ?? (await pictureFor(entry));
     return { entry, reason, rank: i + 1, kind: KINDS[entry.collection] ?? entry.collection, status, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
   })
 );
 // A set of seven (or any count that leaves a gap in the last row) is laid out on purpose: the
 // first-ranked tile takes the spare columns as a wide tile, so no row implies a missing card.
-// Four across from 700 px, two across from 360 px; an eighth item returns the grid to squares.
+// Four across from 900 px, two across from 360 px; an eighth item returns the grid to squares.
 const spare4 = (4 - (tiles.length % 4)) % 4;
 const spare2 = tiles.length % 2;
 ---
@@ -44,7 +56,7 @@ const spare2 = tiles.length % 2;
       <ol class="top8" data-spare4={spare4 || undefined} data-spare2={spare2 || undefined}>
         {tiles.map((t) => (
           <li>
-            <article class:list={['tile', { 'has-cover': !!t.cover }]}>
+            <article class:list={['tile', t.cover ? 'has-cover' : 'type-tile', { pale: (t.cover as { pale?: boolean } | undefined)?.pale }]}>
               <div class="tile-art">
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>
@@ -74,7 +86,7 @@ const spare2 = tiles.length % 2;
   </p>
 </section>
 
-<style>
+<style is:global>
   .top8-note {
     margin-top: var(--space-3);
   }

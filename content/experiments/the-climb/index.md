@@ -26,14 +26,13 @@ provenance:
 
 ## What it is
 
-The scene that launched as khaylub.com on 2026-06-24 and still serves the public domain (this
-site takes over only at a later phase), kept as it shipped at tag `v1.0.0-3d-experiment` and
+The scene that launched as khaylub.com on 2026-06-24, kept as it shipped at tag `v1.0.0-3d-experiment` and
 ported into this site as an island: the Wanderer walking from
 night into day, the Phoenix igniting at the midpoint and filling the sky at the summit, the same
 models and camera choreography, the same six beats, the words as shipped (except the availability
 line, which is this site's), and the atmosphere plates re-encoded. What the port leaves out is
-listed under "What changed in the port". It opens from "Enter the climb" on
-the home page or from "Tap to explore" on [[climb|its own page]], and nothing from it downloads
+listed under "What changed in the port". It opens from "Tap to explore" on [[climb|its own page]],
+reached from the home page by "The original June 2026 version", and nothing from it downloads
 before that press.
 
 ## What loads, and when
