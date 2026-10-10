@@ -44,7 +44,7 @@ const tiles = await Promise.all(
 );
 // A set of seven (or any count that leaves a gap in the last row) is laid out on purpose: the
 // first-ranked tile takes the spare columns as a wide tile, so no row implies a missing card.
-// Four across from 700 px, two across from 360 px; an eighth item returns the grid to squares.
+// Four across from 900 px, two across from 360 px; an eighth item returns the grid to squares.
 const spare4 = (4 - (tiles.length % 4)) % 4;
 const spare2 = tiles.length % 2;
 ---

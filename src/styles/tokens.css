@@ -144,7 +144,7 @@
 
 /* Breakpoints (documented constants, not tokens: a custom property cannot drive an @media
    condition in plain CSS). A change is made in every file that names the value.
-   360px  the Top 8 tiles go two across (Top8)
+   360px  the Top 8 tiles go two across; 900px four across (Top8)
    560px  the doors side by side; previous and next (Doors, PrevNext)
    900px  the second hero column; the section gap steps up (IdentityCard, tokens.css); the Home
           profile columns (index.astro)

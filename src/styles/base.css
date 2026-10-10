@@ -675,7 +675,7 @@ small,
 }
 
 /* The Top 8 tiles (document 65): a set of squares, the rank at the top and the title at the foot,
-   the owner's reason under each. Four across from 700 px, two across from 360 px, rows below;
+   the owner's reason under each. Four across from 900 px, two across from 360 px, rows below;
    on a full-width page the grid stops growing at about 200 px a tile. */
 .top8 {
   list-style: none;
@@ -689,7 +689,7 @@ small,
 }
 /* The first-ranked tile takes the spare columns when the count leaves a gap (a set of seven), at
    the height of a square tile, so the rows stay whole. */
-@media (min-width: 360px) and (max-width: 699px) {
+@media (min-width: 360px) and (max-width: 899px) {
   .top8[data-spare2] > li:first-child {
     grid-column: span 2;
   }
@@ -698,7 +698,7 @@ small,
     min-height: calc((100cqw - var(--space-grid)) / 2);
   }
 }
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .top8 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
