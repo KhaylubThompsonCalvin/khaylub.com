@@ -1,7 +1,8 @@
 ---
 // Nine links: seven primary, two utility. Under 1024 px they collapse behind a disclosure
 // button (aria-expanded, Escape closes, focus returns). No ARIA menu role: a plain list.
-// Search carries the conventional magnifier beside its word (decorative; the word is the name).
+// Search carries the conventional magnifier beside its word (decorative; the word is the name; the
+// icon's box is wider than its drawing, which is the gap, so it needs no CSS of its own).
 interface Props {
   current?: string;
 }
@@ -34,7 +35,7 @@ const links = [
         <li class:list={{ utility: l.utility }}>
           <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
             {l.key === 'search' && (
-              <svg class="nav-ico" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="5" /><path d="M10.5 10.5 15 15" /></svg>
+              <svg aria-hidden="true" focusable="false" width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="5" /><path d="M10.5 10.5 15 15" /></svg>
             )}
             {l.label}
           </a>
@@ -48,7 +49,7 @@ const links = [
         <li>
           <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
             {l.key === 'search' && (
-              <svg class="nav-ico" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="5" /><path d="M10.5 10.5 15 15" /></svg>
+              <svg aria-hidden="true" focusable="false" width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="5" /><path d="M10.5 10.5 15 15" /></svg>
             )}
             {l.label}
           </a>
@@ -110,24 +111,18 @@ const links = [
     list-style: none;
   }
   .nav-list-static a {
-    display: inline-block;
+    display: inline-flex;
     min-height: var(--target);
     padding: var(--space-1-5) var(--space-half);
   }
   .nav-list a {
-    display: block;
+    display: flex;
     padding: var(--space-1-5) var(--space-1-5);
     min-height: var(--target);
     min-width: var(--target);
-    white-space: nowrap;
     text-decoration: none;
     border-radius: var(--radius-sm);
     border-bottom: 2px solid transparent;
-  }
-  .nav-ico {
-    display: inline-block;
-    vertical-align: -0.15em;
-    margin-right: var(--space-half);
   }
   .nav-list a:hover {
     background: color-mix(in srgb, var(--ink) 6%, transparent);
