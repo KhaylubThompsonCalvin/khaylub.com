@@ -1,13 +1,67 @@
 ---
+// The web résumé (the 2026-10-10 polish): the owner's résumé (content/profile/resume.md, his facts
+// and words, never edited here) read into fields by src/lib/resume.ts and set as a résumé: a header
+// block with the name, the role line, and the contact line as icon rows that are real links; then,
+// from 1024 px, two columns (Summary, Experience, and Projects; Skills, Education, and
+// Certifications beside them), one column on a phone. Download the PDF stays the first action. Each
+// role: its title in bold, the place as a meta line, the dates at the right; each project: its name
+// as a link, its stack as chips, its repository as a short link. The print rules in base.css set it
+// on paper without the site's chrome.
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { getCollection, render } from 'astro:content';
+import ContactRows, { type Row } from '@components/profile/ContactRows.astro';
+import { getCollection } from 'astro:content';
 import { availability, identity, monthLabel } from '@lib/profile';
+import { allVisible, routeFor } from '@lib/catalog';
+import { parseResume, pipes, isDates, urlOf, linkLabel, type Item } from '@lib/resume';
 
 const [entry] = await getCollection('resume');
 if (!entry) throw new Error('content/profile/resume.md is missing');
-const { Content } = await render(entry);
 const avail = availability();
 const id = identity();
+const sections = parseResume(entry.body ?? '');
+const get = (name: string) => sections.find((s) => s.name === name);
+const head = sections[0];
+const [roleLine = '', contactLine = ''] = head?.lines ?? [];
+
+// The contact line: the place, then each address as a short labelled link.
+const contact: Row[] = pipes(contactLine).map((part) => {
+  if (part.includes('@')) return { icon: 'mail', label: 'Email', href: `mailto:${part}`, note: part };
+  const url = urlOf(part);
+  if (!url) return { icon: 'place', label: part };
+  const host = new URL(url).hostname.replace(/^www\./, '');
+  if (host === 'linkedin.com') return { icon: 'work', label: 'LinkedIn', href: url, note: id.name, external: true };
+  if (host === 'github.com') return { icon: 'code', label: 'GitHub', href: url, note: url.split('/').pop(), external: true };
+  return { icon: 'globe', label: part, href: '/' };
+});
+
+// A role or a degree: the dates out of the pipes, the rest as the meta line.
+const split = (it: Item) => ({ dates: it.parts.find(isDates), meta: [...it.parts.filter((p) => !isDates(p)), ...it.lines].join(' · ') });
+
+// A project: its stack (not a status word or an address), its link, and this site's page for it.
+const entries = await allVisible();
+const project = (it: Item) => {
+  const addr = it.parts.find((p) => urlOf(p));
+  const url = addr ? urlOf(addr) : undefined;
+  const own = !!url && new URL(url).hostname.replace(/^www\./, '') === 'khaylub.com';
+  const page =
+    url && !own
+      ? entries.find((e) => {
+          const d = e.data as { repository?: string; story_url?: string };
+          return d.repository === url || !!d.story_url?.startsWith(url);
+        })
+      : undefined;
+  const stack = it.parts.filter((p) => p !== addr && p !== 'Live').flatMap((p) => p.split(', '));
+  return {
+    name: it.title,
+    href: own ? '/' : page ? routeFor(page) : url,
+    live: it.parts.includes('Live'),
+    stack,
+    repo: !own && url ? { href: url, label: linkLabel(url) } : undefined,
+    bullets: it.bullets,
+  };
+};
+const projects = (get('Projects')?.items ?? []).map(project);
+const certs = pipes(get('Certifications and Training')?.lines.join(' ') ?? '');
 ---
 
 <BaseLayout
@@ -15,26 +69,144 @@ const id = identity();
   description={`The résumé of ${id.name} as an HTML page, revision ${entry.data.revision}, with the same PDF that is linked everywhere on the site.`}
   current="resume"
 >
-  <article class="measure-reading resume">
+  <header class="page-intro">
     <h1>Résumé</h1>
     <p class="cta-row">
       <a class="btn btn-primary" href={entry.data.pdf}>Download the PDF</a>
       <span class="muted">Revision {entry.data.revision}, {entry.data.as_of.toISOString().slice(0, 10)}.</span>
     </p>
-    <p class="availability">{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small></p>
-    <div class="resume-body">
-      <Content />
+    <p class="availability"><span class="status-dot" aria-hidden="true"></span>{avail.statement} <small class="muted">(as of {monthLabel(avail.as_of)})</small></p>
+  </header>
+
+  <div class="split">
+    <div class="stack">
+      <section class="surface" aria-labelledby="resume-name">
+        <h2 id="resume-name">{head?.name}</h2>
+        <p class="muted">{pipes(roleLine).join(' · ')}</p>
+        <ContactRows rows={contact} />
+      </section>
+
+      <section class="surface" aria-labelledby="summary-heading">
+        <h2 id="summary-heading" class="module-heading">Summary</h2>
+        {get('Summary')?.lines.map((l) => <p>{l}</p>)}
+      </section>
+
+      <section class="surface" aria-labelledby="experience-heading">
+        <h2 id="experience-heading" class="module-heading">Experience</h2>
+        {
+          get('Experience')?.items.map((it) => {
+            const { dates, meta } = split(it);
+            return (
+              <article class="role">
+                <div class="spread">
+                  <h3>{it.title}</h3>
+                  {dates && <span class="muted">{dates}</span>}
+                </div>
+                {meta && <p class="muted">{meta}</p>}
+                <ul>
+                  {it.bullets.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })
+        }
+      </section>
+
+      <section class="surface" aria-labelledby="projects-heading">
+        <h2 id="projects-heading" class="module-heading">Projects</h2>
+        {
+          projects.map((p) => (
+            <article class="role">
+              <div class="spread">
+                <h3>{p.href ? <a href={p.href}>{p.name}</a> : p.name}</h3>
+                {p.live && <span class="badge badge-live">Live</span>}
+              </div>
+              {(p.stack.length > 0 || p.repo) && (
+                <ul class="chips">
+                  {p.stack.map((s) => (
+                    <li class="chip">{s}</li>
+                  ))}
+                  {p.repo && (
+                    <li>
+                      <a class="chip" href={p.repo.href} rel="noopener noreferrer">
+                        {p.repo.label}
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              )}
+              <ul>
+                {p.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </section>
     </div>
-  </article>
+
+    <div class="stack">
+      <section class="surface" aria-labelledby="skills-heading">
+        <h2 id="skills-heading" class="module-heading">Skills</h2>
+        {
+          get('Skills')?.bullets.map((b) => {
+            const at = b.indexOf(': ');
+            return (
+              <p>
+                <strong>{b.slice(0, at)}</strong>
+                <br />
+                {b.slice(at + 2)}
+              </p>
+            );
+          })
+        }
+      </section>
+
+      <section class="surface" aria-labelledby="education-heading">
+        <h2 id="education-heading" class="module-heading">Education</h2>
+        {
+          get('Education')?.items.map((it) => {
+            const { dates, meta } = split(it);
+            return (
+              <article class="role">
+                <h3>{it.title}</h3>
+                <p class="muted">{[meta, dates].filter(Boolean).join(' · ')}</p>
+                {it.bullets.length > 0 && (
+                  <ul>
+                    {it.bullets.map((b) => (
+                      <li>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            );
+          })
+        }
+      </section>
+
+      <section class="surface" aria-labelledby="certs-heading">
+        <h2 id="certs-heading" class="module-heading">Certifications and Training</h2>
+        <ul>
+          {certs.map((c) => (
+            <li>{c}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
 </BaseLayout>
 
 <style is:global>
-  .resume-body h2 {
-    margin-top: var(--space-4);
-    padding-bottom: var(--space-half);
-    border-bottom: 1px solid var(--line);
-  }
-  .resume-body h3 {
+  /* A role or a project: its head (the title, and the dates at the right, wrapping on a phone), then
+     its lines. */
+  .role + .role {
     margin-top: var(--space-3);
+  }
+  .role h3,
+  .role p {
+    margin: 0 0 var(--space-half);
   }
 </style>

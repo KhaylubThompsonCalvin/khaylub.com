@@ -191,12 +191,12 @@ small,
 .module {
   margin-bottom: var(--space-module);
 }
-/* A surface (the 2026-10-10 polish, soft depth): every block, card, plate, and boxed module is one
-   slightly lighter surface on the page, a hairline edge, a soft warm shadow, and one radius, so
-   nothing reads as an outlined box. A whole-card link lifts it on hover and focus (below). */
+/* A surface (the 2026-10-10 polish, soft depth): every block, card, plate, and section of the
+   résumé and Contact is one slightly lighter surface on the page, a hairline edge, a soft warm
+   shadow, and one radius, so nothing reads as an outlined box. A whole-card link lifts it on hover
+   and focus (below). */
 .bento > *,
-.resume-body,
-.module.boxed,
+.surface,
 .plate,
 .card,
 .banner {
@@ -206,14 +206,40 @@ small,
   box-shadow: var(--shadow-sm);
   padding: var(--pad-block);
 }
-.module.boxed {
-  margin-bottom: var(--space-3);
-}
-.module.boxed .module-heading {
-  font-size: var(--size-h3);
-}
-.module.boxed > :last-child {
+.surface > :last-child,
+.bento > * > :last-child {
   margin-bottom: 0;
+}
+/* Page layouts (Contact, the résumé): a column of surfaces (.stack); from 1024 px two columns, the
+   first the wider (.split); a line whose ends sit apart, wrapping on a phone (.spread). */
+.split,
+.stack {
+  display: grid;
+  gap: var(--gap-block);
+  align-content: start;
+}
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}
+.spread {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+/* On paper: the page's words without the site's chrome, shadows, or actions. */
+@media print {
+  .site-header,
+  .site-footer,
+  .cta-row {
+    display: none;
+  }
+  .surface {
+    box-shadow: none;
+  }
 }
 .module-heading {
   display: flex;

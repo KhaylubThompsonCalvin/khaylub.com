@@ -81,7 +81,6 @@
   --space-intro: var(--space-4);
   --space-header-body: var(--space-4);
   --space-module: var(--space-6);
-  --space-card: var(--space-2);
   --space-grid: var(--space-2);
   --space-footer: var(--space-4);
   /* Text laid over an image (the Top 8's cover tiles) sits on --scrim in both schemes. */
