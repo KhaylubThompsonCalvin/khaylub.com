@@ -122,7 +122,8 @@ li > a,
 .shelf p a,
 .sort-links a,
 .tag-links a,
-.proof-links a {
+.proof-links a,
+.climb-go a {
   display: inline-flex;
   align-items: center;
   min-height: var(--target);
@@ -588,8 +589,16 @@ small,
 .climb-band .climb-line {
   margin: 0;
 }
+/* Home: the button, and under it the June version's link (ink on the scrim, 44 px by the rule above). */
+.climb-go {
+  display: grid;
+  justify-items: start;
+  margin: 0;
+}
+.climb-go > a:last-child {
+  color: var(--on-image);
+}
 .btn-on-image {
-  justify-self: start;
   min-height: 56px;
   padding-inline: var(--space-3);
   border-color: var(--on-image);
@@ -625,8 +634,8 @@ small,
   .climb-words > div {
     grid-column: 2;
   }
-  .btn-on-image {
-    justify-self: end;
+  .climb-go {
+    justify-items: end;
   }
 }
 
@@ -725,6 +734,7 @@ small,
 .tile-kind {
   grid-area: kind;
   justify-self: end;
+  white-space: nowrap;
   text-align: right;
   font-size: var(--size-sm);
   line-height: var(--leading-body);
@@ -753,13 +763,33 @@ small,
   border-radius: calc(var(--radius-sm) - 1px);
 }
 /* The scrim under the rank and the kind at the top and under the title at the foot, so the words
-   read on any cover; the middle of the still stays clear. */
+   read on any cover; a band of the picture stays clear. */
 .has-cover .tile-art::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: calc(var(--radius-sm) - 1px);
-  background: linear-gradient(to bottom, var(--scrim), transparent 38%, transparent 45%, var(--scrim));
+  background: linear-gradient(to bottom, var(--scrim), transparent 30%, transparent 40%, var(--scrim) 62%);
+}
+/* The tile is its own stacking context so the picture sits under the scrim, even a pale chart. */
+.has-cover .tile-art {
+  isolation: isolate;
+}
+.has-cover img {
+  z-index: -1;
+}
+.pale .tile-art {
+  background: var(--scrim);
+}
+.pale img {
+  opacity: 0.3;
+}
+/* No picture: a typographic tile, the rank large on the sienna tint. */
+.type-tile .tile-art {
+  background: color-mix(in srgb, var(--signal) var(--tint-active), var(--surface));
+}
+.type-tile .tile-rank {
+  font-size: var(--size-h1);
 }
 .has-cover .tile-rank,
 .has-cover :is(h2, h3) a {

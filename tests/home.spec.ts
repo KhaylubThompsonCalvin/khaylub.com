@@ -118,4 +118,23 @@ test.describe('home', () => {
     const [nowBox, top8Box] = await Promise.all(['.profile .now .module', '.profile .top8-col .section'].map((s) => page.locator(s).boundingBox()));
     expect(Math.abs(nowBox!.y - top8Box!.y), 'Now and the Top 8 start on the same row').toBeLessThan(8);
   });
+  test('the climb band leads to the remastered climb; every Top 8 tile shows a picture or a typographic tile; Search has its magnifier', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const band = page.locator('.climb-band');
+    await expect(band.getByRole('img')).toHaveAttribute('alt', /golden wheat/);
+    await expect(band.getByRole('link', { name: 'Enter the climb' })).toHaveAttribute('href', 'https://v1.khaylub.com/');
+    await expect(band.getByRole('link', { name: 'The original June 2026 version' })).toHaveAttribute('href', '/climb/');
+    // Visitors expect a picture on a card: a tile has its picture, or it is a typographic tile on the tint, never an empty frame.
+    for (const tile of await page.locator('.top8 .tile').all()) {
+      const pictured = (await tile.locator('img').count()) === 1;
+      const typographic = (await tile.getAttribute('class'))!.includes('type-tile');
+      expect(pictured || typographic, 'a tile with a picture or a typographic tile').toBe(true);
+    }
+    await expect(page.locator('.top8 .tile').first().locator('img')).toHaveAttribute('src', /wheat-lane/);
+    const search = page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Search' });
+    await expect(search).toHaveAccessibleName('Search');
+    await expect(search.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+    expect((await search.boundingBox())!.height, 'Search is a 44 px target').toBeGreaterThanOrEqual(44);
+  });
 });

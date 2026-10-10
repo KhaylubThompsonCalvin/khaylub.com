@@ -2,10 +2,25 @@
 // Khaylub's Top 8: eight things ranked and dated, as a set of captioned tiles (the design
 // initiative's F5, vault document 65: the profile-page grammar, set like a publication). Each tile
 // carries its rank, its title in the display face, and, under the tile, the owner's one-line reason
-// with the kind and the date. A media entry's cover fills its tile under the scrim.
+// with the kind and the date. An entry's picture fills its tile under the scrim: its cover, or for an
+// entry with no cover a picture it already shows (PICTURES); a tile with no picture at all is a
+// typographic tile on the tint, never an empty frame.
+import { getImage } from 'astro:assets';
 import { top8Entries, badgeFor, routeFor } from '@lib/catalog';
 import type { top8Revisions } from '@lib/profile';
-import { coverThumb } from '@lib/media';
+import { coverThumb, type Thumb } from '@lib/media';
+import wheat from '../assets/climb/wheat-lane.webp';
+
+const wheatThumb = await getImage({ src: wheat, width: 640, format: 'webp', quality: 70 });
+// The pictures already published for entries without a cover: the climb's golden-wheat still (the
+// home band's picture) and the charts on the two data case studies, whose pale charts are dimmed on
+// the scrim (`pale`) so the rank and title keep their contrast. Decorative beside the title.
+const PALE = new Set(['fuel-economy-regression', 'sql-python-analytics-pipeline']);
+const PICTURES: Record<string, Thumb> = {
+  'khaylub-com-v1': { src: wheatThumb.src, alt: '', width: Number(wheatThumb.attributes.width), height: Number(wheatThumb.attributes.height) },
+  'fuel-economy-regression': { src: '/media/fuel-economy-regression/residuals.webp', alt: '', width: 1200, height: 462 },
+  'sql-python-analytics-pipeline': { src: '/media/sql-python-analytics-pipeline/names-trend-chart.webp', alt: '', width: 1200, height: 655 },
+};
 
 interface Props {
   /** An archived revision; the newest revision when omitted. */
@@ -26,7 +41,7 @@ const tiles = await Promise.all(
   entries.map(async ({ entry, reason }, i) => {
     const badge = badgeFor(entry);
     const status = entry.collection === 'projects' && badge.text !== 'Published' ? badge.text : undefined;
-    const cover = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
+    const cover = (await coverThumb(entry)) ?? PICTURES[entry.data.slug];
     return { entry, reason, rank: i + 1, kind: KINDS[entry.collection] ?? entry.collection, status, live: badge.tone === 'live', cover, date: entry.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) };
   })
 );
@@ -44,7 +59,7 @@ const spare2 = tiles.length % 2;
       <ol class="top8" data-spare4={spare4 || undefined} data-spare2={spare2 || undefined}>
         {tiles.map((t) => (
           <li>
-            <article class:list={['tile', { 'has-cover': !!t.cover }]}>
+            <article class:list={['tile', t.cover ? 'has-cover' : 'type-tile', { pale: PALE.has(t.entry.data.slug) }]}>
               <div class="tile-art">
                 {t.cover && <img src={t.cover.src} alt="" loading="lazy" decoding="async" width={t.cover.width} height={t.cover.height} />}
                 <span class="tile-rank" aria-hidden="true">{String(t.rank).padStart(2, '0')}</span>

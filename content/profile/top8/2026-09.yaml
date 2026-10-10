@@ -4,7 +4,7 @@
 as_of: "2026-09"
 items:
   - slug: khaylub-com-v1
-    reason: "The shipped 3D experience, kept as the front door by choice."
+    reason: "The 3D climb, remastered at v1.khaylub.com; the June version is kept here."
   - slug: fuel-economy-regression
     reason: "Reproducible data work with residual diagnostics."
   - slug: sql-python-analytics-pipeline
