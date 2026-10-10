@@ -53,3 +53,14 @@ test('the early script and the audience file agree on every mapping', () => {
   const js = readFileSync('src/scripts/theme-early.js', 'utf8');
   for (const a of cfg) expect(js, a.id).toContain(`${a.id}:['${a.skin}','${a.tier}']`);
 });
+
+test('every scene skin has its four cover widths in AVIF and WebP, each under its weight', async () => {
+  const { statSync } = await import('node:fs');
+  const max: Record<number, number> = { 640: 45_000, 1024: 90_000, 1440: 150_000, 2880: 250_000 };
+  for (const s of ['paper', 'desert-night', 'arizona-made', 'golden-hour', 'above-the-clouds'])
+    for (const w of [640, 1024, 1440, 2880])
+      for (const f of ['avif', 'webp']) {
+        const size = statSync(`public/skins/${s}/cover-${w}.${f}`).size;
+        expect(size, `${s} ${w} ${f}`).toBeLessThanOrEqual(max[w]);
+      }
+});
