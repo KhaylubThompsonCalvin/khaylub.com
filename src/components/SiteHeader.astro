@@ -9,9 +9,9 @@ const { current } = Astro.props;
 const id = identity();
 ---
 
-<header class="site-header">
+<header class="site-header" id="site-header">
   <div class="container navbar">
-    <a class="brand" href="/">{id.name}</a>
+    <a class="brand" href="/" aria-current={current === 'home' ? 'page' : undefined}>{id.name}</a>
     <PrimaryNav current={current} />
   </div>
 </header>
@@ -24,6 +24,17 @@ const id = identity();
     background: var(--bg);
     border-bottom: 1px solid var(--line);
   }
+  /* On a long page the header steps away while reading down and returns on any scroll up
+     (header-scroll.ts); never while the menu is open or the header has focus. It leaves at once,
+     so it never half-covers the content, and slides back over --ease. While away it is hidden
+     outright, so nothing above the viewport counts as covering a target at its edge. */
+  .site-header[data-hidden] {
+    transform: translateY(-100%);
+    visibility: hidden;
+  }
+  .site-header:not([data-hidden]) {
+    transition: transform var(--ease);
+  }
   .navbar {
     display: flex;
     align-items: center;
@@ -35,7 +46,9 @@ const id = identity();
     font-family: var(--font-display);
     font-size: var(--size-brand);
     text-decoration: none;
-    padding: var(--space-1) 0;
+    display: flex;
+    align-items: center;
+    min-height: var(--target);
     line-height: 1.2;
     min-width: 0;
     flex: 1 1 auto;

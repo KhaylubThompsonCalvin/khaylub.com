@@ -91,15 +91,14 @@ const context: string | undefined = entry.collection === 'projects' ? data.conte
     position: relative;
     z-index: 1;
   }
-  /* On an entry the proof is a row of plain links (Code, Live, Result), each its own 24 px target. */
+  /* On an entry the proof is a row of plain links (Code, Live, Result), each a 44 px target. */
   .proof-links {
-    gap: var(--space-1) var(--space-2);
-    font-size: var(--size-sm);
+    gap: 0 var(--space-2);
+    align-items: center;
+    font-size: var(--size-card);
   }
+  /* The 44 px target is the global rule in base.css. */
   .proof-links a {
-    display: inline-block;
-    min-height: var(--target-min);
-    padding: var(--space-quarter) 0;
     font-weight: 600;
   }
 </style>

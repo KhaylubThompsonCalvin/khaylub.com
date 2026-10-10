@@ -25,7 +25,7 @@ const tags = await termPages('tags');
     <h3>Collections</h3>
     <ul>{COLLECTIONS.map((c) => <li><a href={c.route}>{c.label}</a></li>)}</ul>
     <h3>Tags</h3>
-    <p>{tags.map((t, i) => <><a href={`/tags/${t.slug}/`}>{t.label}</a>{i < tags.length - 1 ? ' · ' : ''}</>)}</p>
+    <p class="tag-links">{tags.map((t, i) => <><a href={`/tags/${t.slug}/`}>{t.label}</a>{i < tags.length - 1 ? ' · ' : ''}</>)}</p>
     <h3>By date</h3>
     <p><a href="/timeline/">The timeline</a> lists everything in order.</p>
   </div>

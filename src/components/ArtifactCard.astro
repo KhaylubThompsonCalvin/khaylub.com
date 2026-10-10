@@ -19,10 +19,11 @@ const meta = [date];
 const plain = showCollection && entry.collection !== 'projects' && entry.collection !== 'data';
 if (plain) meta.unshift(badge.text);
 // Media collections lead with their cover (Journey 2 step 2); a 400 px WebP from the pipeline.
+const status = entry.collection === 'projects' ? (entry.data as { project_status?: string }).project_status : undefined;
 const thumb = ['music', 'video', 'gallery', 'experiments'].includes(entry.collection) ? await coverThumb(entry) : undefined;
 ---
 
-<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb}>
+<Card href={routeFor(entry)} title={entry.data.title} summary={entry.data.summary} badge={plain ? undefined : badge} meta={meta} rank={rank} thumb={thumb} status={status}>
   {detail && <ProjectFacts entry={entry} compact />}
   {/* Callers may add a line under the summary (the related rail's one-line reason). */}
   <slot />
