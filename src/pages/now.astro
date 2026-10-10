@@ -7,13 +7,17 @@ const id = identity();
 ---
 
 <BaseLayout title="Now" description={`What ${id.name} is focused on right now, with the date it was written.`} current="now">
-  <article class="measure-reading">
-    <h1 class="section-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h1>
-    <NowLines />
-    <h2>About this page</h2>
-    <p>
-      A dated status page, updated by hand. If the date above is more than a few months old, the
-      list is probably stale and the <a href="/timeline/">timeline</a> is the better record.
-    </p>
-  </article>
+  <h1 class="section-heading">Now <span class="as-of">as of {monthLabel(n.as_of)}</span></h1>
+  <div class="split">
+    <section class="surface" aria-label="What I am doing now">
+      <NowLines />
+    </section>
+    <section class="surface" aria-labelledby="about-now">
+      <h2 id="about-now" class="module-heading">About this page</h2>
+      <p>
+        A dated status page, updated by hand. If the date above is more than a few months old, the
+        list is probably stale and the <a href="/timeline/">timeline</a> is the better record.
+      </p>
+    </section>
+  </div>
 </BaseLayout>

@@ -9,6 +9,8 @@ const rows = await timelineRows();
   <div class="measure-reading">
     <h1>Timeline</h1>
     <p class="muted">Authored events plus every published item, newest first.</p>
-    <TimelineList rows={rows} all={rows} />
+    <div class="surface">
+      <TimelineList rows={rows} all={rows} />
+    </div>
   </div>
 </BaseLayout>

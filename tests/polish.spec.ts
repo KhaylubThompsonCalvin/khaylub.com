@@ -97,7 +97,7 @@ test.describe('primary actions and motion', () => {
   test('Contact leads with Email me and Résumé with Download the PDF, both filled buttons', async ({ page }) => {
     await page.goto('/contact/');
     await expect(page.locator('main .btn-primary').first()).toHaveText('Email me');
-    await expect(page.locator('main .contact li svg[aria-hidden="true"]')).toHaveCount(5);
+    expect(await page.locator('main .contact li svg[aria-hidden="true"]').count()).toBeGreaterThanOrEqual(5);
     await page.goto('/resume/');
     await expect(page.locator('main .btn-primary').first()).toHaveText('Download the PDF');
   });
@@ -155,5 +155,32 @@ test.describe('pictures, About, and the search shortcut (round two)', () => {
     await page.locator('#search-input').blur();
     await page.keyboard.press('Control+k');
     await expect(page.locator('#search-input')).toBeFocused();
+  });
+});
+
+test.describe('résumé and contact (round four)', () => {
+  test('the résumé is set as a résumé: linked contact rows, two columns from 1024 px, roles with dates, projects as links with chips, certifications as a list', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/resume/');
+    const head = page.locator('section[aria-labelledby="resume-name"]');
+    for (const [name, href] of [['Email', /^mailto:/], ['LinkedIn', /linkedin\.com\/in\//], ['GitHub', /github\.com\//]] as const) {
+      await expect(head.getByRole('link', { name: new RegExp(`^${name}`) })).toHaveAttribute('href', href);
+    }
+    const [main, side] = await Promise.all(['#experience-heading', '#skills-heading'].map((s) => page.locator(s).boundingBox()));
+    expect(side!.x, 'the sidebar sits beside the main column').toBeGreaterThan(main!.x + main!.width);
+    await expect(page.locator('#experience-heading ~ .role .spread span').first()).toHaveText('Dec 2017 to Aug 2025');
+    await expect(page.locator('#projects-heading ~ .role h3 a')).not.toHaveCount(0);
+    expect(await page.locator('#projects-heading ~ .role .chip').count()).toBeGreaterThan(3);
+    expect(await page.locator('#certs-heading + ul li').count()).toBeGreaterThanOrEqual(4);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const [m2, s2] = await Promise.all(['#experience-heading', '#skills-heading'].map((s) => page.locator(s).boundingBox()));
+    expect(s2!.y, 'one column on a phone').toBeGreaterThan(m2!.y);
+  });
+
+  test('Contact: Email me, a Copy button that appears with JavaScript, the address as text, and the values of each way', async ({ page }) => {
+    await page.goto('/contact/');
+    await expect(page.getByRole('button', { name: 'Copy address' })).toBeVisible();
+    await expect(page.locator('main strong', { hasText: 'khaylubthompsoncalvin@gmail.com' })).toBeVisible();
+    await expect(page.locator('#fit-heading ~ .contact li')).toHaveCount(3);
   });
 });

@@ -123,6 +123,18 @@ if (id.photo && !photo) throw new Error(`identity.yaml photo "${id.photo}" is no
       width: 240px;
     }
   }
+  /* On a tablet the text column is too narrow for the two doors side by side: they take the
+     block's full width under the portrait. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .hero .id-photo {
+      grid-row: 1 / 7;
+    }
+    .hero .doors {
+      grid-column: 1 / -1;
+      grid-row: 7;
+      margin: var(--space-2) 0 0;
+    }
+  }
   @media (min-width: 1024px) {
     .id-photo img {
       width: 280px;
