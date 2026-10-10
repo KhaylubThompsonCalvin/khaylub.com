@@ -9,8 +9,7 @@ spark-wakes.webp
   public/climb/provenance.yaml (generated base meshes finished in Blender by the author; generated video plates).
 
 wheat-lane.webp
-  A frame of the remastered climb at v1.khaylub.com (the golden-wheat scene: the Wanderer on a
-  trodden lane toward a lone tree and a low sun, the Phoenix above), the author's own capture of the
-  author's own site at 1200 by 630, the same frame that site uses as its link preview. Converted to
-  WebP with sharp on 2026-10-10 (quality 82). Same license: all rights reserved. Used on the Home
-  climb band and the first Top 8 tile.
+  A frame of the remastered climb's golden-wheat scene (the Wanderer on a trodden lane toward a lone
+  tree and a low sun), the author's own capture of the author's own site at 2880 by 1620, cropped to
+  1200 by 630 and converted to WebP with sharp on 2026-10-10 (quality 82). Same license: all rights
+  reserved. Used on the Home climb band and the first Top 8 tile.
