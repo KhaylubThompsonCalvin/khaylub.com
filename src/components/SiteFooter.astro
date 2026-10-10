@@ -107,7 +107,12 @@ const avail = availability();
     padding: 0;
     margin: 0;
   }
+  /* A wrapped label keeps the arrow of a link that leaves the site on its last line (an inline
+     block, not a flex row). */
   .footer-links a {
+    display: inline-block;
     min-width: var(--target);
+    padding: var(--space-1) 0;
+    line-height: 1.75rem;
   }
 </style>

@@ -37,7 +37,9 @@ const { kind, items, idPrefix } = Astro.props;
     display: grid;
     gap: var(--space-1);
   }
+  /* The whole row is the target (the term's page); the work links in it stay their own targets. */
   .evidence li {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -53,6 +55,17 @@ const { kind, items, idPrefix } = Astro.props;
     min-width: 9rem;
   }
   /* Every link is its own target (WCAG 2.5.8, 24 px): the labels and the comma-separated proofs. */
+  .evidence li:hover {
+    background: color-mix(in srgb, var(--ink) var(--tint-hover), transparent);
+  }
+  .term-label a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .term-items a {
+    position: relative;
+  }
   .evidence a {
     display: inline-block;
     min-height: var(--target-min);
