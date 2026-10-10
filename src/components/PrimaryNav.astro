@@ -1,6 +1,7 @@
 ---
 // Nine links: seven primary, two utility. Under 1024 px they collapse behind a disclosure
-// button (aria-expanded, Escape closes, focus returns). No ARIA menu role: a plain list.
+// button with the three-line icon and its word (aria-expanded, Escape closes, focus returns, the
+// page behind does not scroll while it is open). No ARIA menu role: a plain list.
 // Search carries the conventional magnifier beside its word (decorative; the word is the name; the
 // icon's box is wider than its drawing, which is the gap, so it needs no CSS of its own).
 interface Props {
@@ -27,7 +28,8 @@ const links = [
     type="button"
     aria-expanded="false"
     aria-controls="primary-nav-list"
-    id="primary-nav-button">Menu</button
+    id="primary-nav-button"
+    ><svg aria-hidden="true" focusable="false" width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M0 1h18M0 7h18M0 13h18" /></svg>Menu</button
   >
   <ul class="nav-list" id="primary-nav-list">
     {
@@ -78,6 +80,12 @@ const links = [
     color: var(--ink);
     font: inherit;
     cursor: pointer;
+    gap: var(--space-1);
+  }
+  @media (max-width: 1023px) {
+    .menu-open {
+      overflow: hidden;
+    }
   }
   .menu-btn[aria-expanded='true'] {
     border-color: var(--ink);

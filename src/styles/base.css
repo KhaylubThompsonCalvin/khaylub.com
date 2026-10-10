@@ -341,7 +341,7 @@ small,
 }
 .card .thumb {
   aspect-ratio: 16 / 10;
-  background: var(--line);
+  background: var(--surface);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -593,6 +593,7 @@ small,
    link role; 44 px by the rule above). */
 .climb-go {
   display: grid;
+  justify-items: start;
   margin: 0;
   --interactive: var(--on-image);
 }
@@ -768,13 +769,13 @@ small,
   border-radius: calc(var(--radius-sm) - 1px);
   background: linear-gradient(to bottom, var(--scrim), transparent 38%, transparent 45%, var(--scrim));
 }
-/* A pale picture (a chart) is dimmed so the light rank and title keep their contrast. */
+/* A pale picture (a chart) is dimmed by half; the scrim at the foot keeps the title at large-text contrast. */
 .pale img {
-  filter: brightness(0.3);
+  filter: brightness(0.5);
 }
-/* No picture: a typographic tile, the rank and the kind on the line colour, never an empty frame. */
+/* No picture: a typographic tile on a sienna tint of the plate, never an empty frame. */
 .type-tile .tile-art {
-  background: var(--line);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
 }
 .has-cover .tile-rank,
 .has-cover :is(h2, h3) a {
@@ -897,4 +898,68 @@ figcaption {
   margin-top: var(--space-1);
   font-size: var(--size-sm);
   color: var(--muted);
+}
+
+/* Controls (the 2026-10-10 polish, Jakob's Law): a segmented control (the Appearance choice, a
+   list's sort order) and a filter chip share one shape, a 44 px pill; the pressed or current choice
+   is filled with ink, so the state never rests on colour alone. */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+.seg > *,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--target);
+  min-width: var(--target);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--size-sm);
+  text-decoration: none;
+  cursor: pointer;
+}
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.seg > :hover,
+.chip:hover {
+  background: color-mix(in srgb, var(--ink) var(--tint-hover), var(--surface));
+}
+.seg [aria-pressed='true'],
+.seg [aria-current='page'],
+.chip[aria-current='page'] {
+  background: var(--interactive);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* Motion (the 2026-10-10 polish): pages cross-fade on a change and the content rises into place,
+   both over --motion-page, which is 0 s under reduced motion. The reveal starts from a trace of
+   opacity, never zero, so the first paint still counts as content. */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-page);
+}
+.site-main {
+  animation: reveal var(--motion-page) both;
+}
+@keyframes reveal {
+  from {
+    opacity: 0.01;
+    translate: 0 0.5rem;
+  }
 }

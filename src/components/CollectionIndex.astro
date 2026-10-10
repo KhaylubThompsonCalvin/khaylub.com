@@ -52,16 +52,15 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
 
   {
     !filter && shown.length > 1 && (
-      <p class="sort-links small">
-        Sort:{' '}
-        {SORT_ORDERS.map((s, i) => (
-          <>
+      <p class="sort-links">
+        <span class="small muted">Sort by</span>
+        <span class="seg">
+          {SORT_ORDERS.map((s) => (
             <a href={sortHref(s.order)} aria-current={s.order === sort ? 'page' : undefined}>
               {s.label}
             </a>
-            {i < SORT_ORDERS.length - 1 ? ' · ' : ''}
-          </>
-        ))}
+          ))}
+        </span>
       </p>
     )
   }
@@ -94,9 +93,11 @@ const sortHref = (order: SortOrder) => (order === 'newest' ? meta.route : `${met
     font-size: var(--size-h3);
     font-weight: 600;
   }
-  .sort-links a[aria-current='page'] {
-    font-weight: 600;
-    text-decoration: none;
+  .sort-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
   }
   .feed-link {
     margin-top: var(--space-2);

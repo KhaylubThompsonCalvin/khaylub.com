@@ -26,14 +26,14 @@ const useless = !filtered && options.length === 1 && options[0].count === total;
       <span class="filter-label small muted">{label}</span>
       <ul>
         <li>
-          <a href={allHref} aria-current={filtered ? undefined : 'page'}>
+          <a class="chip" href={allHref} aria-current={filtered ? undefined : 'page'}>
             All
           </a>
         </li>
         {options.map((o) => (
           <li>
-            <a href={o.href} aria-current={o.slug === active ? 'page' : undefined}>
-              {o.label} <span class="muted">({o.count})</span>
+            <a class="chip" href={o.href} aria-current={o.slug === active ? 'page' : undefined}>
+              {o.label} <span class="small">{o.count}</span>
             </a>
           </li>
         ))}
@@ -46,7 +46,7 @@ const useless = !filtered && options.length === 1 && options[0].count === total;
   .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     gap: var(--space-1) var(--space-2);
     margin-bottom: var(--space-2);
   }
@@ -58,20 +58,6 @@ const useless = !filtered && options.length === 1 && options[0].count === total;
     padding: 0;
     margin: 0;
   }
-  /* Filters are plain links, not pills: the current one carries the signal rule under it. */
-  .filter-bar a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--target);
-    padding: var(--space-half) var(--space-1);
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-  }
-  .filter-bar a:hover {
-    border-bottom-color: var(--muted);
-  }
-  .filter-bar a[aria-current='page'] {
-    border-bottom-color: var(--signal);
-    font-weight: 600;
-  }
+  /* Filters are chips (the convention for a filter): the chip shape and the pressed state are the
+     segmented control's, in base.css (.chip). */
 </style>

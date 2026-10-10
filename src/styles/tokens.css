@@ -1,7 +1,8 @@
 /* Design tokens. The palette is the design initiative's F4 (vault document 64, decision D-32), a
    warm paper palette with a working sienna accent: light on :root, dark under prefers-color-scheme
    and, since F4, under the Appearance control's data-theme attribute (light and dark force a scheme;
-   no attribute means the system decides). Text on --bg: ink 13.61:1 light and 14.78:1 dark, muted
+   no attribute means the system decides). The divider --line is 3.04:1 light and 3.03:1 dark on
+   --bg since the 2026-10-10 polish (same hue, lightness only; it was 1.44:1 and 1.51:1). Text on --bg: ink 13.61:1 light and 14.78:1 dark, muted
    6.66:1 and 8.35:1; the accent 5.36:1 and 8.68:1, so it may be text; the notice 4.99:1 and 9.19:1.
    The palette tokens are values; the semantic aliases below them carry the roles components use. */
 :root {
@@ -11,7 +12,7 @@
   --muted: #574c3b;
   --accent: #8a4b1f;
   --card: #f6f1e9;
-  --line: #cbbfae;
+  --line: #957f60;
   --focus: #1d4ed8;
   --notice: #7a5b15;
   --scrim: rgba(34, 26, 17, 0.85);
@@ -36,7 +37,8 @@
   --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, 'Times New Roman', serif;
   --font-body: 'KT Sans', 'KT Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  --size-sm: 0.8rem;
+  /* 0.875rem since the 2026-10-10 polish (was 0.8rem): meta lines and captions read at 14 px. */
+  --size-sm: 0.875rem;
   --size-body: 1rem;
   --size-h3: 1.25rem;
   --size-h2: 1.75rem;
@@ -107,6 +109,9 @@
   --radius-pill: 999px;
   --radius-photo: 12px;
   --ease: 150ms ease;
+  /* The page change and the content reveal (the 2026-10-10 polish): a short fade, 0 s under reduced
+     motion (below). */
+  --motion-page: 240ms ease-out;
 
   /* Interaction tints and elevation (F2): the button hover and active mixes; the card and the
      open menu shadows. The primary nav keeps its own 6% hover until F4. */
@@ -143,7 +148,7 @@
     --muted: #b7ac9b;
     --accent: #e0a56a;
     --card: #1f1a14;
-    --line: #3b332a;
+    --line: #6e5f4e;
     --focus: #8ab6e2;
     --notice: #d9b060;
     --scrim: rgba(21, 18, 13, 0.85);
@@ -156,7 +161,7 @@
   --muted: #b7ac9b;
   --accent: #e0a56a;
   --card: #1f1a14;
-  --line: #3b332a;
+  --line: #6e5f4e;
   --focus: #8ab6e2;
   --notice: #d9b060;
   --scrim: rgba(21, 18, 13, 0.85);
@@ -168,6 +173,7 @@
 @media (prefers-reduced-motion: reduce) {
   :root {
     --ease: 0s;
+    --motion-page: 0s;
   }
   *,
   *::before,
