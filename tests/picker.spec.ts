@@ -75,7 +75,7 @@ test('a fixed-scheme skin says so beside Appearance and marks its buttons aria-d
   await page.goto('/work/');
   await expect(note).toHaveCount(0);
   await theme(page).locator('[data-audience-choice="tech"]').click();
-  await expect(note).toHaveText('This theme sets its own colours.');
+  await expect(note).toHaveText('This theme sets its own colors.');
   await expect(appearance).toHaveAttribute('aria-describedby', 'appearance-note');
   for (const b of await appearance.locator('[data-theme-choice]').all()) await expect(b).toHaveAttribute('aria-disabled', 'true');
   // Still focusable, and a press changes nothing.

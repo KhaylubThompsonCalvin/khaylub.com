@@ -62,7 +62,7 @@ function fixedScheme(): void {
   if (fixed && !note) {
     note = document.createElement('span');
     note.className = 'small muted'; note.id = 'appearance-note'; note.dataset.appearanceNote = '';
-    note.textContent = 'This theme sets its own colours.';
+    note.textContent = 'This theme sets its own colors.';
     group.append(note); group.setAttribute('aria-describedby', note.id);
   } else if (!fixed && note) { note.remove(); group.removeAttribute('aria-describedby'); }
   group.querySelectorAll('[data-theme-choice]').forEach((b) => (fixed ? b.setAttribute('aria-disabled', 'true') : b.removeAttribute('aria-disabled')));
