@@ -5,9 +5,11 @@ import { setupTheme } from './theme';
 import { setupHeaderScroll } from './header-scroll';
 import { setupSearchShortcut } from './search-shortcut';
 import { setupCopy } from './copy';
+import { setupAudience } from './audience';
 
 setupNavDisclosure();
 setupTheme();
 setupHeaderScroll();
 setupSearchShortcut();
 setupCopy();
+setupAudience();

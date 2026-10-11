@@ -55,7 +55,7 @@ test.describe('home', () => {
   test('blocks appear in the required DOM order', async ({ page }) => {
     await page.goto('/');
     const order = await page.locator('main h1, main h2').evaluateAll((els) => els.map((e) => e.textContent?.trim().split(' as of')[0] ?? ''));
-    expect(order.slice(0, 4)).toEqual(['Khaylub Thompson-Calvin', "Khaylub's Top 8", 'The climb', 'Writing']);
+    expect(order.slice(0, 5)).toEqual(['Khaylub Thompson-Calvin', 'What brings you here?', "Khaylub's Top 8", 'The climb', 'Writing']);
     const recruiter = page.getByRole('navigation', { name: 'Quick links' }).getByRole('link');
     await expect(recruiter).toHaveText(['About', 'GitHub', 'Résumé', 'Contact']);
   });
@@ -107,7 +107,8 @@ test.describe('home', () => {
     const names = (await page.locator('main h2').allTextContents()).map((h) =>
       h.split(/\s+as of/)[0].trim()
     );
-    expect(names.slice(0, 9)).toEqual([
+    expect(names.slice(0, 10)).toEqual([
+      'What brings you here?',
       "Khaylub's Top 8",
       'The climb',
       'Writing',

@@ -1,0 +1,13 @@
+---
+// "What brings you here?" (Profile Themes spec 3.1): a slim row under the cover on Home, never a pop-up.
+// Hidden in the HTML; src/scripts/audience.ts reveals it when no answer is stored and it was not closed.
+import { audiences } from '@lib/profile';
+const list = audiences();
+---
+<section class="picker surface" data-picker hidden aria-labelledby="picker-heading">
+  <h2 id="picker-heading" class="small">What brings you here?</h2>
+  <div class="chips">
+    {list.map((a) => <button type="button" class="chip" data-audience-choice={a.id}>{a.label}</button>)}
+    <button type="button" class="chip" data-picker-close>Not now</button>
+  </div>
+</section>

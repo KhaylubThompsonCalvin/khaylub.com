@@ -1,0 +1,47 @@
+// The audience picker (Home) and the footer Theme row (Profile Themes, 2026-10-10). The same map as
+// theme-early.js (tests/skins.spec.ts holds all three in step). Stored on this device only.
+const KEY = 'khaylub-audience';
+const CLOSED = 'khaylub-picker-closed';
+const M: Record<string, [string, string]> = {hiring:['paper','lean'],tech:['desert-night','standard'],creative:['arizona-made','full'],exploring:['golden-hour','full'],youtube:['above-the-clouds','full'],nostalgia:['profile-2006','standard']};
+
+const get = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
+const put = (k: string, v: string | null) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* the choice still applies to this page */ } };
+
+function apply(id: string | null): void {
+  const d = document.documentElement;
+  document.getElementById('skin-css')?.remove();
+  if (!id || !(id in M)) { delete d.dataset.audience; delete d.dataset.skin; delete d.dataset.tier; mark(null); return; }
+  const [skin, tier] = M[id];
+  d.dataset.audience = id; d.dataset.skin = skin; d.dataset.tier = tier;
+  if (tier !== 'lean') {
+    const l = document.createElement('link');
+    l.id = 'skin-css'; l.rel = 'stylesheet'; l.href = `/skins/${skin}.css`;
+    document.head.appendChild(l);
+  }
+  mark(id);
+  document.dispatchEvent(new CustomEvent('audiencechange', { detail: { id, tier } }));
+}
+
+function mark(id: string | null): void {
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-row] [data-audience-choice]').forEach((b) => {
+    if (b.dataset.audienceChoice !== 'reset') b.setAttribute('aria-pressed', String(b.dataset.audienceChoice === id));
+  });
+}
+
+export function setupAudience(): void {
+  const picker = document.querySelector<HTMLElement>('[data-picker]');
+  const stored = get(KEY);
+  if (picker && !(stored && stored in M) && get(CLOSED) !== '1') picker.hidden = false;
+  mark(stored && stored in M ? stored : null);
+  const row = document.querySelector<HTMLElement>('[data-theme-row]');
+  if (row) row.hidden = false;
+
+  document.addEventListener('click', (e) => {
+    const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-audience-choice],[data-picker-close]');
+    if (!t) return;
+    if (t.hasAttribute('data-picker-close')) { put(CLOSED, '1'); if (picker) picker.hidden = true; return; }
+    const id = t.dataset.audienceChoice!;
+    if (id === 'reset') { put(KEY, null); apply(null); } else { put(KEY, id); apply(id); }
+    if (picker) picker.hidden = true;
+  });
+}

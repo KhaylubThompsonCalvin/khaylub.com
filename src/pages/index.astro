@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import ProfileCover from '@components/ProfileCover.astro';
+import AudiencePicker from '@components/AudiencePicker.astro';
 import ClimbBand from '@components/ClimbBand.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
@@ -33,6 +34,7 @@ const jsonLd = await personAndWebsite();
   jsonLd={jsonLd}
 >
   <ProfileCover />
+  <AudiencePicker />
   <div class="profile-cols">
     <div class="bento">
       <Top8 audiences />

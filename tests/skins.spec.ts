@@ -50,8 +50,10 @@ test('a skin file that fails to load never leaves the page hidden (1.5 s guard)'
 });
 
 test('the early script and the audience file agree on every mapping', () => {
-  const js = readFileSync('src/scripts/theme-early.js', 'utf8');
-  for (const a of cfg) expect(js, a.id).toContain(`${a.id}:['${a.skin}','${a.tier}']`);
+  for (const f of ['src/scripts/theme-early.js', 'src/scripts/audience.ts']) {
+    const js = readFileSync(f, 'utf8');
+    for (const a of cfg) expect(js, `${f} ${a.id}`).toContain(`${a.id}:['${a.skin}','${a.tier}']`);
+  }
 });
 
 test('every scene skin has its four cover widths in AVIF and WebP, each under its weight', async () => {
