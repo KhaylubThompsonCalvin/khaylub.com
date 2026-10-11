@@ -78,7 +78,7 @@ const ext = (href: string) => href.startsWith('https://');
       <Name id="site-name" class="cover-name">{id.name}</Name>
       <p class="muted">{id.role_line} · {id.location}</p>
       <p class="cover-status">
-        <span class="status-dot" aria-hidden="true"></span>{avail.statement}
+        <span class="status-dot" aria-hidden="true"></span>{avail.statement}{' '}
         <small class="muted">(as of {monthLabel(avail.as_of)})</small>
       </p>
       {
