@@ -6,7 +6,8 @@ export function setupCopy(): void {
     if (!navigator.clipboard) continue;
     const label = button.textContent;
     button.hidden = false;
-    button.addEventListener('click', async () => {
+    button.addEventListener('click', async (e) => {
+      if (button instanceof HTMLAnchorElement) e.preventDefault(); // a link copies instead of navigating
       await navigator.clipboard.writeText(button.dataset.copy ?? '');
       button.textContent = 'Copied';
       window.setTimeout(() => (button.textContent = label), 2000);

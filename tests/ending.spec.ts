@@ -29,14 +29,29 @@ test('Yes plays only the harvest clip and shows the thanks with three referral l
   await expect.poll(playing).toEqual(['trials']);
 });
 
-test('Share on LinkedIn opens a new tab safely and names that; Copy link copies the page address', async ({ page, context }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
+test('Share on LinkedIn opens a new tab safely and says so', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Yes' }).click();
   const li = page.locator('#thanks').getByRole('link', { name: /Share on LinkedIn/ });
   await expect(li).toHaveAttribute('target', '_blank');
   await expect(li).toHaveAttribute('rel', /noopener/);
   await expect(li).toHaveAccessibleName(/new tab/);
+});
+
+test('Copy link copies the page address, says Copied, and does not navigate', async ({ page, context }, testInfo) => {
+  test.skip(testInfo.project.name === 'webkit' || testInfo.project.name === 'firefox', 'clipboard permissions are Chromium-only');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Yes' }).click();
+  const link = page.locator('#thanks [data-copy]');
+  await link.scrollIntoViewIfNeeded();
+  const before = await page.evaluate(() => ({ url: location.href, y: scrollY }));
+  await link.click();
+  await expect(link).toHaveText('Copied');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('https://khaylub.com/');
+  expect(await page.evaluate(() => ({ url: location.href, y: scrollY }))).toEqual(before);
+  expect(before.y).toBeGreaterThan(0);
+  await expect(page.locator('#thanks')).toBeVisible();
 });
 
 test('reduced motion: the answer changes the text but no clip is ever requested', async ({ browser }) => {
