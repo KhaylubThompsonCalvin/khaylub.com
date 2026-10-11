@@ -2,6 +2,8 @@
 // theme-early.js (tests/skins.spec.ts holds all three in step). Stored on this device only.
 const KEY = 'khaylub-audience';
 const CLOSED = 'khaylub-picker-closed';
+// The skin version token, written by scripts/build-skins.mjs (render.yaml caches /skins/* for a year).
+const SKIN_V = '974076137f';
 const M: Record<string, [string, string]> = {hiring:['paper','lean'],tech:['desert-night','standard'],creative:['arizona-made','full'],exploring:['golden-hour','full'],youtube:['above-the-clouds','full'],nostalgia:['profile-2006','standard']};
 
 const known = (id: string | null): id is string => id !== null && Object.hasOwn(M, id);
@@ -25,7 +27,7 @@ function apply(id: string | null): void {
   // The new link goes in first; the old one leaves, and data-skin changes (the skin files are keyed on
   // it), only once the new one has loaded or failed, so there is no flash of Paper between two skins.
   const l = document.createElement('link');
-  l.rel = 'stylesheet'; l.href = `/skins/${skin}.css`; l.dataset.skinPending = '';
+  l.rel = 'stylesheet'; l.href = `/skins/${skin}.css?v=${SKIN_V}`; l.dataset.skinPending = '';
   const swap = () => {
     if (run !== seq) return;
     old?.remove(); l.removeAttribute('data-skin-pending'); l.id = 'skin-css';

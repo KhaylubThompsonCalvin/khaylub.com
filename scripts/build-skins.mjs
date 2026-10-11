@@ -2,6 +2,7 @@
 // public/skins/<skin>.css from scripts/skins/skins.json. Tokens only, the cover as a background from
 // the sized files (scripts/skin-covers.mjs), and one CSS motion layer that stops under reduced motion.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { skinVersion } from './skin-version.mjs';
 const table = JSON.parse(readFileSync('scripts/skins/skins.json', 'utf8'));
 // A skin whose subject sits low in its frame names its own cover_position (the Summit's signpost and
 // the Wanderer by the fire); the others keep the bundle's 50% 35%.
@@ -14,7 +15,9 @@ const SCHEME = {
   light: '--focus:#1d4ed8;--notice:#7a5b15;--scrim:rgba(34,26,17,.85);--shade:#221a11;--status:#2e7d32',
   dark: '--focus:#8ab6e2;--notice:#d9b060;--scrim:rgba(21,18,13,.85);--shade:#000;--status:#6cc070',
 };
-const img = (s, w) => `image-set(url(/skins/${s}/cover-${w}.avif) type("image/avif"),url(/skins/${s}/cover-${w}.webp) type("image/webp"))`;
+// Every skin URL carries the version token (scripts/skin-version.mjs), so render.yaml caches /skins/* for a year.
+const V = skinVersion();
+const img = (s, w) => `image-set(url(/skins/${s}/cover-${w}.avif?v=${V}) type("image/avif"),url(/skins/${s}/cover-${w}.webp?v=${V}) type("image/webp"))`;
 const cover = (s, pos) => `html[data-tier] .profile-cover .cover-art{background-image:${img(s, 1024)}${pos ? `;background-position:${pos}` : ''}}@media (min-width:1025px){html[data-tier] .profile-cover .cover-art{background-image:${img(s, 1440)}}}@media (min-width:1025px) and (min-resolution:1.5dppx){html[data-tier] .profile-cover .cover-art{background-image:${img(s, 2880)}}}@media (max-width:640px){html[data-tier] .profile-cover .cover-art{background-image:${img(s, 640)}}}html[data-tier] .profile-cover .cover-art picture{display:none}`;
 // Profile 2006 has no scene: the cover is the blue bar on a tiled stripe, and the name, the status
 // and the buttons sit on the white profile box (never on the striped page, about 2.7:1 for the name).
@@ -41,4 +44,11 @@ for (const [skin, def] of Object.entries(table)) {
     `@media (prefers-reduced-motion:reduce){.skin-motion,.profile-cover .cover-art::after,.profile-cover .cover-name,.skin-motion::before,.skin-motion::after{animation:none!important}}`;
   writeFileSync(`public/skins/${skin}.css`, css);
 }
-console.log('skins written');
+// The two scripts that link a skin file ask for /skins/<skin>.css?v=<token>; the token is written in place.
+for (const f of ['src/scripts/theme-early.js', 'src/scripts/audience.ts']) {
+  const src = readFileSync(f, 'utf8');
+  const next = src.replace(/(SKIN_V\s*=\s*')[0-9a-f]*(')/, (_, a, b) => `${a}${V}${b}`);
+  if (next === src && !src.includes(`'${V}'`)) throw new Error(`${f}: no SKIN_V token to write`);
+  if (next !== src) writeFileSync(f, next);
+}
+console.log(`skins written (version ${V})`);

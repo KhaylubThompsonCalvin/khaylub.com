@@ -17,7 +17,7 @@ test('choosing applies the skin at once, without a reload, and is remembered on 
   await row(page).getByRole('button', { name: 'Tech and security' }).click();
   // The skin attribute changes when the new skin file has loaded (no flash of the old one), so wait for it.
   await expect.poll(() => page.evaluate(() => [document.documentElement.dataset.audience, document.documentElement.dataset.skin])).toEqual(['tech', 'desert-night']);
-  await expect(page.locator('link#skin-css')).toHaveAttribute('href', '/skins/desert-night.css');
+  await expect(page.locator('link#skin-css')).toHaveAttribute('href', /^\/skins\/desert-night\.css\?v=[0-9a-f]{10}$/);
   await expect(row(page)).toBeHidden();
   await page.goto('/resume/');
   expect(await page.evaluate(() => document.documentElement.dataset.skin)).toBe('desert-night');
@@ -28,7 +28,7 @@ test('changing the answer mid-visit swaps the skin link (never two) and the Top 
   await row(page).getByRole('button', { name: 'Creative and 3D' }).click();
   await theme(page).locator('[data-audience-choice="youtube"]').click();
   await expect(page.locator('link#skin-css')).toHaveCount(1);
-  await expect(page.locator('link#skin-css')).toHaveAttribute('href', '/skins/above-the-clouds.css');
+  await expect(page.locator('link#skin-css')).toHaveAttribute('href', /^\/skins\/above-the-clouds\.css\?v=[0-9a-f]{10}$/);
   await expect(page.locator('ol.top8[data-for="youtube"]')).toBeVisible();
 });
 

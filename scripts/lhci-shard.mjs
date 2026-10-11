@@ -51,7 +51,7 @@ export function tierConfig(base, audience, paths, index, total) {
 }
 
 /** Lighthouse 0.15.1's resource-summary assertions take only a maximum, so a tier run proves its skin by its
-    own reports: every report in the folder must have requested /skins/<skin>.css. Returns the problems (none is a pass). */
+    own reports: every report in the folder must have requested /skins/<skin>.css (with its ?v= token). Returns the problems (none is a pass). */
 export function skinProblems(dir, skin, expected) {
   const files = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.report.json')) : [];
   const problems = [];
@@ -59,7 +59,7 @@ export function skinProblems(dir, skin, expected) {
   for (const f of files) {
     const lhr = JSON.parse(readFileSync(`${dir}/${f}`, 'utf8'));
     const urls = (lhr.audits['network-requests']?.details?.items ?? []).map((i) => i.url);
-    if (!urls.some((u) => u.endsWith(`/skins/${skin}.css`))) problems.push(`${lhr.finalUrl}: /skins/${skin}.css was not requested, so this run measured the Lean page`);
+    if (!urls.some((u) => new URL(u).pathname.endsWith(`/skins/${skin}.css`))) problems.push(`${lhr.finalUrl}: /skins/${skin}.css was not requested, so this run measured the Lean page`);
   }
   return problems;
 }

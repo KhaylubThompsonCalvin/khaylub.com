@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { load } from 'js-yaml';
+import { skinVersion } from '../scripts/skin-version.mjs';
 
 const KEY = 'khaylub-audience';
 const cfg = (load(readFileSync('content/profile/audiences.yaml', 'utf8')) as { audiences: { id: string; skin: string; tier: string }[] }).audiences;
@@ -20,7 +21,7 @@ for (const a of cfg.filter((x) => x.skin !== 'paper')) {
     await page.addInitScript(([k, v]) => localStorage.setItem(k, v), [KEY, a.id]);
     await page.goto('/work/', { waitUntil: 'domcontentloaded' });
     expect(await attrs(page)).toEqual([a.id, a.skin, a.tier]);
-    await expect(page.locator('link#skin-css')).toHaveAttribute('href', `/skins/${a.skin}.css`);
+    await expect(page.locator('link#skin-css')).toHaveAttribute('href', `/skins/${a.skin}.css?v=${skinVersion()}`);
   });
 }
 
@@ -101,4 +102,21 @@ test('a skin changes the page colours (the palette tokens follow the semantic on
   const [bg, ink] = await page.evaluate(() => [getComputedStyle(document.documentElement).backgroundColor, getComputedStyle(document.querySelector('h1')!).color]);
   expect(bg).toBe('rgb(13, 17, 36)');
   expect(ink).toBe('rgb(236, 233, 255)');
+});
+
+test('skin URLs carry the version token (a content hash), and render.yaml caches /skins/* for a year', async ({ request }) => {
+  const v = skinVersion();
+  expect(v).toMatch(/^[0-9a-f]{10}$/);
+  // The early script and audience.ts link /skins/<skin>.css?v=<token>; build-skins.mjs writes the token into both.
+  for (const f of ['src/scripts/theme-early.js', 'src/scripts/audience.ts']) expect(readFileSync(f, 'utf8'), f).toMatch(new RegExp(`SKIN_V\\s*=\\s*'${v}'`));
+  // Every cover a skin file asks for carries the same token, so a changed cover is a new URL too.
+  for (const s of ['desert-night', 'arizona-made', 'golden-hour', 'above-the-clouds']) {
+    const urls = [...readFileSync(`public/skins/${s}.css`, 'utf8').matchAll(/url\(([^)]+)\)/g)].map((m) => m[1]);
+    expect(urls.length, s).toBeGreaterThan(0);
+    for (const u of urls) expect(u, s).toMatch(new RegExp(`\\?v=${v}$`));
+  }
+  for (const svc of (load(readFileSync('render.yaml', 'utf8')) as { services: { name: string; headers?: { path: string; name: string; value: string }[] }[] }).services.filter((x) => x.headers))
+    expect(svc.headers!.find((h) => h.path === '/skins/*' && h.name === 'Cache-Control')?.value, svc.name).toBe('public, max-age=31536000, immutable');
+  expect((await request.get(`/skins/desert-night.css?v=${v}`)).headers()['cache-control']).toBe('public, max-age=31536000, immutable');
+  expect((await request.get(`/skins/desert-night/cover-640.avif?v=${v}`)).headers()['cache-control']).toBe('public, max-age=31536000, immutable');
 });
