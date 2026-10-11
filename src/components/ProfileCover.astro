@@ -59,13 +59,14 @@ const ext = (href: string) => href.startsWith('https://');
           {/* The headshot is 3 by 4 (972 by 1296). Measured on a 5 % grid: the hair from 3.5 % of
               the height, the foot of the beard at 70 %, the eyes at 31 %. In the square frame (the
               width fills) object-position 50% 4% keeps the head from 3 % to 92 % of the frame with
-              the eyes at 40 %. sizes names twice the shown width (112 px, 160 px from 768 px), so a
-              1x screen still gets a 2x file and the face is never soft. */}
+              the eyes at 40 %. on a phone sizes names the shown width (112 px): the smallest file, 224, is
+              still 2x on a 1x phone, and a 2x or 3x phone takes 224 or 448. From 768 px it names twice
+              the shown width (160 px), so a 1x screen still gets a 2x file. The face is never soft. */}
           <Picture
             src={photo}
             alt={id.photo_alt}
             widths={[224, 320, 448, 672, 960]}
-            sizes="(min-width: 768px) 320px, 224px"
+            sizes="(min-width: 768px) 320px, 112px"
             formats={['avif', 'webp']}
             fallbackFormat="webp"
             loading="eager"
