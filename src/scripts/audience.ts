@@ -42,6 +42,26 @@ function mark(id: string | null): void {
   document.querySelectorAll<HTMLButtonElement>('[data-theme-row] [data-audience-choice]').forEach((b) => {
     if (b.dataset.audienceChoice !== 'reset') b.setAttribute('aria-pressed', String(b.dataset.audienceChoice === id));
   });
+  fixedScheme();
+}
+
+// Spec section 4: Paper follows Appearance; every other skin is fixed dark or light, and the Appearance
+// control says so. The note sits beside the buttons, which stay focusable but are marked aria-disabled
+// (theme.ts ignores a press on them). A skin whose file failed to load has no tier, shows Paper, and
+// leaves Appearance working.
+function fixedScheme(): void {
+  const group = document.querySelector<HTMLElement>('[data-appearance]');
+  if (!group) return;
+  const d = document.documentElement;
+  const fixed = !!d.dataset.skin && d.dataset.skin !== 'paper' && !!d.dataset.tier && d.dataset.tier !== 'lean';
+  let note = group.querySelector<HTMLElement>('[data-appearance-note]');
+  if (fixed && !note) {
+    note = document.createElement('span');
+    note.className = 'small muted'; note.id = 'appearance-note'; note.dataset.appearanceNote = '';
+    note.textContent = 'This theme sets its own colours.';
+    group.append(note); group.setAttribute('aria-describedby', note.id);
+  } else if (!fixed && note) { note.remove(); group.removeAttribute('aria-describedby'); }
+  group.querySelectorAll('[data-theme-choice]').forEach((b) => (fixed ? b.setAttribute('aria-disabled', 'true') : b.removeAttribute('aria-disabled')));
 }
 
 export function setupAudience(): void {

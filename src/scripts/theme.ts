@@ -39,7 +39,8 @@ export function setupTheme(): void {
   apply(stored());
   group.addEventListener('click', (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-theme-choice]');
-    if (!button) return;
+    // A fixed-scheme skin marks the buttons aria-disabled (audience.ts); a press then changes nothing.
+    if (!button || button.getAttribute('aria-disabled') === 'true') return;
     const choice = button.dataset.themeChoice as Choice;
     try {
       if (choice === 'system') localStorage.removeItem(KEY);

@@ -68,3 +68,29 @@ test('with JavaScript off neither the picker nor the Theme row is shown', async 
   await expect(page.locator('[data-theme-row]')).toBeHidden();
   await ctx.close();
 });
+
+test('a fixed-scheme skin says so beside Appearance and marks its buttons aria-disabled; Paper clears it', async ({ page }) => {
+  const appearance = page.getByRole('group', { name: 'Appearance' });
+  const note = appearance.locator('[data-appearance-note]');
+  await page.goto('/work/');
+  await expect(note).toHaveCount(0);
+  await theme(page).locator('[data-audience-choice="tech"]').click();
+  await expect(note).toHaveText('This theme sets its own colours.');
+  await expect(appearance).toHaveAttribute('aria-describedby', 'appearance-note');
+  for (const b of await appearance.locator('[data-theme-choice]').all()) await expect(b).toHaveAttribute('aria-disabled', 'true');
+  // Still focusable, and a press changes nothing.
+  await appearance.locator('[data-theme-choice="dark"]').focus();
+  await expect(appearance.locator('[data-theme-choice="dark"]')).toBeFocused();
+  await page.keyboard.press('Enter');
+  expect(await page.evaluate(() => [document.documentElement.getAttribute('data-theme'), localStorage.getItem('khaylub-theme')])).toEqual([null, null]);
+  // A stored skin shows the note on the next page from the start.
+  await page.goto('/resume/');
+  await expect(note).toHaveCount(1);
+  await theme(page).locator('[data-audience-choice="hiring"]').click();
+  await expect(note).toHaveCount(0);
+  await expect(appearance.locator('[data-theme-choice][aria-disabled]')).toHaveCount(0);
+  await theme(page).locator('[data-audience-choice="nostalgia"]').click();
+  await expect(note).toHaveCount(1);
+  await theme(page).locator('[data-audience-choice="reset"]').click();
+  await expect(note).toHaveCount(0);
+});
