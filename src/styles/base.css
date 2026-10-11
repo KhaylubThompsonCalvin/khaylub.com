@@ -1073,3 +1073,109 @@ figcaption {
 .picker[hidden]{display:none}
 .picker h2{margin:0}
 [data-theme-row] .seg{border-radius:var(--radius)}
+
+/* The ending band (EndingBand.astro, Home only): on a phone the words sit in a dark panel above the
+   picture; from 640 px they sit on the darker left of it, so the sun is never behind a button. Yes plays
+   the harvest clip, Not this time the rain; with JS off :target shows the text. */
+.ending {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--radius-block);
+  background: #0d0905;
+  color: var(--on-image);
+}
+.ending-art {
+  position: relative;
+  grid-row: 2;
+  aspect-ratio: 4 / 3;
+}
+.ending-art picture,
+.ending-art img,
+.ending-clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ending-art img {
+  filter: saturate(0.5) brightness(0.65);
+}
+.ending-art .still-trials,
+.ending-clip {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.ending-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#0d0905, transparent 40%);
+}
+.ending-panel {
+  position: relative;
+  z-index: 1;
+  grid-row: 1;
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+.ending-panel h2,
+.ending-panel .kind {
+  color: var(--on-image);
+  margin: 0 0 var(--space-1);
+  text-wrap: balance;
+}
+.ending-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+#thanks,
+#goodbye,
+.ending[data-state] #ending-ask {
+  display: none;
+}
+.ending[data-state='yes'] #thanks,
+.ending[data-state='no'] #goodbye,
+#thanks:target,
+#goodbye:target {
+  display: block;
+}
+.ending:has(:target) #ending-ask {
+  display: none;
+}
+.ending[data-state='yes'] img,
+.ending[data-state='no'] img {
+  filter: none;
+}
+.ending[data-state='no'] .still-trials,
+.ending[data-state='yes'] [data-clip='harvest'],
+.ending[data-state='no'] [data-clip='trials'] {
+  opacity: 1;
+}
+@media (min-width: 640px) {
+  .ending {
+    min-height: clamp(22rem, 40vw, 32rem);
+  }
+  .ending-art {
+    grid-area: 1 / 1;
+    aspect-ratio: auto;
+  }
+  .ending-art::after {
+    background: linear-gradient(to right, rgba(13, 9, 5, 0.9), rgba(13, 9, 5, 0.78) 32%, rgba(13, 9, 5, 0.4) 46%, transparent 62%);
+  }
+  .ending-panel {
+    grid-area: 1 / 1;
+    align-self: center;
+    max-width: min(30rem, 46%);
+    padding: var(--space-4) var(--space-3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ending * {
+    transition: none !important;
+  }
+  .ending-clip {
+    display: none;
+  }
+}

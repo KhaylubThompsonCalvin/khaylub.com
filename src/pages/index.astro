@@ -2,6 +2,7 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import ProfileCover from '@components/ProfileCover.astro';
 import AudiencePicker from '@components/AudiencePicker.astro';
+import EndingBand from '@components/EndingBand.astro';
 import ClimbBand from '@components/ClimbBand.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
@@ -83,6 +84,7 @@ const jsonLd = await personAndWebsite();
       <Contact />
     </div>
   </div>
+  <EndingBand />
 </BaseLayout>
 
 <style is:global>

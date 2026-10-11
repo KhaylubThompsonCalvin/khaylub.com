@@ -15,7 +15,8 @@ test('Home shows the picker with six answers as 44 px buttons; other pages do no
 test('choosing applies the skin at once, without a reload, and is remembered on every page', async ({ page }) => {
   await page.goto('/');
   await row(page).getByRole('button', { name: 'Tech and security' }).click();
-  expect(await page.evaluate(() => [document.documentElement.dataset.audience, document.documentElement.dataset.skin])).toEqual(['tech', 'desert-night']);
+  // The skin attribute changes when the new skin file has loaded (no flash of the old one), so wait for it.
+  await expect.poll(() => page.evaluate(() => [document.documentElement.dataset.audience, document.documentElement.dataset.skin])).toEqual(['tech', 'desert-night']);
   await expect(page.locator('link#skin-css')).toHaveAttribute('href', '/skins/desert-night.css');
   await expect(row(page)).toBeHidden();
   await page.goto('/resume/');

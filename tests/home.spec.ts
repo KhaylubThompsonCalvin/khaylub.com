@@ -64,7 +64,9 @@ test.describe('home', () => {
     const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
     await page.goto('/');
-    expect(await page.locator('video, audio').count()).toBe(0);
+    // The ending band's clips are in the markup but never loaded or played under reduced motion.
+    expect(await page.locator('audio').count()).toBe(0);
+    expect(await page.evaluate(() => [...document.querySelectorAll('video')].filter((v) => !v.paused || v.currentSrc !== '').length)).toBe(0);
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
     const duration = await page.getByRole('link', { name: 'VIEW MY WORK' }).evaluate((e) => getComputedStyle(e).transitionDuration);
     expect(duration.split(',').every((d) => d.trim() === '0s')).toBe(true);

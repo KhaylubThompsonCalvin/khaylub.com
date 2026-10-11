@@ -1,8 +1,8 @@
 // Copy buttons (the 2026-10-10 polish): a button with data-copy="<text>" ships hidden, because it can
 // only work with JavaScript; this shows it and copies its text, saying so in its own label for a
-// moment. Without JavaScript the text it copies is on the page as plain text.
+// moment (a link with data-copy works too). Without JavaScript the text it copies is on the page as plain text.
 export function setupCopy(): void {
-  for (const button of document.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
+  for (const button of document.querySelectorAll<HTMLElement>('[data-copy]')) {
     if (!navigator.clipboard) continue;
     const label = button.textContent;
     button.hidden = false;

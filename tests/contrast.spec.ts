@@ -225,3 +225,57 @@ test.describe('colour contrast in every skin', () => {
     }
   }
 });
+
+// The ending band's words sit on a photograph, which no computed colour can describe. So the band is
+// rendered with its words made transparent (the scrim and the buttons' own fill stay), every pixel under each text box is read, and the
+// lightest one must still hold the words at 4.5:1: the ask over the dimmed harvest still, the thanks
+// over the full-colour harvest (the lightest picture), the goodbye over the rain (the darkest).
+test('the ending band words read on the lightest pixel under them (ask, thanks, goodbye; phone and desktop)', async ({ browser }) => {
+  const reader = await (await browser.newContext()).newPage();
+  for (const width of [1440, 390]) {
+    const ctx = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto('/');
+    await page.locator('section.ending').scrollIntoViewIfNeeded();
+    const band = page.locator('section.ending');
+    const setState = (s: string) => page.evaluate((v) => {
+      const b = document.querySelector<HTMLElement>('section.ending')!;
+      if (v) b.dataset.state = v; else delete b.dataset.state;
+      document.querySelectorAll<HTMLElement>('.ending-clip').forEach((c) => (c.style.display = 'none'));
+      document.querySelectorAll<HTMLElement>('.ending-art img').forEach((i) => (i.style.transition = 'none'));
+    }, s);
+    for (const [state, panel] of [['', '#ending-ask'], ['yes', '#thanks'], ['no', '#goodbye']] as const) {
+      await setState(state);
+      await page.waitForTimeout(100);
+      const boxes = await page.evaluate((sel) => {
+        const b = document.querySelector('section.ending')!.getBoundingClientRect();
+        const items = [...document.querySelectorAll<HTMLElement>(`${sel} .kind, ${sel} h2, ${sel} p:not(.ending-answers), ${sel} .btn`)];
+        const out: { x: number; y: number; w: number; h: number; btn: boolean }[] = [];
+        for (const e of items) { const r = e.getBoundingClientRect(); const m = e.matches('.btn') ? 5 : 0; out.push({ x: r.x - b.x + m, y: r.y - b.y + m, w: r.width - 2 * m, h: r.height - 2 * m, btn: false }); }
+        document.querySelectorAll<HTMLElement>('.ending-panel *').forEach((e) => (e.style.color = 'transparent'));
+        return out;
+      }, panel);
+      const png = (await band.screenshot()).toString('base64');
+      await page.evaluate(() => document.querySelectorAll<HTMLElement>('.ending-panel *').forEach((e) => (e.style.color = '')));
+      const lightest = await reader.evaluate(async ({ png, boxes }) => {
+        const img = new Image();
+        img.src = 'data:image/png;base64,' + png;
+        await img.decode();
+        const c = document.createElement('canvas');
+        c.width = img.width; c.height = img.height;
+        const g = c.getContext('2d')!;
+        g.drawImage(img, 0, 0);
+        const lum = (r: number, gg: number, b: number) => [r, gg, b].map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
+        let max = 0;
+        for (const b of boxes.filter((x) => !x.btn && x.w > 0)) {
+          const d = g.getImageData(Math.max(0, Math.floor(b.x)), Math.max(0, Math.floor(b.y)), Math.max(1, Math.ceil(b.w)), Math.max(1, Math.ceil(b.h))).data;
+          for (let i = 0; i < d.length; i += 4) max = Math.max(max, lum(d[i], d[i + 1], d[i + 2]));
+        }
+        return max;
+      }, { png, boxes });
+      const text = lum('#f6f1e9');
+      expect((text + 0.05) / (lightest + 0.05), `${panel} words at ${width}`).toBeGreaterThanOrEqual(4.5);
+    }
+    await ctx.close();
+  }
+});

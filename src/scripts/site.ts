@@ -6,6 +6,7 @@ import { setupHeaderScroll } from './header-scroll';
 import { setupSearchShortcut } from './search-shortcut';
 import { setupCopy } from './copy';
 import { setupAudience } from './audience';
+import { setupEnding } from './ending';
 
 setupNavDisclosure();
 setupTheme();
@@ -13,3 +14,4 @@ setupHeaderScroll();
 setupSearchShortcut();
 setupCopy();
 setupAudience();
+setupEnding();
