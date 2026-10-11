@@ -143,14 +143,85 @@ test.describe('colour contrast in every skin', () => {
   });
 
   // The shimmer name is gradient text over transparent colour, which no computed-colour check can read.
-  // So it is excluded from the rendered floor above and held here instead: the stylesheet clips the
-  // gradient to the text, the fallback colour is solid and passes where clipping is unsupported, and
-  // every gradient stop reaches the 3:1 large-text floor on the white surface.
-  test('profile-2006: the shimmer name is clipped gradient text with a solid fallback and 3:1 stops', () => {
+  // So it is excluded from the rendered axe floor above and held here instead: the stylesheet clips the
+  // gradient to the text and keeps a solid fallback colour where clipping is unsupported.
+  test('profile-2006: the shimmer name is clipped gradient text with a solid fallback', () => {
     const css = readFileSync('public/skins/profile-2006.css', 'utf8');
-    expect(css).toMatch(/@supports \(background-clip:text\)\{[^}]*\.cover-name\{[^}]*background-clip:text/);
+    expect(css).toMatch(
+      /@supports \(background-clip:text\)\{[^}]*\.cover-name\{[^}]*background-clip:text/
+    );
     expect(css).toMatch(/\.cover-name\{color:#[0-9a-f]{6}\}/);
-    const stops = css.match(/linear-gradient\(90deg,([^)]+)\)/)![1].split(',');
-    for (const stop of stops) expect(ratio(stop, '#ffffff'), stop).toBeGreaterThanOrEqual(3);
   });
+
+  // The cover name against its real backdrop (Task 5, ruling 10): rendered in Paper (both schemes) and
+  // in every skin, at a desktop and a phone width. The backdrop is the first opaque background behind
+  // the name; it must be the cover's own panel (never the page ground, which in Profile 2006 is the
+  // striped blue body at about 2.7:1), and the name, or in Profile 2006 its fallback colour and every
+  // gradient stop, reaches the 3:1 large-text floor on it.
+  for (const audience of ['', ...Object.keys(AUDIENCE_SKIN)]) {
+    for (const scheme of audience ? (['light'] as const) : (['light', 'dark'] as const)) {
+      test(`the cover name reads on its own panel: ${audience ? AUDIENCE_SKIN[audience] : `paper ${scheme}`}`, async ({
+        browser,
+      }) => {
+        for (const width of [1440, 390]) {
+          const ctx = await browser.newContext({
+            viewport: { width, height: 900 },
+            colorScheme: scheme,
+          });
+          const page = await ctx.newPage();
+          if (audience)
+            await page.addInitScript((v) => localStorage.setItem('khaylub-audience', v), audience);
+          await page.goto('/');
+          await page.waitForFunction(
+            () => !document.documentElement.classList.contains('skin-wait')
+          );
+          const r = await page.evaluate(() => {
+            const hex = (c: string) =>
+              '#' +
+              (c.match(/[\d.]+/g) ?? [])
+                .slice(0, 3)
+                .map((n) => Math.round(Number(n)).toString(16).padStart(2, '0'))
+                .join('');
+            const name = document.querySelector('.cover-name') as HTMLElement;
+            let e: HTMLElement | null = name;
+            const opaque = (el: HTMLElement) => {
+              const c = getComputedStyle(el).backgroundColor;
+              const a = c.match(/rgba\([^)]*,\s*([\d.]+)\)/);
+              return c !== 'transparent' && (!a || Number(a[1]) === 1);
+            };
+            while (e && !opaque(e)) e = e.parentElement;
+            const cs = getComputedStyle(name);
+            const stops = (cs.backgroundImage.match(/rgba?\([^)]*\)/g) ?? []).map(hex);
+            return {
+              fg: hex(cs.color),
+              transparent: /rgba\(.*, 0\)/.test(cs.color),
+              stops,
+              bg: hex(getComputedStyle(e!).backgroundColor),
+              panel: !!e && !!e.closest('.profile-cover'),
+            };
+          });
+          expect(r.panel, `the backdrop is the cover's panel at ${width}`).toBe(true);
+          if (!r.transparent)
+            expect(ratio(r.fg, r.bg), `name ${r.fg} on ${r.bg} at ${width}`).toBeGreaterThanOrEqual(
+              3
+            );
+          for (const stop of r.stops)
+            expect(
+              ratio(stop, r.bg),
+              `gradient stop ${stop} on ${r.bg} at ${width}`
+            ).toBeGreaterThanOrEqual(3);
+          if (AUDIENCE_SKIN[audience] === 'profile-2006') {
+            expect(r.stops.length, 'the shimmer is rendered').toBeGreaterThan(0);
+            const fallback = readFileSync('public/skins/profile-2006.css', 'utf8').match(
+              /\.cover-name\{color:(#[0-9a-f]{6})\}/
+            )![1];
+            expect(ratio(fallback, r.bg), `fallback ${fallback} on ${r.bg}`).toBeGreaterThanOrEqual(
+              3
+            );
+          }
+          await ctx.close();
+        }
+      });
+    }
+  }
 });
