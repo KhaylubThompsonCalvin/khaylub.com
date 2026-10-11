@@ -10,19 +10,23 @@ import trials from '../assets/ending/trials-still.jpg';
 const id = identity();
 const page = new URL(Astro.url.pathname, 'https://khaylub.com').href;
 const mail = (subject: string, body: string) => `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-const poster = async (src: ImageMetadata) => (await getImage({ src, width: 1024, format: 'webp', quality: 70 })).src;
-const harvestPoster = await poster(harvest);
-const trialsPoster = await poster(trials);
+// The HTML poster is a small placeholder (the stills above are the picture); the full poster is set when the clip is armed,
+// so two 45 KB images never compete with the cover for the first bytes (Lighthouse, Home LCP).
+const poster = async (src: ImageMetadata, width: number, quality: number) => (await getImage({ src, width, format: 'webp', quality })).src;
+const harvestPoster = await poster(harvest, 320, 40);
+const trialsPoster = await poster(trials, 320, 40);
+const harvestFull = await poster(harvest, 1024, 70);
+const trialsFull = await poster(trials, 1024, 70);
 const still = { alt: '', widths: [640, 1024], sizes: '(min-width: 1152px) 1104px, 100vw', formats: ['avif', 'webp'] as ('avif' | 'webp')[], fallbackFormat: 'webp' as const, loading: 'lazy' as const, decoding: 'async' as const };
 ---
 <section class="ending" aria-labelledby="ending-heading" data-ending>
   <div class="ending-art">
     <Picture class="still-harvest" src={harvest} {...still} />
     <Picture class="still-trials" src={trials} {...still} />
-    <video class="ending-clip" data-clip="harvest" poster={harvestPoster} controls muted loop playsinline preload="none" aria-label="The wheat field at golden hour, with the Wanderer walking">
+    <video class="ending-clip" data-clip="harvest" poster={harvestPoster} data-poster={harvestFull} controls muted loop playsinline preload="none" aria-label="The wheat field at golden hour, with the Wanderer walking">
       <source data-src="/media/ending/harvest.webm" type="video/webm" /><source data-src="/media/ending/harvest.mp4" type="video/mp4" />
     </video>
-    <video class="ending-clip" data-clip="trials" poster={trialsPoster} controls muted loop playsinline preload="none" aria-label="The Wanderer walking a ridge in the rain">
+    <video class="ending-clip" data-clip="trials" poster={trialsPoster} data-poster={trialsFull} controls muted loop playsinline preload="none" aria-label="The Wanderer walking a ridge in the rain">
       <source data-src="/media/ending/trials.webm" type="video/webm" /><source data-src="/media/ending/trials.mp4" type="video/mp4" />
     </video>
   </div>

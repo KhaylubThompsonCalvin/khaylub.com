@@ -2,7 +2,7 @@
 // clip at a time, never loads a clip under reduced motion or Data Saver, and on the Full tier warms
 // the clips when the band nears the screen. Nothing is recorded or sent.
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-const arm = (v: HTMLVideoElement) => { if (v.dataset.armed) return; v.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((s) => (s.src = s.dataset.src!)); v.preload = 'auto'; v.load(); v.dataset.armed = '1'; };
+const arm = (v: HTMLVideoElement) => { if (v.dataset.armed) return; v.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((s) => (s.src = s.dataset.src!)); v.preload = 'auto'; if (v.dataset.poster) v.poster = v.dataset.poster; v.load(); v.dataset.armed = '1'; };
 
 export function setupEnding(): void {
   const band = document.querySelector<HTMLElement>('[data-ending]');
