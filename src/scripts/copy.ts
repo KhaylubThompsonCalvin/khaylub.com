@@ -8,8 +8,10 @@ export function setupCopy(): void {
     button.hidden = false;
     button.addEventListener('click', async (e) => {
       if (button instanceof HTMLAnchorElement) e.preventDefault(); // a link copies instead of navigating
-      await navigator.clipboard.writeText(button.dataset.copy ?? '');
-      button.textContent = 'Copied';
+      // A refused write (no permission, an unfocused document) says so the same way, instead of failing silently.
+      let said = 'Copied';
+      try { await navigator.clipboard.writeText(button.dataset.copy ?? ''); } catch { said = 'Copy failed'; }
+      button.textContent = said;
       window.setTimeout(() => (button.textContent = label), 2000);
     });
   }

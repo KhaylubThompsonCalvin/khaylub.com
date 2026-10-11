@@ -95,3 +95,16 @@ test('focus moves to the message after an answer', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.locator('#thanks h2')).toBeFocused();
 });
+
+test('Copy link says Copy failed when the clipboard refuses, with no unhandled rejection', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.addInitScript(() => { navigator.clipboard.writeText = () => Promise.reject(new DOMException('denied', 'NotAllowedError')); });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Yes' }).click();
+  const link = page.locator('#thanks [data-copy]');
+  await link.click();
+  await expect(link).toHaveText('Copy failed');
+  await expect(link).toHaveText('Copy link', { timeout: 4000 });
+  expect(errors).toEqual([]);
+});
