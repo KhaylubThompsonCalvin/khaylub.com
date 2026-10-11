@@ -108,3 +108,15 @@ test('Copy link says Copy failed when the clipboard refuses, with no unhandled r
   await expect(link).toHaveText('Copy link', { timeout: 4000 });
   expect(errors).toEqual([]);
 });
+
+for (const [hash, state, panel] of [['#thanks', 'yes', '#thanks'], ['#goodbye', 'no', '#goodbye']] as const) {
+  test(`arriving with ${hash}: the state takes over, the fragment is cleared, and Start over shows the question`, async ({ page }) => {
+    await page.goto(`/${hash}`);
+    await expect(page.locator('section.ending')).toHaveAttribute('data-state', state);
+    expect(await page.evaluate(() => [location.hash, document.querySelector(':target')?.id ?? null])).toEqual(['', null]);
+    await expect(page.locator(panel)).toBeVisible();
+    await page.locator(panel).getByRole('button', { name: 'Start over' }).click();
+    await expect(page.locator('#ending-ask')).toBeVisible();
+    await expect(page.locator(panel)).toBeHidden();
+  });
+}

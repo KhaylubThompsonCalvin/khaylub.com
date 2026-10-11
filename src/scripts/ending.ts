@@ -28,6 +28,13 @@ export function setupEnding(): void {
     b.addEventListener('click', () => show(''));
     p.appendChild(b);
   });
+  // Arriving with #thanks or #goodbye (a shared or reloaded address): the state takes over from :target,
+  // and the fragment is dropped so Start over can show the question again.
+  const hash = location.hash;
+  if (hash === '#thanks' || hash === '#goodbye') {
+    band.dataset.state = hash === '#thanks' ? 'yes' : 'no';
+    history.replaceState(history.state, '', location.pathname + location.search);
+  }
   const warm = () => {
     if (document.documentElement.dataset.tier !== 'full' || reduced()) return;
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { vids.forEach(arm); io.disconnect(); } }, { rootMargin: '600px 0px' });
