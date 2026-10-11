@@ -1107,11 +1107,15 @@ figcaption {
   opacity: 0;
   transition: opacity 1.2s ease;
 }
+.ending-clip {
+  visibility: hidden;
+}
 .ending-art::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(#0d0905, transparent 40%);
+  pointer-events: none;
 }
 .ending-panel {
   position: relative;
@@ -1152,6 +1156,7 @@ figcaption {
 .ending[data-state='yes'] [data-clip='harvest'],
 .ending[data-state='no'] [data-clip='trials'] {
   opacity: 1;
+  visibility: visible;
 }
 @media (min-width: 640px) {
   .ending {
