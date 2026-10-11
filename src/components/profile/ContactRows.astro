@@ -62,11 +62,13 @@ const rows: Row[] = Astro.props.rows ?? [
   .contact li:last-child {
     border-bottom: 0;
   }
+  /* In a narrow column a value that does not fit moves under its label whole, never broken mid-word. */
   .contact :is(a, p) {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-2);
+    gap: 0 var(--space-1);
     min-height: var(--target);
     margin: 0;
     padding: var(--space-1) 0;

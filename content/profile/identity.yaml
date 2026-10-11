@@ -15,6 +15,13 @@ response_time: Usually replies within 1 to 2 business days.
 # professional headshot (2026), a 3:4 crop of the original, which stays outside the repository.
 photo: headshot.png
 photo_alt: Portrait of Khaylub Thompson-Calvin wearing a dark suit and tie, looking at the camera.
+# The owner's own words for About ("In my words") and the About me box on Home, verbatim; the text
+# exists once, here. Changed only by the owner.
+in_my_words: >-
+  I build for a better future, so the next generation starts further ahead than I did. I am a
+  Computer Information Systems student making interactive 3D and tools for the web, with seven
+  years of hands-on hardware repair, calibration, and testing behind me. This site is a record
+  of the climb, not the arrival.
 security_contact: mailto:khaylubthompsoncalvin@gmail.com
 # security.txt Expires is computed as security_as_of plus one year at build time (decision D-20).
 security_as_of: 2026-09-09

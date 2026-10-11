@@ -65,9 +65,9 @@ test.describe('the web fonts', () => {
     const meta = await page.locator('.meta').first().evaluate((e) => getComputedStyle(e).fontSize);
     expect(meta, 'the metadata keeps the interface size').toBe('16px');
     await page.goto('/');
-    const home = await page.locator('.hero .role').evaluate((e) => ({ size: getComputedStyle(e).fontSize, lh: getComputedStyle(e).lineHeight }));
+    const home = await page.locator('.cover-words p').first().evaluate((e) => ({ size: getComputedStyle(e).fontSize, lh: getComputedStyle(e).lineHeight }));
     expect(home).toEqual({ size: '16px', lh: '24px' });
-    const h2 = await page.locator('main h2').first().evaluate((e) => getComputedStyle(e).fontSize);
+    const h2 = await page.locator('.climb-band h2').evaluate((e) => getComputedStyle(e).fontSize);
     expect(h2, 'the section heading at 1.75rem').toBe('28px');
   });
 });

@@ -20,7 +20,7 @@ test.describe('top 8 archives', () => {
   test('an archive page resolves the same items as the current set when it is the newest revision', async ({ page }) => {
     const newest = revisions[0];
     await page.goto('/');
-    const home = await page.locator('ol.top8 h3 a').allInnerTexts();
+    const home = await page.locator('ol.top8[data-for="default"] h3 a').allInnerTexts();
     await page.goto(`/top8/${newest.as_of}/`);
     await expect(page.getByRole('heading', { level: 1 })).toContainText(newest.as_of.slice(0, 4));
     // On the Top 8 pages the page's H1 names the set and the tile titles are H2s (one title).

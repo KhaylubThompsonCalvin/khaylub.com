@@ -145,12 +145,13 @@
 /* Breakpoints (documented constants, not tokens: a custom property cannot drive an @media
    condition in plain CSS). A change is made in every file that names the value.
    360px  the Top 8 tiles go two across; 900px four across (Top8)
-   560px  the doors side by side; previous and next (Doors, PrevNext)
-   900px  the second hero column; the section gap steps up (IdentityCard, tokens.css); the Home
-          profile columns (index.astro)
+   560px  the doors side by side; previous and next (Doors, PrevNext); the quick links leave
+          their phone 2 by 2 grid (RecruiterRow)
+   768px  the cover's photo beside the name, 160 px (ProfileCover)
+   900px  the section gap steps up (tokens.css)
    1024px the primary nav expands; the contents side column; the artifact two-column layout
           (PrimaryNav, TableOfContents, [collection]/[slug])
-   1200px the 270 px portrait (IdentityCard)
+   1280px the Home and About profile columns (index.astro)
    40rem  the Credits list stacks (Credits) */
 
 /* The dark palette: the system's preference, unless the Appearance control pins a scheme. The two

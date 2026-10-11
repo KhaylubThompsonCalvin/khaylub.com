@@ -42,7 +42,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 |---|---|
 | `content/` | all public content (Markdown and YAML); profile data in `content/profile/` |
 | `src/layouts/BaseLayout.astro` | skip link, header, nav, `main`, footer, SEO head |
-| `src/components/` | IdentityCard, RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
+| `src/components/` | ProfileCover (the Home and About cover profile, Layout B), RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
 | `src/lib/` | catalog (public/private filter, featured set, evidence), profile, seo |
 | `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, targets, widths, radii, tints, motion (`tests/tokens.spec.ts` holds every `var()` defined and the tokenised values out of components; breakpoints are documented literals). The colour roles are semantic aliases over the palette (`--surface`, `--text`, `--text-secondary`, `--border`, `--interactive` for the chrome's ink treatment, `--link-content` for sienna links inside content, `--signal` for the current page and live state, `--focus` the blue ring, `--notice` the amber notice); `tests/contrast.spec.ts` asserts every floor in both palettes and holds the theme-color metas and the Open Graph constants to the tokens |
 | `src/islands/` | React islands (the climb), loaded only after the door is pressed |

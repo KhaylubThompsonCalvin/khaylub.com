@@ -1,0 +1,43 @@
+---
+// Skills in Home's side column (Profile Themes spec, section 3.3): the first four as chips, then a
+// "+N more" chip that drops the rest down in place (a native details element). The same skills and
+// technologies, from the same source and in the same order, as About's chips.
+import { termPages } from '@lib/catalog';
+
+const terms = [...(await termPages('skills')), ...(await termPages('technologies'))];
+const first = terms.slice(0, 4);
+const more = terms.slice(4);
+---
+
+{
+  terms.length > 0 && (
+    <section class="module" aria-labelledby="skills-drop-heading">
+      <h2 id="skills-drop-heading" class="module-heading">
+        Skills
+      </h2>
+      <ul class="chips">
+        {first.map((t) => (
+          <li>
+            <a class="chip" href={`/${t.kind}/${t.slug}/`}>
+              {t.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      {more.length > 0 && (
+        <details class="skills-drop">
+          <summary class="chip">+{more.length} more</summary>
+          <ul class="chips">
+            {more.map((t) => (
+              <li>
+                <a class="chip" href={`/${t.kind}/${t.slug}/`}>
+                  {t.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  )
+}

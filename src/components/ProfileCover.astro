@@ -1,0 +1,216 @@
+---
+// The cover profile (Layout B, Profile Themes spec 2026-10-10, section 3.3), on Home and About: a
+// wide scene, the round photo over its lower left edge, the name, the status light with the role and
+// the place, the audience's greeting (the owner's words; an empty one renders nothing), the quick
+// links and the two doors, and on Home the Start-here row. The whole cover is one surface, so the
+// name always sits on a solid panel, in every skin. Paper's scene is this <picture>; a chosen skin
+// swaps the scene through its own stylesheet (public/skins/<skin>.css). The name, the availability
+// and both doors stay on the first screen at 390 by 844 and 1440 by 900 (P2-FE-04).
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { identity, availability, monthLabel, audiences } from '@lib/profile';
+import RecruiterRow from './RecruiterRow.astro';
+import Doors from './Doors.astro';
+import paperCover from '../assets/skins/paper-cover.jpg';
+
+interface Props {
+  /** Home names the owner in its h1; About keeps "About" as the h1 and names the owner in an h2. */
+  level?: 'h1' | 'h2';
+}
+const { level = 'h1' } = Astro.props;
+const Name = level;
+const home = level === 'h1';
+const id = identity();
+const avail = availability();
+const list = audiences();
+const portraits = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/profile/*.{png,jpg,webp}',
+  { eager: true }
+);
+const photo = id.photo ? portraits[`/src/assets/profile/${id.photo}`]?.default : undefined;
+if (id.photo && !photo)
+  throw new Error(`identity.yaml photo "${id.photo}" is not a file under src/assets/profile/`);
+const DEFAULT_START = [
+  { label: 'Work', href: '/work/' },
+  { label: 'Library', href: '/library/' },
+  { label: 'About', href: '/about/' },
+];
+const ext = (href: string) => href.startsWith('https://');
+---
+
+<section class="profile-cover surface" aria-labelledby="site-name">
+  <div class="cover-art">
+    <Picture
+      src={paperCover}
+      alt=""
+      widths={[640, 1024, 1440, 2880]}
+      sizes="(min-width: 1152px) 1104px, 100vw"
+      formats={['avif', 'webp']}
+      fallbackFormat="webp"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </div>
+  <div class="cover-head">
+    {
+      photo && (
+        <span class="cover-photo">
+          {/* The headshot is 3 by 4 (972 by 1296). Measured on a 5 % grid: the hair from 3.5 % of
+              the height, the foot of the beard at 70 %, the eyes at 31 %. In the square frame (the
+              width fills) object-position 50% 4% keeps the head from 3 % to 92 % of the frame with
+              the eyes at 40 %. sizes names twice the shown width (112 px, 160 px from 768 px), so a
+              1x screen still gets a 2x file and the face is never soft. */}
+          <Picture
+            src={photo}
+            alt={id.photo_alt}
+            widths={[224, 320, 448, 672, 960]}
+            sizes="(min-width: 768px) 320px, 224px"
+            formats={['avif', 'webp']}
+            fallbackFormat="webp"
+            loading="eager"
+            decoding="async"
+          />
+        </span>
+      )
+    }
+    <div class="cover-words">
+      <Name id="site-name" class="cover-name">{id.name}</Name>
+      <p class="muted">{id.role_line} · {id.location}</p>
+      <p class="cover-status">
+        <span class="status-dot" aria-hidden="true"></span>{avail.statement}
+        <small class="muted">(as of {monthLabel(avail.as_of)})</small>
+      </p>
+      {
+        list.some((a) => a.greeting.trim()) && (
+          <div class="cover-greeting">
+            {list
+              .filter((a) => a.greeting.trim())
+              .map((a) => (
+                <p data-for={a.id}>{a.greeting}</p>
+              ))}
+          </div>
+        )
+      }
+    </div>
+    <div class="cover-actions">
+      <RecruiterRow />
+      <Doors />
+    </div>
+    {
+      home && (
+        <nav class="start-here" aria-labelledby="start-here-label">
+          <span id="start-here-label" class="small muted">
+            Start here
+          </span>
+          <ul class="chips" data-for="default">
+            {DEFAULT_START.map((l) => (
+              <li>
+                <a class="chip" href={l.href}>
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          {list.map((a) => (
+            <ul class="chips" data-for={a.id}>
+              {a.start_here.map((l) => (
+                <li>
+                  <a
+                    class="chip"
+                    href={l.href}
+                    rel={ext(l.href) ? 'noopener noreferrer' : undefined}
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </nav>
+      )
+    }
+  </div>
+</section>
+
+<style is:global>
+  .profile-cover {
+    padding: 0;
+    margin-bottom: var(--gap-block);
+  }
+  .cover-art {
+    position: relative;
+    height: clamp(160px, 28vw, 320px);
+    border-radius: var(--radius-block) var(--radius-block) 0 0;
+    overflow: hidden;
+    background: center 35% / cover;
+  }
+  .cover-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .cover-head {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--pad-block) var(--pad-block);
+  }
+  .cover-photo img {
+    position: relative;
+    display: block;
+    width: 112px;
+    height: 112px;
+    margin-top: -72px;
+    border: 4px solid var(--surface);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 4%;
+  }
+  .cover-name {
+    margin: 0;
+    font-size: clamp(1.875rem, 4vw, 3.25rem);
+  }
+  .cover-words p {
+    margin: var(--space-1) 0 0;
+  }
+  .start-here {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .start-here ul {
+    margin: 0;
+  }
+  /* Each audience's Start-here row, greeting, Top 8 and its date carry data-for: the default shows
+     until a stored audience (html[data-audience], set before first paint) picks its own. */
+  html:not([data-audience='hiring']) [data-for='hiring'],
+  html:not([data-audience='tech']) [data-for='tech'],
+  html:not([data-audience='creative']) [data-for='creative'],
+  html:not([data-audience='exploring']) [data-for='exploring'],
+  html:not([data-audience='youtube']) [data-for='youtube'],
+  html:not([data-audience='nostalgia']) [data-for='nostalgia'],
+  html[data-audience] [data-for='default'] {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .cover-head {
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: var(--space-4);
+    }
+    /* The photo holds the words' and the actions' rows (About has no Start-here row, so no empty
+       third row); Start here keeps to the words' column. */
+    .cover-photo {
+      grid-row: span 2;
+    }
+    .start-here {
+      grid-column: 2;
+    }
+    .cover-photo img {
+      width: 160px;
+      height: 160px;
+      margin-top: -96px;
+    }
+  }
+</style>

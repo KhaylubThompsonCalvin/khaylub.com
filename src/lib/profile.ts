@@ -39,6 +39,7 @@ export const identitySchema = z
     response_time: z.string(),
     photo: z.string(),
     photo_alt: z.string(),
+    in_my_words: z.string().min(20),
     security_contact: z.string().startsWith('mailto:'),
     security_as_of: z.coerce.date(),
   })

@@ -136,14 +136,14 @@ test.describe('pictures, About, and the search shortcut (round two)', () => {
     }
   });
 
-  test('About is the block language: the identity block, the words, and the blocks after it', async ({ page }) => {
+  test('About is the block language: the cover profile, the words, and the blocks after it', async ({ page }) => {
     await page.goto('/about/');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('About');
-    await expect(page.locator('.about > .hero .id-photo img')).toHaveCount(1);
-    const labels = (await page.locator('.about .module-heading').allTextContents()).map((t) => t.split(/\s+as of/)[0].trim());
+    await expect(page.locator('.profile-cover .cover-photo img')).toHaveCount(1);
+    const labels = (await page.locator('.profile-cols .module-heading').allTextContents()).map((t) => t.split(/\s+as of/)[0].trim());
     for (const l of ['In my words', 'How I work', 'Now', 'Education', 'Certified and planned', 'Skills and technologies', 'Contact']) expect(labels).toContain(l);
-    expect(await page.locator('.about a.chip').count()).toBeGreaterThan(5);
-    await expect(page.locator('.about .contact li svg')).toHaveCount(5);
+    expect(await page.locator('.profile-cols a.chip').count()).toBeGreaterThan(5);
+    await expect(page.locator('.profile-cols .contact li svg')).toHaveCount(5);
   });
 
   test('"/" and Ctrl+K open the search with the field focused', async ({ page, isMobile }) => {

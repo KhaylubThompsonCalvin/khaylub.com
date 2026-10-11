@@ -819,6 +819,13 @@ small,
   font-size: 3rem;
   color: color-mix(in srgb, var(--accent) 70%, var(--surface));
 }
+/* In a narrower set (two across on a phone, four across in Home's main column) the large numeral
+   would push the kind label to break inside a word: it takes the pictured tiles' size instead. */
+@container (max-width: 46rem) {
+  .type-tile .tile-rank {
+    font-size: var(--size-h2);
+  }
+}
 /* A calling card (CallingCard): in a picture's place, the kind's icon and label (a kind label),
    and one line of the entry's own, large. */
 .call {
@@ -856,6 +863,26 @@ small,
 .signal {
   color: var(--signal);
   font-weight: 600;
+}
+/* The status light (the convention recruiters know): green, pulsing softly, still under reduced
+   motion. Green is the one colour outside the accent, a status token. On the cover, Contact, the
+   résumé and the footer. */
+.status-dot {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: var(--space-1);
+  border-radius: 50%;
+  background: var(--status);
+  animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--status) 50%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 0.5em transparent;
+  }
 }
 /* Under 360 px two squares would break titles mid-word: each tile becomes a row instead, the rank
    beside the title, so the set stays short on the narrowest phones. */
