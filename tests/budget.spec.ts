@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { TEMPLATES } from './helpers';
-import { shardUrls } from '../scripts/lhci-shard.mjs';
+import { shardUrls, tierRuns, tierConfig, TIER_AUDIENCES, SKIN_ALLOWANCE } from '../scripts/lhci-shard.mjs';
 
 // The performance budget (vault document 13) as the repository asserts it. Lighthouse 12 removed the
 // performance-budget audit, so budget.json is enforced only through Lighthouse CI's own assertions;
@@ -115,6 +115,38 @@ test.describe('the performance budget as asserted', () => {
     expect([...all].sort()).toEqual([...urls].sort());
     const sizes = shards.map((i) => shardUrls(urls, i, SHARDS).length);
     expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe('the weight-tier Lighthouse runs (D-37)', () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'configuration files: run once, in the desktop project');
+  });
+
+  test('Standard (tech) and Full (exploring) measure Home, About and Work, split across the CI shards exactly once', () => {
+    expect(TIER_AUDIENCES).toEqual({ standard: 'tech', full: 'exploring' });
+    const runs = tierRuns();
+    expect(runs.map((r) => `${r.audience}${r.path}`).sort()).toEqual(
+      ['exploring/', 'exploring/about/', 'exploring/work/', 'tech/', 'tech/about/', 'tech/work/'],
+    );
+    const all = [...Array(SHARDS).keys()].flatMap((i) => shardUrls(runs, i, SHARDS));
+    expect(all.length).toBe(runs.length);
+    expect(new Set(all.map((r) => `${r.audience}${r.path}`)).size).toBe(runs.length);
+  });
+
+  test('the tier config differs from the Lean sweep only in the stylesheet line (one skin more) and the stored answer', () => {
+    const cfg = tierConfig(lhci, 'tech', ['/', '/about/'], 0, 3) as unknown as Lhci & { ci: { collect: { puppeteerScript: string } } };
+    expect(cfg.ci.collect.puppeteerScript).toBe('scripts/lhci-audience.cjs');
+    expect(cfg.ci.collect.url).toEqual([`${ORIGIN}/`, `${ORIGIN}/about/`]);
+    const every = cfg.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern === '.*')!;
+    expect(value(every.assertions['resource-summary:stylesheet:size'], 'maxNumericValue')).toBe(38912 + SKIN_ALLOWANCE);
+    expect(SKIN_ALLOWANCE).toBe(6 * 1024);
+    // Every other line is the Lean sweep's line, and the Lean sweep itself still holds 38 KiB.
+    const lean = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern === '.*')!;
+    expect(value(lean.assertions['resource-summary:stylesheet:size'], 'maxNumericValue')).toBe(38912);
+    for (const key of Object.keys(lean.assertions).filter((k) => k !== 'resource-summary:stylesheet:size')) {
+      expect(every.assertions[key], key).toEqual(lean.assertions[key]);
+    }
   });
 });
 

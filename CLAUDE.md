@@ -101,6 +101,13 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
   compressed); it stays a real ceiling and is never raised again without an owner decision.
   D-38 (2026-10-10): the owner raised it to 38 KiB (38,912 bytes, headers counted) for the profile themes
   (the picker and the ending band), choosing "Raise to 38 KB"; it is still a real ceiling.
+  D-36 (2026-10-10): profile themes as approved: a visitor answers "What brings you here?", the answer is
+  remembered on the device, and it picks one of six skins, a Top 8 order and a Start-here set; with no
+  answer, or with JavaScript off, the site is Paper. D-37: weight by audience. Lean (Paper) is the default
+  visit and holds every budget; Standard (`tech`, `nostalgia`) and Full (`creative`, `exploring`,
+  `youtube`) add one skin file of at most 6 KB, so their stylesheet line is 38 KiB plus 6 KiB; the ending clips load
+  only after a press or, on Full, when the band nears the viewport. `lighthouserc.json` stays the Lean sweep;
+  `scripts/lhci-shard.mjs` adds the Standard (`tech`) and Full (`exploring`) runs of Home, About and Work.
 - SEO and content: every page's primary text is in the initial HTML and readable with JavaScript
   off (`tests/js-off.spec.ts`); title, description, canonical, sitemap, robots, and structured
   data per `tests/seo.spec.ts`; JSON-LD is the only inline script allowed.
