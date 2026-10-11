@@ -230,11 +230,16 @@ small,
   align-items: baseline;
   gap: 0 var(--space-2);
 }
-/* On paper: the page's words without the site's chrome, shadows, or actions. */
+/* On paper: the page's words without the site's chrome, shadows, or actions (the picker, the ending
+   band and the skin motion layer included; the skin files themselves are screen only). The two body
+   selectors outrank the display rules that come later in this file. */
 @media print {
   .site-header,
   .site-footer,
-  .cta-row {
+  .cta-row,
+  body .picker,
+  body .ending,
+  .skin-motion {
     display: none;
   }
   .surface {

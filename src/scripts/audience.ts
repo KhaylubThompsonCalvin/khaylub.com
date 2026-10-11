@@ -3,7 +3,7 @@
 const KEY = 'khaylub-audience';
 const CLOSED = 'khaylub-picker-closed';
 // The skin version token, written by scripts/build-skins.mjs (render.yaml caches /skins/* for a year).
-const SKIN_V = '974076137f';
+const SKIN_V = '55751e4e1d';
 const M: Record<string, [string, string]> = {hiring:['paper','lean'],tech:['desert-night','standard'],creative:['arizona-made','full'],exploring:['golden-hour','full'],youtube:['above-the-clouds','full'],nostalgia:['profile-2006','standard']};
 
 // The skin names a visitor hears when the picker closes (Profile Themes spec, the six skins).

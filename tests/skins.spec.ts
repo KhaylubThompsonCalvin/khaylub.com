@@ -120,3 +120,22 @@ test('skin URLs carry the version token (a content hash), and render.yaml caches
   expect((await request.get(`/skins/desert-night.css?v=${v}`)).headers()['cache-control']).toBe('public, max-age=31536000, immutable');
   expect((await request.get(`/skins/desert-night/cover-640.avif?v=${v}`)).headers()['cache-control']).toBe('public, max-age=31536000, immutable');
 });
+
+test('print: a dark skin prints as Paper (dark text on white), without the picker, the ending band or the motion layer', async ({ page }) => {
+  await page.addInitScript((v) => localStorage.setItem('khaylub-audience', v), 'tech');
+  await page.goto('/resume/');
+  await page.waitForFunction(() => !document.documentElement.classList.contains('skin-wait'));
+  await page.emulateMedia({ media: 'print', colorScheme: 'light' });
+  const lum = (rgb: string) => {
+    const [r, g, b] = rgb.match(/\d+/g)!.slice(0, 3).map((n) => { const c = Number(n) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  for (const sel of ['h1', 'main p']) {
+    const color = await page.locator(sel).first().evaluate((e) => getComputedStyle(e).color);
+    expect((1.05) / (lum(color) + 0.05), `${sel} ${color} on white`).toBeGreaterThanOrEqual(7);
+  }
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('.skin-motion')!).display)).toBe('none');
+  await page.goto('/');
+  await expect(page.locator('.ending')).toBeHidden();
+  await expect(page.locator('[data-picker]')).toBeHidden();
+});
