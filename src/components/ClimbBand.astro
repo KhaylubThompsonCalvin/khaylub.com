@@ -5,7 +5,7 @@
 // June 2026 version kept on /climb/. On /climb/ it is the page's head (`standalone`) for that June
 // version, with the door rendered by the page below it. Each still is served through Astro's image
 // pipeline (src/assets/climb/PROVENANCE.txt). The still loads eagerly on both: the band is in the
-// first viewport at 1440 by 900, so a lazy still would be the page's late LCP element.
+// first viewport at 1440 by 900 on its own page (standalone), so a lazy still would be that page's late LCP element; on Home the cover and the Top 8 come first, so the still waits until the band nears the screen.
 import { Picture } from 'astro:assets';
 import june from '../assets/climb/spark-wakes.webp';
 import wheat from '../assets/climb/wheat-lane.webp';
@@ -21,11 +21,11 @@ const { standalone = false } = Astro.props;
     src={standalone ? june : wheat}
     alt={standalone ? '' : 'A traveller with a pack walks a trodden lane through golden wheat toward a lone tree and a low sun.'}
     widths={[480, 720, 960]}
-    sizes={standalone ? '(min-width: 1200px) 1104px, 100vw' : '(min-width: 1024px) 560px, 100vw'}
+    sizes={standalone ? '(min-width: 1200px) 1104px, 100vw' : '(min-width: 1152px) 810px, (min-width: 1024px) 72vw, 100vw'}
     formats={['avif', 'webp']}
     fallbackFormat="webp"
-    loading="eager"
-    fetchpriority="low"
+    loading={standalone ? 'eager' : 'lazy'}
+    fetchpriority={standalone ? 'low' : undefined}
     decoding="async"
     class="climb-still"
   />

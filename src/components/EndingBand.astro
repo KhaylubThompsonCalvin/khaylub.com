@@ -1,0 +1,60 @@
+---
+// The ending (Profile Themes spec 3.4): "Did you find what you came for?" at the foot of Home, above the
+// footer. Yes: the harvest clip and the referral. Not this time: the Wanderer walking on in the rain and
+// a thank-you. Nothing is recorded or sent. With JS off the answers are links to #thanks and #goodbye
+// (CSS :target shows the text); src/scripts/ending.ts upgrades them to buttons and clips.
+import { Picture, getImage } from 'astro:assets';
+import { identity } from '@lib/profile';
+import harvest from '../assets/ending/harvest-still.jpg';
+import trials from '../assets/ending/trials-still.jpg';
+const id = identity();
+const page = new URL(Astro.url.pathname, 'https://khaylub.com').href;
+const mail = (subject: string, body: string) => `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// The HTML poster is a small placeholder (the stills above are the picture); the full poster is set when the clip is armed,
+// so two 45 KB images never compete with the cover for the first bytes (Lighthouse, Home LCP).
+const poster = async (src: ImageMetadata, width: number, quality: number) => (await getImage({ src, width, format: 'webp', quality })).src;
+const harvestPoster = await poster(harvest, 320, 40);
+const trialsPoster = await poster(trials, 320, 40);
+const harvestFull = await poster(harvest, 1024, 70);
+const trialsFull = await poster(trials, 1024, 70);
+const still = { alt: '', widths: [640, 1024], sizes: '(min-width: 1152px) 1104px, 100vw', formats: ['avif', 'webp'] as ('avif' | 'webp')[], fallbackFormat: 'webp' as const, loading: 'lazy' as const, decoding: 'async' as const };
+---
+<section class="ending" aria-labelledby="ending-heading" data-ending>
+  <div class="ending-art">
+    <Picture class="still-harvest" src={harvest} {...still} />
+    <Picture class="still-trials" src={trials} {...still} />
+    <video class="ending-clip" data-clip="harvest" poster={harvestPoster} data-poster={harvestFull} controls muted loop playsinline preload="none" aria-label="The wheat field at golden hour, with the Wanderer walking">
+      <source data-src="/media/ending/harvest.webm" type="video/webm" /><source data-src="/media/ending/harvest.mp4" type="video/mp4" />
+    </video>
+    <video class="ending-clip" data-clip="trials" poster={trialsPoster} data-poster={trialsFull} controls muted loop playsinline preload="none" aria-label="The Wanderer walking a ridge in the rain">
+      <source data-src="/media/ending/trials.webm" type="video/webm" /><source data-src="/media/ending/trials.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="ending-panel" id="ending-ask">
+    <p class="kind">Before you go</p>
+    <h2 id="ending-heading" tabindex="-1">Did you find what you came for?</h2>
+    <p class="ending-answers"><a class="btn btn-on-image" href="#thanks" data-answer="yes">Yes</a> <a class="btn btn-on-image" href="#goodbye" data-answer="no">Not this time</a></p>
+  </div>
+  <div class="ending-panel" id="thanks">
+    <p class="kind">The sun is out</p>
+    <h2 tabindex="-1">Thank you for the visit.</h2>
+    <p>Know someone who should see this work?</p>
+    <p class="ending-answers">
+      <a class="btn btn-on-image" href={Astro.url.pathname} data-copy={page}>Copy link</a>
+      <a class="btn btn-on-image" href={mail(`${id.name}'s portfolio`, page)}>Email a friend</a>
+      <a class="btn btn-on-image" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(page)}`} rel="noopener noreferrer" target="_blank">Share on LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a>
+    </p>
+  </div>
+  <div class="ending-panel" id="goodbye">
+    <p class="kind">The road keeps going</p>
+    <h2 tabindex="-1">Thank you for coming. Safe travels.</h2>
+    <p>If you tell me what you were looking for, the next visitor may find it.</p>
+    <p class="ending-answers"><a class="btn btn-on-image" href={`mailto:${id.email}?subject=${encodeURIComponent('What I was looking for')}`}>Tell me what you were looking for</a></p>
+  </div>
+</section>
+
+<script>
+  // The ending's own script travels only with the page that shows the band (Home), not in the site bundle.
+  import { setupEnding } from '../scripts/ending';
+  setupEnding();
+</script>

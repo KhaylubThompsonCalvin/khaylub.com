@@ -1,26 +1,29 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import IdentityCard from '@components/IdentityCard.astro';
+import ProfileCover from '@components/ProfileCover.astro';
+import AudiencePicker from '@components/AudiencePicker.astro';
+import EndingBand from '@components/EndingBand.astro';
 import ClimbBand from '@components/ClimbBand.astro';
 import NowLine from '@components/NowLine.astro';
 import Top8 from '@components/Top8.astro';
 import Details from '@components/profile/Details.astro';
 import Contact from '@components/profile/Contact.astro';
+import AboutDrop from '@components/profile/AboutDrop.astro';
+import SkillsDrop from '@components/profile/SkillsDrop.astro';
 import Writing from '@components/profile/Writing.astro';
 import Library from '@components/profile/Library.astro';
-import { identity, onRepeat, availability } from '@lib/profile';
+import { identity, onRepeat } from '@lib/profile';
 import { published } from '@lib/catalog';
 import { personAndWebsite } from '@lib/seo';
 
-// The Home page is a grid of blocks (the owner's request of 2026-10-10, the developer-portfolio
-// convention): each block a card with its small label and one action. The DOM order is the phone
-// order: the identity block, the climb, Now, Looking for, the Top 8, Writing, the Library, Details,
-// Contact. Two columns from 640 px; four from 1024 px. The identity block and the Top 8 run the full
-// width; the climb takes two columns beside Now and Looking for; the rest pair up two by two, so no
-// row leaves a hole at any width.
+// The Home page is the cover profile (Layout B, Profile Themes spec 2026-10-10, section 3.3): the
+// cover (the scene, the round photo, the name, the status, the quick links, the doors, Start here),
+// then two columns from 1280 px (narrower, the Top 8's tiles would crowd). The main column: the Top 8
+// (one list per audience), the climb, Writing, the Library, and the journal when it has entries. The
+// side column: About me, Now, Details (with what the owner is looking for), Skills, Contact. The DOM
+// order is the phone order.
 const id = identity();
 const repeat = onRepeat();
-const avail = availability();
 const journal = (await published('journal')).slice(0, 5);
 const jsonLd = await personAndWebsite();
 ---
@@ -31,70 +34,70 @@ const jsonLd = await personAndWebsite();
   current="home"
   jsonLd={jsonLd}
 >
-  <div class="bento">
-    <IdentityCard />
-    <ClimbBand />
-    <NowLine />
-    <section class="module" aria-labelledby="looking-heading">
-      <h2 id="looking-heading" class="module-heading">Looking for</h2>
-      <ul class="row-list">{avail.roles_sought.map((r) => <li>{r}</li>)}</ul>
-      <p class="block-go"><a href="/resume/">Read the résumé</a></p>
-    </section>
-    <Top8 />
-    <Writing />
-    <Library />
-    <Details />
-    <Contact />
+  <ProfileCover />
+  <AudiencePicker />
+  <div class="profile-cols">
+    <div class="bento">
+      <Top8 audiences />
+      <ClimbBand />
+      <Writing />
+      <Library />
+      {
+        journal.length > 0 && (
+          <section class="section" aria-labelledby="journal-heading">
+            <h2 id="journal-heading">Latest from the journal</h2>
+            <ul>
+              {journal.map((e) => (
+                <li>
+                  <a href={`/journal/${e.data.slug}/`}>{e.data.title}</a>{' '}
+                  <span class="small muted">{e.data.date.toISOString().slice(0, 10)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        repeat.title && (
+          <section class="section" aria-labelledby="repeat-heading">
+            <h2 id="repeat-heading">On repeat</h2>
+            <p>
+              {repeat.url ? (
+                <a href={repeat.url} rel="noopener noreferrer">
+                  {repeat.title}
+                </a>
+              ) : (
+                repeat.title
+              )}
+              {repeat.artist && ` by ${repeat.artist}`}
+            </p>
+          </section>
+        )
+      }
+    </div>
+    <div class="bento">
+      <AboutDrop />
+      <NowLine />
+      <Details />
+      <SkillsDrop />
+      <Contact />
+    </div>
   </div>
-
-  {
-    journal.length > 0 && (
-      <section class="section" aria-labelledby="journal-heading">
-        <h2 id="journal-heading">Latest from the journal</h2>
-        <ul>
-          {journal.map((e) => (
-            <li>
-              <a href={`/journal/${e.data.slug}/`}>{e.data.title}</a>{' '}
-              <span class="small muted">{e.data.date.toISOString().slice(0, 10)}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-
-  {
-    repeat.title && (
-      <section class="section" aria-labelledby="repeat-heading">
-        <h2 id="repeat-heading">On repeat</h2>
-        <p>
-          {repeat.url ? <a href={repeat.url} rel="noopener noreferrer">{repeat.title}</a> : repeat.title}
-          {repeat.artist && ` by ${repeat.artist}`}
-        </p>
-      </section>
-    )
-  }
+  <EndingBand />
 </BaseLayout>
 
 <style is:global>
+  /* Each column is a stack of blocks; every block is a surface (base.css). Two columns from 1280 px,
+     the side column 20rem, so the Top 8 keeps four tiles across. About uses the same. */
   .bento {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--gap-block);
-    margin-bottom: var(--space-section);
+    align-content: start;
   }
-  /* Every block is a surface (base.css); blocks are not whole links, so they do not lift. A module
-     is a column whose last action keeps to the foot, so a shorter block on a row ends level. */
   .bento > * {
     margin: 0;
-  }
-  .bento > .module {
-    display: flex;
-    flex-direction: column;
-  }
-  /* Writing and the Library differ in length: each keeps its own height on the row. */
-  .bento > :is([aria-labelledby='writing-heading'], [aria-labelledby='library-heading']) {
-    align-self: start;
   }
   .bento > .climb-band {
     padding: 0;
@@ -108,7 +111,7 @@ const jsonLd = await personAndWebsite();
   /* The climb's words keep to the left on their scrim, so the sun and the Wanderer stay clear. */
   @media (min-width: 640px) {
     .bento .climb-words {
-      background: linear-gradient(to right, var(--scrim) 60%, transparent 85%);
+      background: linear-gradient(to right, var(--scrim) 45%, transparent 70%);
     }
     .bento .climb-words > * {
       max-width: 20rem;
@@ -121,26 +124,27 @@ const jsonLd = await personAndWebsite();
     margin-top: auto;
     padding-top: var(--space-1);
   }
-  @media (min-width: 640px) {
-    .bento {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .bento > :is(.hero, .climb-band, [aria-labelledby='top8-heading']) {
-      grid-column: span 2;
+  .profile-cols {
+    display: grid;
+    gap: var(--gap-block);
+    margin-bottom: var(--space-section);
+  }
+  @media (min-width: 1280px) {
+    .profile-cols {
+      grid-template-columns: minmax(0, 1fr) 20rem;
     }
   }
-  @media (min-width: 1024px) {
-    .bento {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-    .bento > * {
-      grid-column: span 2;
-    }
-    .bento > :is(.hero, [aria-labelledby='top8-heading']) {
-      grid-column: 1 / -1;
-    }
-    .bento > :is([aria-labelledby='now-heading'], [aria-labelledby='looking-heading']) {
-      grid-column: span 1;
-    }
+  /* About me's drop-down: a 44 px summary whose label says what a press does. The skills' "+N more"
+     summary is a chip (base.css), already a 44 px target. */
+  .about-drop summary {
+    min-height: var(--target);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--accent);
+  }
+  .about-drop:not([open]) summary :last-child,
+  .about-drop[open] summary :first-child {
+    display: none;
   }
 </style>

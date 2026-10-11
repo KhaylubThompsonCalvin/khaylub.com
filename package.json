@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "skins": "node scripts/build-skins.mjs",
+    "build": "npm run skins && astro build && pagefind --site dist",
     "build:preview": "cross-env PUBLIC_SITE_ENV=preview astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",

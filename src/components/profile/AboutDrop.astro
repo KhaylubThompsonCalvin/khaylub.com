@@ -1,0 +1,33 @@
+---
+// The owner's own words (identity.yaml in_my_words, verbatim), dropping down in place (owner,
+// 2026-10-10: "the read me should drop down when you click it in that bar"). The first sentence is
+// the visible lead; a native details element opens the rest inside the box, so it works with the
+// keyboard, a screen reader, and JavaScript off. Nothing navigates away.
+import { identity } from '@lib/profile';
+
+interface Props {
+  /** "About me" in Home's side column; "In my words" on About. */
+  heading?: string;
+}
+const { heading = 'About me' } = Astro.props;
+const words = identity().in_my_words.trim();
+const cut = words.indexOf('. ') + 1;
+const lead = cut > 0 ? words.slice(0, cut) : words;
+const rest = cut > 0 ? words.slice(cut).trim() : '';
+---
+
+<section class="module" aria-labelledby="aboutme-heading">
+  <h2 id="aboutme-heading" class="module-heading">{heading}</h2>
+  <p>{lead}</p>
+  {
+    rest && (
+      <details class="about-drop">
+        <summary>
+          <span>Read more</span>
+          <span>Show less</span>
+        </summary>
+        <p>{rest}</p>
+      </details>
+    )
+  }
+</section>

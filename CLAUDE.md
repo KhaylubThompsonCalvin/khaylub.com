@@ -42,7 +42,7 @@ V1 (the 3D climb) lives in the separate repository `khaylub-portfolio`, frozen a
 |---|---|
 | `content/` | all public content (Markdown and YAML); profile data in `content/profile/` |
 | `src/layouts/BaseLayout.astro` | skip link, header, nav, `main`, footer, SEO head |
-| `src/components/` | IdentityCard, RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
+| `src/components/` | ProfileCover (the Home and About cover profile, Layout B), RecruiterRow, Doors, ClimbDoor, NowLine, Top8, cards, nav, footer |
 | `src/lib/` | catalog (public/private filter, featured set, evidence), profile, seo |
 | `src/styles/tokens.css`, `base.css` | the design tokens: the only source of color, type, space, targets, widths, radii, tints, motion (`tests/tokens.spec.ts` holds every `var()` defined and the tokenised values out of components; breakpoints are documented literals). The colour roles are semantic aliases over the palette (`--surface`, `--text`, `--text-secondary`, `--border`, `--interactive` for the chrome's ink treatment, `--link-content` for sienna links inside content, `--signal` for the current page and live state, `--focus` the blue ring, `--notice` the amber notice); `tests/contrast.spec.ts` asserts every floor in both palettes and holds the theme-color metas and the Open Graph constants to the tokens |
 | `src/islands/` | React islands (the climb), loaded only after the door is pressed |
@@ -73,7 +73,7 @@ balanced), and the Home page below the hero is the profile composition of the Vi
 `base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
 that is the phone order, two columns from 900 px. Component styles are global under each
 component's own root class (`<style is:global>`; a generic name is prefixed by its root) since the
-2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its 36 KiB line.
+2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its line (38 KiB since D-38).
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 
@@ -94,11 +94,25 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
 - Responsive: Playwright runs desktop 1440x900, tablet 768x1024, and mobile 390x844. Name, role
   line, availability, and both doors sit above the fold at 390x844 and 1440x900 (P2-FE-04).
 - Performance: `lighthouserc.json` requires performance 0.90 or better, accessibility 1.0,
-  best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less, CLS 0.05 or less, TBT 150 ms or
-  less. `budget.json`: 900 KB total, 60 KB script, 36 KB CSS, 100 KB fonts, 300 KB images,
+  best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less (Home 2400 ms, D-39), CLS 0.05 or
+  less, TBT 150 ms or less. `budget.json`: 900 KB total, 60 KB script, 38 KB CSS, 100 KB fonts, 300 KB images,
   40 requests, zero third-party. The CSS line was 30 KB until the owner raised it to 36 KiB on
   2026-09-22 (the F5 visual completion; the file measured 31,486 bytes raw and about 6.8 KB
   compressed); it stays a real ceiling and is never raised again without an owner decision.
+  D-38 (2026-10-10): the owner raised it to 38 KiB (38,912 bytes, headers counted) for the profile themes
+  (the picker and the ending band), choosing "Raise to 38 KB"; it is still a real ceiling.
+  D-39 (2026-10-11): the owner gave Home its own LCP line of 2400 ms ("Yes, Home 2400"); every other page
+  keeps 2000 ms. The cover profile puts Home's first paint at about 2030 ms in the simulated mobile throttle
+  however light its pictures are (measured 2026-10-11: a lighter or inlined cover, a lazy headshot, no hidden
+  Top 8 lists and no early ending downloads all stayed at 2030 ms or more). Neither line loosens again without
+  an owner decision.
+  D-36 (2026-10-10): profile themes as approved: a visitor answers "What brings you here?", the answer is
+  remembered on the device, and it picks one of six skins, a Top 8 order and a Start-here set; with no
+  answer, or with JavaScript off, the site is Paper. D-37: weight by audience. Lean (Paper) is the default
+  visit and holds every budget; Standard (`tech`, `nostalgia`) and Full (`creative`, `exploring`,
+  `youtube`) add one skin file of at most 6 KB, so their stylesheet line is 38 KiB plus 6 KiB; the ending clips load
+  only after a press or, on Full, when the band nears the viewport. `lighthouserc.json` stays the Lean sweep;
+  `scripts/lhci-shard.mjs` adds the Standard (`tech`) and Full (`exploring`) runs of Home, About and Work.
 - SEO and content: every page's primary text is in the initial HTML and readable with JavaScript
   off (`tests/js-off.spec.ts`); title, description, canonical, sitemap, robots, and structured
   data per `tests/seo.spec.ts`; JSON-LD is the only inline script allowed.

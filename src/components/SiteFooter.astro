@@ -1,9 +1,11 @@
 ---
-import { identity, blogroll, resumeMeta, availability } from '@lib/profile';
+import { audiences, identity, blogroll, resumeMeta, availability, builtAt } from '@lib/profile';
 const id = identity();
+const answers = audiences();
 const roll = blogroll();
 const resume = resumeMeta();
-const year = new Date().getUTCFullYear();
+const year = builtAt.getUTCFullYear();
+const built = builtAt.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const avail = availability();
 ---
 
@@ -18,6 +20,16 @@ const avail = availability();
         <button type="button" aria-pressed="false" data-theme-choice="light">Light</button>
         <button type="button" aria-pressed="false" data-theme-choice="dark">Dark</button>
         <button type="button" aria-pressed="true" data-theme-choice="system">System</button>
+      </div>
+    </div>
+    {/* The Theme row (Profile Themes): the visitor's own answer to "What brings you here?", changeable
+        on any page. Hidden in the HTML; src/scripts/audience.ts shows it, so with JavaScript off the
+        visitor sees Paper. */}
+    <div class="appearance" role="group" aria-labelledby="theme-label" data-theme-row hidden>
+      <span id="theme-label" class="small">Theme</span>
+      <div class="appearance-choices seg">
+        {answers.map((a) => <button type="button" aria-pressed="false" data-audience-choice={a.id}>{a.label}</button>)}
+        <button type="button" data-audience-choice="reset">Reset to Paper</button>
       </div>
     </div>
     {/* The links in three named groups (the footer convention): who to reach, where to go next, and
@@ -72,6 +84,7 @@ const avail = availability();
       {year} {id.name}. Code under the MIT license; writing and media all rights reserved unless a
       page says otherwise.
     </p>
+    <p class="edition small muted">Edition {id.edition}, {built}</p>
   </div>
 </footer>
 
@@ -82,6 +95,9 @@ const avail = availability();
     align-items: center;
     gap: var(--space-1) var(--space-1-5);
     margin: 0 0 var(--space-3);
+  }
+  .appearance[hidden] {
+    display: none;
   }
   .site-footer {
     margin-top: auto;

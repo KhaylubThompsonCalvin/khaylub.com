@@ -1,7 +1,7 @@
 ---
 import { identity } from '@lib/profile';
 const id = identity();
-// The Home hero's quick links: verification and contact only (About, GitHub, Résumé, Contact; the
+// The cover's quick links (Home and About): verification and contact only (About, GitHub, Résumé, Contact; the
 // owner's decision of 2026-09-20). Skills and Projects keep their routes and their place in the nav.
 const here = Astro.url.pathname;
 const links = [
@@ -34,6 +34,13 @@ const links = [
     list-style: none;
     padding: 0;
     margin: 0 0 var(--space-3);
+  }
+  /* On a phone the four links are a 2 by 2 grid (Profile Themes spec, 3.3), never a row with one left over. */
+  @media (max-width: 559px) {
+    .recruiter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
   }
   .recruiter-row a {
     display: inline-flex;

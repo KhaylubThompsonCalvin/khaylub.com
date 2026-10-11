@@ -230,11 +230,16 @@ small,
   align-items: baseline;
   gap: 0 var(--space-2);
 }
-/* On paper: the page's words without the site's chrome, shadows, or actions. */
+/* On paper: the page's words without the site's chrome, shadows, or actions (the picker, the ending
+   band and the skin motion layer included; the skin files themselves are screen only). The two body
+   selectors outrank the display rules that come later in this file. */
 @media print {
   .site-header,
   .site-footer,
-  .cta-row {
+  .cta-row,
+  body .picker,
+  body .ending,
+  .skin-motion {
     display: none;
   }
   .surface {
@@ -819,6 +824,13 @@ small,
   font-size: 3rem;
   color: color-mix(in srgb, var(--accent) 70%, var(--surface));
 }
+/* In a narrower set (two across on a phone, four across in Home's main column) the large numeral
+   would push the kind label to break inside a word: it takes the pictured tiles' size instead. */
+@container (max-width: 46rem) {
+  .type-tile .tile-rank {
+    font-size: var(--size-h2);
+  }
+}
 /* A calling card (CallingCard): in a picture's place, the kind's icon and label (a kind label),
    and one line of the entry's own, large. */
 .call {
@@ -856,6 +868,26 @@ small,
 .signal {
   color: var(--signal);
   font-weight: 600;
+}
+/* The status light (the convention recruiters know): green, pulsing softly, still under reduced
+   motion. Green is the one colour outside the accent, a status token. On the cover, Contact, the
+   résumé and the footer. */
+.status-dot {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: var(--space-1);
+  border-radius: 50%;
+  background: var(--status);
+  animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--status) 50%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 0.5em transparent;
+  }
 }
 /* Under 360 px two squares would break titles mid-word: each tile becomes a row instead, the rank
    beside the title, so the set stays short on the narrowest phones. */
@@ -1038,4 +1070,122 @@ figcaption {
 .card .chips {
   position: relative;
   margin: 0;
+}
+
+/* Skin stylesheet loading (theme-early.js): hold paint, 1.5 s at most. */
+.skin-wait body{visibility:hidden}
+.picker{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-1) var(--space-2);padding:var(--space-2) var(--space-3);margin-bottom:var(--gap-block)}
+.picker[hidden]{display:none}
+.picker h2{margin:0}
+[data-theme-row] .seg{border-radius:var(--radius)}
+
+/* The ending band (EndingBand.astro, Home only): on a phone the words sit in a dark panel above the
+   picture; from 640 px they sit on the darker left of it, so the sun is never behind a button. Yes plays
+   the harvest clip, Not this time the rain; with JS off :target shows the text. */
+.ending {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--radius-block);
+  background: #0d0905;
+  color: var(--on-image);
+}
+.ending-art {
+  position: relative;
+  grid-row: 2;
+  aspect-ratio: 4 / 3;
+}
+.ending-art picture,
+.ending-art img,
+.ending-clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ending-art img {
+  filter: saturate(0.5) brightness(0.65);
+}
+.ending-art .still-trials,
+.ending-clip {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.ending-clip {
+  visibility: hidden;
+}
+.ending-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#0d0905, transparent 40%);
+  pointer-events: none;
+}
+.ending-panel {
+  position: relative;
+  z-index: 1;
+  grid-row: 1;
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+.ending-panel h2,
+.ending-panel .kind {
+  color: var(--on-image);
+  margin: 0 0 var(--space-1);
+  text-wrap: balance;
+}
+.ending-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+#thanks,
+#goodbye,
+.ending[data-state] #ending-ask {
+  display: none;
+}
+.ending[data-state='yes'] #thanks,
+.ending[data-state='no'] #goodbye,
+#thanks:target,
+#goodbye:target {
+  display: block;
+}
+.ending:has(:target) #ending-ask {
+  display: none;
+}
+.ending[data-state='yes'] img,
+.ending[data-state='no'] img {
+  filter: none;
+}
+.ending[data-state='no'] .still-trials,
+.ending[data-state='yes'] [data-clip='harvest'],
+.ending[data-state='no'] [data-clip='trials'] {
+  opacity: 1;
+  visibility: visible;
+}
+@media (min-width: 640px) {
+  .ending {
+    min-height: clamp(22rem, 40vw, 32rem);
+  }
+  .ending-art {
+    grid-area: 1 / 1;
+    aspect-ratio: auto;
+  }
+  .ending-art::after {
+    background: linear-gradient(to right, rgba(13, 9, 5, 0.9), rgba(13, 9, 5, 0.78) 32%, rgba(13, 9, 5, 0.4) 46%, transparent 62%);
+  }
+  .ending-panel {
+    grid-area: 1 / 1;
+    align-self: center;
+    max-width: min(30rem, 46%);
+    padding: var(--space-4) var(--space-3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ending * {
+    transition: none !important;
+  }
+  .ending-clip {
+    display: none;
+  }
 }

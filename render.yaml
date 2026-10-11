@@ -146,6 +146,11 @@ services:
       - path: /og/*
         name: Cache-Control
         value: public, max-age=604800
+      # The profile skins and their covers: every URL carries the version token (?v=, a content hash
+      # written by scripts/build-skins.mjs into the skin CSS and both scripts), so a change is a new URL.
+      - path: /skins/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
       - path: /robots.txt
         name: Cache-Control
         value: public, max-age=3600
@@ -279,6 +284,11 @@ services:
       - path: /og/*
         name: Cache-Control
         value: public, max-age=604800
+      # The profile skins and their covers: every URL carries the version token (?v=, a content hash
+      # written by scripts/build-skins.mjs into the skin CSS and both scripts), so a change is a new URL.
+      - path: /skins/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
       - path: /robots.txt
         name: Cache-Control
         value: public, max-age=3600

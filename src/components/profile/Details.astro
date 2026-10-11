@@ -1,13 +1,15 @@
 ---
 // The Details module of the Home profile (F5, document 65): labelled rows drawn from the profile
-// data that already exists (education, the roles sought, certifications, the interests groups).
+// data that already exists (the roles sought, education, certifications, the interests groups).
 // Nothing here is new copy; a row renders only when its source has a value.
-import { education, certifications, interests, periodLabel } from '@lib/profile';
+import { education, certifications, interests, availability, periodLabel } from '@lib/profile';
 
 const edu = education().entries[0];
 const certs = certifications();
 const groups = interests().groups.filter((g) => g.items.length > 0);
 const rows: { term: string; html?: string; text?: string; links?: { label: string; href: string }[] }[] = [];
+const sought = availability().roles_sought;
+if (sought.length) rows.push({ term: 'Looking for', text: sought.join(', ') });
 if (edu) rows.push({ term: 'Studying', text: `${edu.program}, ${edu.institution}, ${periodLabel(edu.start, edu.end)}` });
 if (certs.items.length) rows.push({ term: 'Certified', text: `${certs.items[0].name}, ${certs.items[0].issuer}` });
 if (certs.planned.length) rows.push({ term: 'Planned', text: certs.planned.join(', ') });

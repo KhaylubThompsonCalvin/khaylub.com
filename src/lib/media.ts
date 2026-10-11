@@ -5,6 +5,7 @@
 // starts with "/" is a public path and passes through untouched.
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import sharp from 'sharp';
 import type { AnyEntry } from './catalog';
 
 const rasters = import.meta.glob<ImageMetadata>('/content/**/*.{png,jpg,jpeg,webp,avif}', { eager: true, import: 'default' });
@@ -99,7 +100,10 @@ export async function pictureFor(entry: AnyEntry, width = 400): Promise<(Thumb &
   const meta = data.cover ? resolveRaster(entry, data.cover) : undefined;
   if (meta) {
     const img = await getImage({ src: meta, width: Math.min(width, meta.width), format: 'webp', quality: 70 });
-    return { src: img.src, alt: data.cover_alt ?? '', width: Number(img.attributes.width), height: Number(img.attributes.height) };
+    // A light cover (mean grey above 180 of 255) is dimmed under the tile's scrim like a chart, so its title keeps its contrast.
+    const file = `${process.cwd()}${artifactDir(entry)}/${(data.cover as string).replace(/^\.\//, '')}`;
+    const pale = (await sharp(file).greyscale().stats()).channels[0].mean > 180;
+    return { src: img.src, alt: data.cover_alt ?? '', width: Number(img.attributes.width), height: Number(img.attributes.height), pale };
   }
   if (data.cover) return { src: mediaUrl(entry, data.cover), alt: data.cover_alt ?? '', width: 400, height: 250 };
   const tag = (entry.body ?? '').match(/<img\b[^>]*\bsrc="(\/media\/[^"]+)"[^>]*>/);

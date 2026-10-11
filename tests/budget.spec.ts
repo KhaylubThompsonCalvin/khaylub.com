@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { TEMPLATES } from './helpers';
-import { shardUrls } from '../scripts/lhci-shard.mjs';
+import { shardUrls, tierRuns, tierConfig, TIER_AUDIENCES, SKIN_ALLOWANCE, skinProblems, TIER_SKINS } from '../scripts/lhci-shard.mjs';
 
 // The performance budget (vault document 13) as the repository asserts it. Lighthouse 12 removed the
 // performance-budget audit, so budget.json is enforced only through Lighthouse CI's own assertions;
@@ -35,7 +35,7 @@ test.describe('the performance budget as asserted', () => {
     // names; a preset, form factor, or throttling override here would change the profile, and
     // budget.json is asserted through assertMatrix, not the removed audit.
     expect(lhci.ci.collect.settings ?? {}).toEqual({});
-    expect(lhci.ci.assert.assertMatrix.length, 'one block for every page, one for content pages').toBe(2);
+    expect(lhci.ci.assert.assertMatrix.length, 'every page, content pages, then the LCP line for Home and for every other page').toBe(4);
     for (const block of lhci.ci.assert.assertMatrix) expect(block.aggregationMethod, block.matchingUrlPattern).toBe('median');
   });
 
@@ -62,7 +62,7 @@ test.describe('the performance budget as asserted', () => {
     // stays a real ceiling: a later package that approaches it investigates the cause first, and no
     // edit raises it again without an owner decision recorded in the vault.
     const css = lines!.resourceSizes.find((l) => l.resourceType === 'stylesheet');
-    expect(css?.budget, 'the stylesheet line is the 36 KiB ceiling of 2026-09-22').toBe(36);
+    expect(css?.budget, 'the stylesheet line is the 38 KiB ceiling (owner decision D-38, 2026-10-10)').toBe(38);
     // Thresholds from CLAUDE.md and doc 13; a later edit may tighten them, never loosen them.
     const atLeast: [string, string, string, number][] = [
       ['categories:performance', 'error', 'minScore', 0.9],
@@ -77,7 +77,6 @@ test.describe('the performance budget as asserted', () => {
       expect(value(a[key], k), key).toBeGreaterThanOrEqual(v);
     }
     const atMost: [string, string, number][] = [
-      ['largest-contentful-paint', 'error', 2000],
       ['cumulative-layout-shift', 'error', 0.05],
       ['total-blocking-time', 'error', 150],
       ['first-contentful-paint', 'warn', 1500],
@@ -94,8 +93,24 @@ test.describe('the performance budget as asserted', () => {
     expect(level(a['uses-long-cache-ttl'])).toBe('warn');
   });
 
+  test('LCP: 2000 ms on every page except Home, which has 2400 ms (owner decision D-39, 2026-10-11)', () => {
+    // The cover profile (D-36) puts the page's first paint at about 2030 ms in the simulated mobile
+    // throttle however light its pictures are, so the owner gave Home alone its own line ("Yes, Home
+    // 2400"). Every other page keeps 2000 ms; no edit loosens either line without an owner decision.
+    const lcp = lhci.ci.assert.assertMatrix.filter((b) => b.assertions['largest-contentful-paint']);
+    expect(lcp.length, 'two LCP blocks').toBe(2);
+    const at = (path: string) => lcp.filter((b) => new RegExp(b.matchingUrlPattern).test(`${ORIGIN}${path}`));
+    for (const path of TEMPLATES) {
+      const blocks = at(path);
+      expect(blocks.length, `${path}: exactly one LCP line`).toBe(1);
+      const a = blocks[0].assertions['largest-contentful-paint'];
+      expect(level(a), path).toBe('error');
+      expect(value(a, 'maxNumericValue'), path).toBe(path === '/' ? 2400 : 2000);
+    }
+  });
+
   test('content pages carry the 500 KB line; Home and Work keep 900 KB', () => {
-    const content = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern !== '.*');
+    const content = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern !== '.*' && b.assertions['resource-summary:total:size']);
     expect(content, 'a content-page block').toBeTruthy();
     const re = new RegExp(content!.matchingUrlPattern);
     expect(re.test(`${ORIGIN}/notes/preserving-v1/`)).toBe(true);
@@ -116,4 +131,58 @@ test.describe('the performance budget as asserted', () => {
     const sizes = shards.map((i) => shardUrls(urls, i, SHARDS).length);
     expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1);
   });
+});
+
+test.describe('the weight-tier Lighthouse runs (D-37)', () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'configuration files: run once, in the desktop project');
+  });
+
+  test('Standard (tech) and Full (exploring) measure Home, About and Work, split across the CI shards exactly once', () => {
+    expect(TIER_AUDIENCES).toEqual({ standard: 'tech', full: 'exploring' });
+    const runs = tierRuns();
+    expect(runs.map((r) => `${r.audience}${r.path}`).sort()).toEqual(
+      ['exploring/', 'exploring/about/', 'exploring/work/', 'tech/', 'tech/about/', 'tech/work/'],
+    );
+    const all = [...Array(SHARDS).keys()].flatMap((i) => shardUrls(runs, i, SHARDS));
+    expect(all.length).toBe(runs.length);
+    expect(new Set(all.map((r) => `${r.audience}${r.path}`)).size).toBe(runs.length);
+  });
+
+  test('a tier run proves its skin was requested, and a run without the stored answer fails', async () => {
+    const { mkdtempSync, writeFileSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const report = (d: string, n: number, urls: string[]) => writeFileSync(`${d}/r${n}.report.json`, JSON.stringify({ finalUrl: `${ORIGIN}/`, audits: { 'network-requests': { details: { items: urls.map((url) => ({ url })) } } } }));
+    const lean = mkdtempSync(`${tmpdir()}/tier-lean-`);
+    report(lean, 1, [`${ORIGIN}/`, `${ORIGIN}/_astro/style.css`]);
+    expect(skinProblems(lean, TIER_SKINS.tech, 1).join(' ')).toMatch(/desert-night.css was not requested/);
+    const skinned = mkdtempSync(`${tmpdir()}/tier-skin-`);
+    report(skinned, 1, [`${ORIGIN}/`, `${ORIGIN}/skins/desert-night.css`]);
+    expect(skinProblems(skinned, TIER_SKINS.tech, 1)).toEqual([]);
+    expect(skinProblems(skinned, TIER_SKINS.tech, 5).join(' ')).toMatch(/expected 5 reports/);
+  });
+
+  test('the tier config differs from the Lean sweep only in the stylesheet line (one skin more) and the stored answer', () => {
+    const cfg = tierConfig(lhci, 'tech', ['/', '/about/'], 0, 3) as unknown as Lhci & { ci: { collect: { puppeteerScript: string } } };
+    expect(cfg.ci.collect.puppeteerScript).toBe('scripts/lhci-audience.cjs');
+    expect(cfg.ci.collect.url).toEqual([`${ORIGIN}/`, `${ORIGIN}/about/`]);
+    const every = cfg.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern === '.*')!;
+    expect(value(every.assertions['resource-summary:stylesheet:size'], 'maxNumericValue')).toBe(38912 + SKIN_ALLOWANCE);
+    expect(SKIN_ALLOWANCE).toBe(6 * 1024);
+    // Every other line is the Lean sweep's line, and the Lean sweep itself still holds 38 KiB.
+    const lean = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern === '.*')!;
+    expect(value(lean.assertions['resource-summary:stylesheet:size'], 'maxNumericValue')).toBe(38912);
+    for (const key of Object.keys(lean.assertions).filter((k) => k !== 'resource-summary:stylesheet:size')) {
+      expect(every.assertions[key], key).toEqual(lean.assertions[key]);
+    }
+  });
+});
+
+test('the bundled stylesheet leaves room under the 38 KiB line (headers counted as 810 bytes)', async () => {
+  const { readFileSync, statSync } = await import('node:fs');
+  // The island's own climb.*.css is not the bundle; the bundle is the one the pages link.
+  const href = /<link rel="stylesheet" href="(\/_astro\/[^"]+\.css)"/.exec(readFileSync('dist/about/index.html', 'utf8'))?.[1];
+  expect(href, 'a bundled stylesheet link').toBeTruthy();
+  const bytes = statSync(`dist${href}`).size;
+  expect(bytes + 810, 'bundle plus headers').toBeLessThanOrEqual(38912);
 });
