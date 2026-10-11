@@ -57,7 +57,7 @@ const KINDS: Record<string, string> = {
   music: 'Music',
   video: 'Video',
   gallery: 'Gallery',
-  experiments: 'Experiment',
+  experiments: 'Exhibit',
 };
 const tilesOf = (list: { entry: AnyEntry; reason: string }[]) =>
   Promise.all(
@@ -170,7 +170,7 @@ const forId = (id: string) => (audiences ? id : undefined);
         ? 'Eight things I was proud of then, ranked and dated.'
         : 'Eight things I am proud of right now, ranked and dated.'
     }
-    <a href="/top8/">{revision ? 'The current set' : 'Previous sets'}</a>.{
+    {' '}<a href="/top8/">{revision ? 'The current set' : 'Previous sets'}</a>.{
       skipped > 0 ? (
         <span
           data-for={forId('default')}
