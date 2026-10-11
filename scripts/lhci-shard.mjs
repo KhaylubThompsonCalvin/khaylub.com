@@ -5,7 +5,7 @@
 // After the default (Lean) sweep, each shard also runs its share of the weight-tier runs (D-37):
 // Home, About and Work with a stored audience (`tech` is Standard, `exploring` is Full), under the
 // same assertions except the stylesheet line, which allows one skin file more.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
@@ -17,6 +17,8 @@ export function shardUrls(urls, index, total) {
 
 /** One representative audience per heavier weight tier (D-37); the default run is the Lean tier. */
 export const TIER_AUDIENCES = { standard: 'tech', full: 'exploring' };
+/** The skin each tier audience loads (the map of content/profile/audiences.yaml). */
+export const TIER_SKINS = { tech: 'desert-night', exploring: 'golden-hour' };
 export const TIER_PATHS = ['/', '/about/', '/work/'];
 /** One skin file (6 KiB) on top of the stylesheet line, for the Standard and Full runs only. */
 export const SKIN_ALLOWANCE = 6144;
@@ -48,6 +50,20 @@ export function tierConfig(base, audience, paths, index, total) {
   return config;
 }
 
+/** Lighthouse 0.15.1's resource-summary assertions take only a maximum, so a tier run proves its skin by its
+    own reports: every report in the folder must have requested /skins/<skin>.css. Returns the problems (none is a pass). */
+export function skinProblems(dir, skin, expected) {
+  const files = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.report.json')) : [];
+  const problems = [];
+  if (files.length !== expected) problems.push(`${dir}: expected ${expected} reports, found ${files.length}`);
+  for (const f of files) {
+    const lhr = JSON.parse(readFileSync(`${dir}/${f}`, 'utf8'));
+    const urls = (lhr.audits['network-requests']?.details?.items ?? []).map((i) => i.url);
+    if (!urls.some((u) => u.endsWith(`/skins/${skin}.css`))) problems.push(`${lhr.finalUrl}: /skins/${skin}.css was not requested, so this run measured the Lean page`);
+  }
+  return problems;
+}
+
 function lhci(file, env = {}) {
   const run = spawnSync('npx', ['--yes', '@lhci/cli@0.15.1', 'autorun', `--config=${file}`], { stdio: 'inherit', shell: true, env: { ...process.env, ...env } });
   if (run.error) console.error(`lhci shard: could not start npx: ${run.error.message}`);
@@ -75,8 +91,12 @@ function main(argv) {
     const paths = mine.filter((r) => r.audience === audience).map((r) => r.path);
     const tierFile = `.lighthouseci/tier-${audience}-${index}-of-${total}.json`;
     writeFileSync(tierFile, JSON.stringify(tierConfig(base, audience, paths, index, total), null, 2));
+    rmSync(`.lighthouseci/tier-${audience}-${index}-of-${total}`, { recursive: true, force: true });
     console.log(`lhci tier run: audience ${audience}: ${paths.join(' ')}`);
     status = lhci(tierFile, { LHCI_AUDIENCE: audience }) || status;
+    const problems = skinProblems(`.lighthouseci/tier-${audience}-${index}-of-${total}`, TIER_SKINS[audience], paths.length * base.ci.collect.numberOfRuns);
+    for (const p of problems) console.error(`lhci tier run: ${p}`);
+    if (problems.length) status = 1;
   }
   return status;
 }

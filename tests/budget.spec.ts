@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { TEMPLATES } from './helpers';
-import { shardUrls, tierRuns, tierConfig, TIER_AUDIENCES, SKIN_ALLOWANCE } from '../scripts/lhci-shard.mjs';
+import { shardUrls, tierRuns, tierConfig, TIER_AUDIENCES, SKIN_ALLOWANCE, skinProblems, TIER_SKINS } from '../scripts/lhci-shard.mjs';
 
 // The performance budget (vault document 13) as the repository asserts it. Lighthouse 12 removed the
 // performance-budget audit, so budget.json is enforced only through Lighthouse CI's own assertions;
@@ -132,6 +132,19 @@ test.describe('the weight-tier Lighthouse runs (D-37)', () => {
     const all = [...Array(SHARDS).keys()].flatMap((i) => shardUrls(runs, i, SHARDS));
     expect(all.length).toBe(runs.length);
     expect(new Set(all.map((r) => `${r.audience}${r.path}`)).size).toBe(runs.length);
+  });
+
+  test('a tier run proves its skin was requested, and a run without the stored answer fails', async () => {
+    const { mkdtempSync, writeFileSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const report = (d: string, n: number, urls: string[]) => writeFileSync(`${d}/r${n}.report.json`, JSON.stringify({ finalUrl: `${ORIGIN}/`, audits: { 'network-requests': { details: { items: urls.map((url) => ({ url })) } } } }));
+    const lean = mkdtempSync(`${tmpdir()}/tier-lean-`);
+    report(lean, 1, [`${ORIGIN}/`, `${ORIGIN}/_astro/style.css`]);
+    expect(skinProblems(lean, TIER_SKINS.tech, 1).join(' ')).toMatch(/desert-night.css was not requested/);
+    const skinned = mkdtempSync(`${tmpdir()}/tier-skin-`);
+    report(skinned, 1, [`${ORIGIN}/`, `${ORIGIN}/skins/desert-night.css`]);
+    expect(skinProblems(skinned, TIER_SKINS.tech, 1)).toEqual([]);
+    expect(skinProblems(skinned, TIER_SKINS.tech, 5).join(' ')).toMatch(/expected 5 reports/);
   });
 
   test('the tier config differs from the Lean sweep only in the stylesheet line (one skin more) and the stored answer', () => {
