@@ -94,13 +94,18 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
 - Responsive: Playwright runs desktop 1440x900, tablet 768x1024, and mobile 390x844. Name, role
   line, availability, and both doors sit above the fold at 390x844 and 1440x900 (P2-FE-04).
 - Performance: `lighthouserc.json` requires performance 0.90 or better, accessibility 1.0,
-  best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less, CLS 0.05 or less, TBT 150 ms or
-  less. `budget.json`: 900 KB total, 60 KB script, 38 KB CSS, 100 KB fonts, 300 KB images,
+  best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less (Home 2400 ms, D-39), CLS 0.05 or
+  less, TBT 150 ms or less. `budget.json`: 900 KB total, 60 KB script, 38 KB CSS, 100 KB fonts, 300 KB images,
   40 requests, zero third-party. The CSS line was 30 KB until the owner raised it to 36 KiB on
   2026-09-22 (the F5 visual completion; the file measured 31,486 bytes raw and about 6.8 KB
   compressed); it stays a real ceiling and is never raised again without an owner decision.
   D-38 (2026-10-10): the owner raised it to 38 KiB (38,912 bytes, headers counted) for the profile themes
   (the picker and the ending band), choosing "Raise to 38 KB"; it is still a real ceiling.
+  D-39 (2026-10-11): the owner gave Home its own LCP line of 2400 ms ("Yes, Home 2400"); every other page
+  keeps 2000 ms. The cover profile puts Home's first paint at about 2030 ms in the simulated mobile throttle
+  however light its pictures are (measured 2026-10-11: a lighter or inlined cover, a lazy headshot, no hidden
+  Top 8 lists and no early ending downloads all stayed at 2030 ms or more). Neither line loosens again without
+  an owner decision.
   D-36 (2026-10-10): profile themes as approved: a visitor answers "What brings you here?", the answer is
   remembered on the device, and it picks one of six skins, a Top 8 order and a Start-here set; with no
   answer, or with JavaScript off, the site is Paper. D-37: weight by audience. Lean (Paper) is the default

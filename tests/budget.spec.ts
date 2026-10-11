@@ -35,7 +35,7 @@ test.describe('the performance budget as asserted', () => {
     // names; a preset, form factor, or throttling override here would change the profile, and
     // budget.json is asserted through assertMatrix, not the removed audit.
     expect(lhci.ci.collect.settings ?? {}).toEqual({});
-    expect(lhci.ci.assert.assertMatrix.length, 'one block for every page, one for content pages').toBe(2);
+    expect(lhci.ci.assert.assertMatrix.length, 'every page, content pages, then the LCP line for Home and for every other page').toBe(4);
     for (const block of lhci.ci.assert.assertMatrix) expect(block.aggregationMethod, block.matchingUrlPattern).toBe('median');
   });
 
@@ -77,7 +77,6 @@ test.describe('the performance budget as asserted', () => {
       expect(value(a[key], k), key).toBeGreaterThanOrEqual(v);
     }
     const atMost: [string, string, number][] = [
-      ['largest-contentful-paint', 'error', 2000],
       ['cumulative-layout-shift', 'error', 0.05],
       ['total-blocking-time', 'error', 150],
       ['first-contentful-paint', 'warn', 1500],
@@ -94,8 +93,24 @@ test.describe('the performance budget as asserted', () => {
     expect(level(a['uses-long-cache-ttl'])).toBe('warn');
   });
 
+  test('LCP: 2000 ms on every page except Home, which has 2400 ms (owner decision D-39, 2026-10-11)', () => {
+    // The cover profile (D-36) puts the page's first paint at about 2030 ms in the simulated mobile
+    // throttle however light its pictures are, so the owner gave Home alone its own line ("Yes, Home
+    // 2400"). Every other page keeps 2000 ms; no edit loosens either line without an owner decision.
+    const lcp = lhci.ci.assert.assertMatrix.filter((b) => b.assertions['largest-contentful-paint']);
+    expect(lcp.length, 'two LCP blocks').toBe(2);
+    const at = (path: string) => lcp.filter((b) => new RegExp(b.matchingUrlPattern).test(`${ORIGIN}${path}`));
+    for (const path of TEMPLATES) {
+      const blocks = at(path);
+      expect(blocks.length, `${path}: exactly one LCP line`).toBe(1);
+      const a = blocks[0].assertions['largest-contentful-paint'];
+      expect(level(a), path).toBe('error');
+      expect(value(a, 'maxNumericValue'), path).toBe(path === '/' ? 2400 : 2000);
+    }
+  });
+
   test('content pages carry the 500 KB line; Home and Work keep 900 KB', () => {
-    const content = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern !== '.*');
+    const content = lhci.ci.assert.assertMatrix.find((b) => b.matchingUrlPattern !== '.*' && b.assertions['resource-summary:total:size']);
     expect(content, 'a content-page block').toBeTruthy();
     const re = new RegExp(content!.matchingUrlPattern);
     expect(re.test(`${ORIGIN}/notes/preserving-v1/`)).toBe(true);
