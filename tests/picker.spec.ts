@@ -141,3 +141,14 @@ test('another tab that changes the answer is followed here (storage event), and 
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.audience ?? null)).toBe(null);
   await expect(row(page)).toBeVisible();
 });
+
+test('one setup that throws does not stop the others (site.ts), and audience.ts avoids Object.hasOwn', async ({ page }) => {
+  const { readFileSync } = await import('node:fs');
+  expect(readFileSync('src/scripts/audience.ts', 'utf8')).not.toContain('Object.hasOwn(');
+  // setupCopy reads navigator.clipboard; make that throw, and the setups after it must still run.
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'clipboard', { get() { throw new Error('no clipboard here'); } }));
+  await page.goto('/');
+  await expect(theme(page)).toBeVisible();
+  await expect(row(page)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Yes' })).toBeVisible();
+});

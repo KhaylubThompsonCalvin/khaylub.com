@@ -9,7 +9,7 @@ const M: Record<string, [string, string]> = {hiring:['paper','lean'],tech:['dese
 // The skin names a visitor hears when the picker closes (Profile Themes spec, the six skins).
 const NAME: Record<string, string> = {paper:'Paper','desert-night':'Desert Night','arizona-made':'Arizona Made','golden-hour':'Golden Hour','above-the-clouds':'Above the Clouds','profile-2006':'Profile 2006'};
 
-const known = (id: string | null): id is string => id !== null && Object.hasOwn(M, id);
+const known = (id: string | null): id is string => id !== null && Object.prototype.hasOwnProperty.call(M, id);
 const get = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
 const put = (k: string, v: string | null) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* the choice still applies to this page */ } };
 

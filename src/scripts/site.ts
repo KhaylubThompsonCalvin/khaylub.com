@@ -8,10 +8,11 @@ import { setupCopy } from './copy';
 import { setupAudience } from './audience';
 import { setupEnding } from './ending';
 
-setupNavDisclosure();
-setupTheme();
-setupHeaderScroll();
-setupSearchShortcut();
-setupCopy();
-setupAudience();
-setupEnding();
+// Each setup runs on its own: one that throws (an old browser, a missing API) is reported and the rest still run.
+for (const setup of [setupNavDisclosure, setupTheme, setupHeaderScroll, setupSearchShortcut, setupCopy, setupAudience, setupEnding]) {
+  try {
+    setup();
+  } catch (error) {
+    console.error(error);
+  }
+}
