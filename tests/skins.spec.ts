@@ -139,3 +139,19 @@ test('print: a dark skin prints as Paper (dark text on white), without the picke
   await expect(page.locator('.ending')).toBeHidden();
   await expect(page.locator('[data-picker]')).toBeHidden();
 });
+
+test('a skin file that fails to load drops the tier: Paper, Appearance live, and the ending warms no clip', async ({ page }) => {
+  const clips: string[] = [];
+  page.on('request', (r) => { if (/\/media\/ending\//.test(r.url())) clips.push(r.url()); });
+  await page.route('**/skins/**', (r) => r.abort());
+  await page.addInitScript((k) => localStorage.setItem(k, 'exploring'), KEY);
+  await page.goto('/');
+  await expect.poll(() => page.evaluate(() => document.documentElement.getAttribute('data-tier'))).toBe(null);
+  await expect(page.getByRole('group', { name: 'Appearance' }).locator('[data-appearance-note]')).toHaveCount(0);
+  await page.locator('section.ending').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(600);
+  expect(clips).toEqual([]);
+  // The same from the picker mid-visit (audience.ts): the failed file leaves no tier.
+  await page.getByRole('group', { name: 'Theme' }).locator('[data-audience-choice="tech"]').click();
+  await expect.poll(() => page.evaluate(() => [document.documentElement.dataset.skin, document.documentElement.getAttribute('data-tier')])).toEqual(['desert-night', null]);
+});

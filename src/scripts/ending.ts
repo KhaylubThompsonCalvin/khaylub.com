@@ -37,7 +37,7 @@ export function setupEnding(): void {
   }
   const warm = () => {
     if (document.documentElement.dataset.tier !== 'full' || reduced()) return;
-    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { vids.forEach(arm); io.disconnect(); } }, { rootMargin: '600px 0px' });
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); if (document.documentElement.dataset.tier === 'full') vids.forEach(arm); } }, { rootMargin: '600px 0px' });
     io.observe(band);
   };
   warm();

@@ -37,7 +37,8 @@ function apply(id: string | null): void {
     done();
   };
   l.addEventListener('load', swap, { once: true });
-  l.addEventListener('error', swap, { once: true });
+  // A file that failed shows Paper: no tier, so the ending does not warm clips and Appearance stays live.
+  l.addEventListener('error', () => { if (run === seq) delete d.dataset.tier; swap(); }, { once: true });
   document.head.appendChild(l);
 }
 
@@ -74,6 +75,8 @@ export function setupAudience(): void {
   mark(known(stored) ? stored : null);
   const row = document.querySelector<HTMLElement>('[data-theme-row]');
   if (row) row.hidden = false;
+  // The early script's skin file may still be loading; if it fails (theme-early.js drops the tier), refresh.
+  document.getElementById('skin-css')?.addEventListener('error', () => fixedScheme());
   // Closing the picker hides the button that had focus, so focus moves to the cover heading (a stable
   // target just above it) and a visually hidden status line, outside the picker, says what happened.
   let status: HTMLElement | null = null;
