@@ -1,10 +1,11 @@
 ---
-import { audiences, identity, blogroll, resumeMeta, availability } from '@lib/profile';
+import { audiences, identity, blogroll, resumeMeta, availability, builtAt } from '@lib/profile';
 const id = identity();
 const answers = audiences();
 const roll = blogroll();
 const resume = resumeMeta();
-const year = new Date().getUTCFullYear();
+const year = builtAt.getUTCFullYear();
+const built = builtAt.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const avail = availability();
 ---
 
@@ -83,6 +84,7 @@ const avail = availability();
       {year} {id.name}. Code under the MIT license; writing and media all rights reserved unless a
       page says otherwise.
     </p>
+    <p class="edition small muted">Edition {id.edition}, {built}</p>
   </div>
 </footer>
 

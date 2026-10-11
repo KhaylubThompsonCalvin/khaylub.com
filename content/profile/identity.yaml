@@ -22,6 +22,8 @@ in_my_words: >-
   Computer Information Systems student making interactive 3D and tools for the web, with seven
   years of hands-on hardware repair, calibration, and testing behind me. This site is a record
   of the climb, not the arrival.
+# The site's edition (Profile Themes spec 3.5): the owner bumps it when the site meaningfully changes.
+edition: 2
 security_contact: mailto:khaylubthompsoncalvin@gmail.com
 # security.txt Expires is computed as security_as_of plus one year at build time (decision D-20).
 security_as_of: 2026-09-09

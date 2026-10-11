@@ -48,3 +48,14 @@ test.describe('structure', () => {
     }
   });
 });
+
+test('the footer carries the same edition stamp on every template', async ({ page }) => {
+  const seen = new Set<string>();
+  for (const p of ['/', '/work/', '/resume/', '/about/']) {
+    await page.goto(p);
+    const t = (await page.locator('footer .edition').textContent())!.trim();
+    expect(t).toMatch(/^Edition \d+, [A-Z][a-z]+ \d{4}$/);
+    seen.add(t);
+  }
+  expect(seen.size).toBe(1);
+});

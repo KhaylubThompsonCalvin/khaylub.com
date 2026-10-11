@@ -40,6 +40,7 @@ export const identitySchema = z
     photo: z.string(),
     photo_alt: z.string(),
     in_my_words: z.string().min(20),
+    edition: z.number().int().positive(),
     security_contact: z.string().startsWith('mailto:'),
     security_as_of: z.coerce.date(),
   })
@@ -225,3 +226,6 @@ export const isPreview = () => import.meta.env.PUBLIC_SITE_ENV === 'preview';
 
 /** The site is production unless PUBLIC_SITE_ENV=preview is set at build time. */
 export const siteEnv = () => (isPreview() ? 'preview' : 'production');
+
+/** The build moment, read once per build so every page's edition stamp is identical. */
+export const builtAt = new Date();
