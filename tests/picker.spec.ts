@@ -94,3 +94,25 @@ test('a fixed-scheme skin says so beside Appearance and marks its buttons aria-d
   await theme(page).locator('[data-audience-choice="reset"]').click();
   await expect(note).toHaveCount(0);
 });
+
+test('keyboard: choosing from the picker moves focus to the cover heading and announces the theme; Not now too', async ({ page }) => {
+  await page.goto('/');
+  const status = page.locator('[data-picker-status][role="status"]');
+  await expect(status).toHaveText('');
+  await row(page).getByRole('button', { name: 'Tech and security' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(row(page)).toBeHidden();
+  await expect(page.locator('#site-name')).toBeFocused();
+  await expect(status).toHaveText('Theme set to Desert Night. Change it any time in the footer.');
+  // Tab moves on from the heading, never from the top of the page.
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement !== document.body)).toBe(true);
+
+  await page.evaluate(() => localStorage.clear());
+  await page.goto('/');
+  await row(page).getByRole('button', { name: 'Not now' }).focus();
+  await page.keyboard.press('Space');
+  await expect(row(page)).toBeHidden();
+  await expect(page.locator('#site-name')).toBeFocused();
+  await expect(page.locator('[data-picker-status]')).toHaveText('No theme chosen. You can pick one in the footer.');
+});

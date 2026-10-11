@@ -6,6 +6,9 @@ const CLOSED = 'khaylub-picker-closed';
 const SKIN_V = '974076137f';
 const M: Record<string, [string, string]> = {hiring:['paper','lean'],tech:['desert-night','standard'],creative:['arizona-made','full'],exploring:['golden-hour','full'],youtube:['above-the-clouds','full'],nostalgia:['profile-2006','standard']};
 
+// The skin names a visitor hears when the picker closes (Profile Themes spec, the six skins).
+const NAME: Record<string, string> = {paper:'Paper','desert-night':'Desert Night','arizona-made':'Arizona Made','golden-hour':'Golden Hour','above-the-clouds':'Above the Clouds','profile-2006':'Profile 2006'};
+
 const known = (id: string | null): id is string => id !== null && Object.hasOwn(M, id);
 const get = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
 const put = (k: string, v: string | null) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* the choice still applies to this page */ } };
@@ -71,13 +74,28 @@ export function setupAudience(): void {
   mark(known(stored) ? stored : null);
   const row = document.querySelector<HTMLElement>('[data-theme-row]');
   if (row) row.hidden = false;
+  // Closing the picker hides the button that had focus, so focus moves to the cover heading (a stable
+  // target just above it) and a visually hidden status line, outside the picker, says what happened.
+  let status: HTMLElement | null = null;
+  if (picker) { status = document.createElement('p'); status.className = 'visually-hidden'; status.setAttribute('role', 'status'); status.dataset.pickerStatus = ''; picker.after(status); }
+  const settle = (message: string) => {
+    const h = document.querySelector<HTMLElement>('#site-name') ?? document.querySelector<HTMLElement>('h1');
+    if (h) { h.tabIndex = -1; h.focus(); }
+    if (status) status.textContent = message;
+  };
 
   document.addEventListener('click', (e) => {
     const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-audience-choice],[data-picker-close]');
     if (!t) return;
-    if (t.hasAttribute('data-picker-close')) { put(CLOSED, '1'); if (picker) picker.hidden = true; return; }
+    const inPicker = !!picker && picker.contains(t);
+    if (t.hasAttribute('data-picker-close')) {
+      put(CLOSED, '1'); if (picker) picker.hidden = true;
+      if (inPicker) settle('No theme chosen. You can pick one in the footer.');
+      return;
+    }
     const id = t.dataset.audienceChoice!;
     if (id === 'reset') { put(KEY, null); apply(null); } else { put(KEY, id); apply(id); }
     if (picker) picker.hidden = true;
+    if (inPicker && known(id)) settle(`Theme set to ${NAME[M[id][0]]}. Change it any time in the footer.`);
   });
 }
