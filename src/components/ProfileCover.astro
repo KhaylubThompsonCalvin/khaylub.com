@@ -44,7 +44,7 @@ const ext = (href: string) => href.startsWith('https://');
       src={paperCover}
       alt=""
       widths={[640, 1024, 1440, 2880]}
-      sizes="(min-width: 1152px) 1104px, 100vw"
+      sizes="(min-width: 1152px) 1104px, (min-width: 768px) 100vw, 60vw"
       formats={['avif', 'webp']}
       fallbackFormat="webp"
       loading="eager"
