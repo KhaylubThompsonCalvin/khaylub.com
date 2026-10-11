@@ -1,9 +1,3 @@
-// Before first paint: apply a stored Appearance choice (F4; the control is src/scripts/theme.ts) and a
-// stored audience (Profile Themes, 2026-10-10; the picker is src/scripts/audience.ts). The audience
-// map must match content/profile/audiences.yaml (tests/skins.spec.ts holds them together). A skin
-// stylesheet is linked only for Standard and Full; the page waits for it at most 1.5 s. SKIN_V is the skin
-// version token, written by scripts/build-skins.mjs (render.yaml caches /skins/* for a year). A skin file
-// that fails to load drops data-tier: the page shows Paper, so the ending must not warm its clips.
 (function(){var SKIN_V='55751e4e1d';var d=document.documentElement;try{var v=localStorage.getItem('khaylub-theme');if(v==='light'||v==='dark')d.setAttribute('data-theme',v)}catch(e){}
 var M={hiring:['paper','lean'],tech:['desert-night','standard'],creative:['arizona-made','full'],exploring:['golden-hour','full'],youtube:['above-the-clouds','full'],nostalgia:['profile-2006','standard']};
 var a=null;try{a=localStorage.getItem('khaylub-audience')}catch(e){}

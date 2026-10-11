@@ -63,7 +63,12 @@ const structured = jsonLd ?? {
     {/* The browser chrome follows the scheme (F4): the system's by these media attributes, or the Appearance control's choice through src/scripts/theme.ts. */}
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ece4d8" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15120d" />
-    {/* The early theme script: external and tiny, before first paint, so a stored Light or Dark does not flash (F4, decision D-32). */}
+    {/* The early theme script: external and tiny, before first paint, so a stored Light or Dark does not flash (F4, decision D-32).
+        It also applies a stored audience (Profile Themes, 2026-10-10; the picker is src/scripts/audience.ts). Its audience map must
+        match content/profile/audiences.yaml (tests/skins.spec.ts holds them together). A skin stylesheet is linked only for Standard
+        and Full; the page waits for it at most 1.5 s. SKIN_V is the skin version token, written by scripts/build-skins.mjs (render.yaml
+        caches /skins/* for a year). A skin file that fails to load drops data-tier, so the ending does not warm its clips. The file
+        carries no comments because every byte of it is on each page's critical path. */}
     <script is:inline src={themeEarly}></script>
     {/* The site's one module script: the menu disclosure and the Appearance control (src/scripts/site.ts), bundled by Astro, external. */}
     <script src="../scripts/site.ts"></script>

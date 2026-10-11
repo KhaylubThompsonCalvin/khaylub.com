@@ -6,10 +6,9 @@ import { setupHeaderScroll } from './header-scroll';
 import { setupSearchShortcut } from './search-shortcut';
 import { setupCopy } from './copy';
 import { setupAudience } from './audience';
-import { setupEnding } from './ending';
 
 // Each setup runs on its own: one that throws (an old browser, a missing API) is reported and the rest still run.
-for (const setup of [setupNavDisclosure, setupTheme, setupHeaderScroll, setupSearchShortcut, setupCopy, setupAudience, setupEnding]) {
+for (const setup of [setupNavDisclosure, setupTheme, setupHeaderScroll, setupSearchShortcut, setupCopy, setupAudience]) {
   try {
     setup();
   } catch (error) {

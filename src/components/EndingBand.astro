@@ -52,3 +52,9 @@ const still = { alt: '', widths: [640, 1024], sizes: '(min-width: 1152px) 1104px
     <p class="ending-answers"><a class="btn btn-on-image" href={`mailto:${id.email}?subject=${encodeURIComponent('What I was looking for')}`}>Tell me what you were looking for</a></p>
   </div>
 </section>
+
+<script>
+  // The ending's own script travels only with the page that shows the band (Home), not in the site bundle.
+  import { setupEnding } from '../scripts/ending';
+  setupEnding();
+</script>
