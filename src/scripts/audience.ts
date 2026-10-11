@@ -84,6 +84,17 @@ export function setupAudience(): void {
     if (status) status.textContent = message;
   };
 
+  // A page restored from the back/forward cache, or another tab that changes the answer, re-reads the
+  // stored answer: the skin, the Theme row and the picker follow it.
+  const sync = () => {
+    const s = get(KEY);
+    const want = known(s) ? s : null;
+    if (want !== (document.documentElement.dataset.audience ?? null)) apply(want); else mark(want);
+    if (picker) picker.hidden = known(s) || get(CLOSED) === '1';
+  };
+  window.addEventListener('pageshow', (e) => { if (e.persisted) sync(); });
+  window.addEventListener('storage', (e) => { if (e.key === null || e.key === KEY || e.key === CLOSED) sync(); });
+
   document.addEventListener('click', (e) => {
     const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-audience-choice],[data-picker-close]');
     if (!t) return;

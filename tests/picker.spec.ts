@@ -116,3 +116,28 @@ test('keyboard: choosing from the picker moves focus to the cover heading and an
   await expect(page.locator('#site-name')).toBeFocused();
   await expect(page.locator('[data-picker-status]')).toHaveText('No theme chosen. You can pick one in the footer.');
 });
+
+test('another tab that changes the answer is followed here (storage event), and a page restored from the back/forward cache re-reads it', async ({ page, context }) => {
+  await page.goto('/');
+  await expect(row(page)).toBeVisible();
+  const other = await context.newPage();
+  await other.goto('/work/');
+  await theme(other).locator('[data-audience-choice="tech"]').click();
+  await expect.poll(() => page.evaluate(() => [document.documentElement.dataset.audience, document.documentElement.dataset.skin])).toEqual(['tech', 'desert-night']);
+  await expect(row(page)).toBeHidden();
+  await expect(theme(page).locator('[data-audience-choice="tech"]')).toHaveAttribute('aria-pressed', 'true');
+  await other.close();
+  // A bfcache restore: storage changed while the page was away (no storage event reaches it), then pageshow with persisted.
+  await page.evaluate(() => {
+    localStorage.setItem('khaylub-audience', 'hiring');
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+  });
+  await expect.poll(() => page.evaluate(() => [document.documentElement.dataset.audience, document.documentElement.dataset.tier])).toEqual(['hiring', 'lean']);
+  await expect(page.locator('link#skin-css')).toHaveCount(0);
+  await page.evaluate(() => {
+    localStorage.clear();
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+  });
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.audience ?? null)).toBe(null);
+  await expect(row(page)).toBeVisible();
+});
