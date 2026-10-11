@@ -62,7 +62,7 @@ test.describe('the performance budget as asserted', () => {
     // stays a real ceiling: a later package that approaches it investigates the cause first, and no
     // edit raises it again without an owner decision recorded in the vault.
     const css = lines!.resourceSizes.find((l) => l.resourceType === 'stylesheet');
-    expect(css?.budget, 'the stylesheet line is the 36 KiB ceiling of 2026-09-22').toBe(36);
+    expect(css?.budget, 'the stylesheet line is the 38 KiB ceiling (owner decision D-38, 2026-10-10)').toBe(38);
     // Thresholds from CLAUDE.md and doc 13; a later edit may tighten them, never loosen them.
     const atLeast: [string, string, string, number][] = [
       ['categories:performance', 'error', 'minScore', 0.9],
@@ -118,11 +118,11 @@ test.describe('the performance budget as asserted', () => {
   });
 });
 
-test('the bundled stylesheet leaves room under the 36 KiB line (headers counted as 810 bytes)', async () => {
+test('the bundled stylesheet leaves room under the 38 KiB line (headers counted as 810 bytes)', async () => {
   const { readFileSync, statSync } = await import('node:fs');
   // The island's own climb.*.css is not the bundle; the bundle is the one the pages link.
   const href = /<link rel="stylesheet" href="(\/_astro\/[^"]+\.css)"/.exec(readFileSync('dist/about/index.html', 'utf8'))?.[1];
   expect(href, 'a bundled stylesheet link').toBeTruthy();
   const bytes = statSync(`dist${href}`).size;
-  expect(bytes + 810, 'bundle plus headers').toBeLessThanOrEqual(36864);
+  expect(bytes + 810, 'bundle plus headers').toBeLessThanOrEqual(38912);
 });

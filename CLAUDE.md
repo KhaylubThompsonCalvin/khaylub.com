@@ -73,7 +73,7 @@ balanced), and the Home page below the hero is the profile composition of the Vi
 `base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
 that is the phone order, two columns from 900 px. Component styles are global under each
 component's own root class (`<style is:global>`; a generic name is prefixed by its root) since the
-2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its 36 KiB line.
+2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its line (38 KiB since D-38).
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 
@@ -95,10 +95,12 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
   line, availability, and both doors sit above the fold at 390x844 and 1440x900 (P2-FE-04).
 - Performance: `lighthouserc.json` requires performance 0.90 or better, accessibility 1.0,
   best practices 0.95 or better, SEO 1.0; LCP 2000 ms or less, CLS 0.05 or less, TBT 150 ms or
-  less. `budget.json`: 900 KB total, 60 KB script, 36 KB CSS, 100 KB fonts, 300 KB images,
+  less. `budget.json`: 900 KB total, 60 KB script, 38 KB CSS, 100 KB fonts, 300 KB images,
   40 requests, zero third-party. The CSS line was 30 KB until the owner raised it to 36 KiB on
   2026-09-22 (the F5 visual completion; the file measured 31,486 bytes raw and about 6.8 KB
   compressed); it stays a real ceiling and is never raised again without an owner decision.
+  D-38 (2026-10-10): the owner raised it to 38 KiB (38,912 bytes, headers counted) for the profile themes
+  (the picker and the ending band), choosing "Raise to 38 KB"; it is still a real ceiling.
 - SEO and content: every page's primary text is in the initial HTML and readable with JavaScript
   off (`tests/js-off.spec.ts`); title, description, canonical, sitemap, robots, and structured
   data per `tests/seo.spec.ts`; JSON-LD is the only inline script allowed.
