@@ -73,7 +73,7 @@ balanced), and the Home page below the hero is the profile composition of the Vi
 `base.css`), Writing, the Library, Details, and Contact (`src/components/profile/`) in the DOM order
 that is the phone order, two columns from 900 px. Component styles are global under each
 component's own root class (`<style is:global>`; a generic name is prefixed by its root) since the
-2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its line (38 KiB since D-38).
+2026-10-10 polish: the scope suffix cost about 3.7 KB, and the one stylesheet stays inside its line (38.5 KiB since D-43).
 
 ## Writing rules (public copy, code comments, docs, commit messages)
 
@@ -101,6 +101,9 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
   compressed); it stays a real ceiling and is never raised again without an owner decision.
   D-38 (2026-10-10): the owner raised it to 38 KiB (38,912 bytes, headers counted) for the profile themes
   (the picker and the ending band), choosing "Raise to 38 KB"; it is still a real ceiling.
+  D-43 (2026-10-17): the owner raised it 512 bytes to 38.5 KiB (39,424 bytes, headers counted) for
+  Work's rule-topped entries (D-42), choosing "Raise the line 512 bytes"; main had 49 bytes left and no
+  dead CSS to pay for the 420-byte package. Still a real ceiling.
   D-39 (2026-10-11): the owner gave Home its own LCP line of 2400 ms ("Yes, Home 2400"); every other page
   keeps 2000 ms. The cover profile puts Home's first paint at about 2030 ms in the simulated mobile throttle
   however light its pictures are (measured 2026-10-11: a lighter or inlined cover, a lazy headshot, no hidden
@@ -110,7 +113,7 @@ component's own root class (`<style is:global>`; a generic name is prefixed by i
   remembered on the device, and it picks one of six skins, a Top 8 order and a Start-here set; with no
   answer, or with JavaScript off, the site is Paper. D-37: weight by audience. Lean (Paper) is the default
   visit and holds every budget; Standard (`tech`, `nostalgia`) and Full (`creative`, `exploring`,
-  `youtube`) add one skin file of at most 6 KB, so their stylesheet line is 38 KiB plus 6 KiB; the ending clips load
+  `youtube`) add one skin file of at most 6 KB, so their stylesheet line is 38.5 KiB plus 6 KiB; the ending clips load
   only after a press or, on Full, when the band nears the viewport. `lighthouserc.json` stays the Lean sweep;
   `scripts/lhci-shard.mjs` adds the Standard (`tech`) and Full (`exploring`) runs of Home, About and Work.
 - SEO and content: every page's primary text is in the initial HTML and readable with JavaScript

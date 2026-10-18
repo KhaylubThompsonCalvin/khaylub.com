@@ -335,6 +335,30 @@ small,
     box-shadow: var(--shadow-md);
   }
 }
+/* Work's featured projects stay rule-topped entries, as document 65 drew the workshop (D-42); every
+   other room keeps the soft-depth surface. The rule warms to the accent on hover and turns the focus
+   blue while the link has focus; the entry itself never lifts. */
+.entries .card {
+  background: none;
+  border: 0;
+  border-top: 3px solid var(--ink);
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-2) 0 0;
+}
+.entries .card:hover {
+  border-top-color: var(--accent);
+}
+.entries .card:focus-within {
+  border-top-color: var(--focus);
+}
+.entries .card:is(:hover, :focus-within) {
+  translate: none;
+  box-shadow: none;
+}
+.entries .card[data-status='concept'] {
+  border-top-style: dashed;
+}
 .card h3 {
   font-family: var(--font-display);
   font-weight: 700;
@@ -469,6 +493,10 @@ small,
 }
 .plate h1 {
   margin-bottom: var(--space-1);
+}
+/* The workshop's plate carries its thick ink rule (D-42), the rule its entries repeat below. */
+.plate.room-work {
+  border-top: 4px solid var(--ink);
 }
 /* The reading room is one column at the reading measure, its plate included. */
 .plate.room-writing {
