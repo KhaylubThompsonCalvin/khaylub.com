@@ -44,7 +44,7 @@ const evidenceTotal = new Set(groups.flatMap((g) => g.skills.flatMap((s) => s.it
 
   <section class="section" aria-labelledby="featured-heading">
     <h2 id="featured-heading">Featured projects</h2>
-    <ul class="card-grid">
+    <ul class="card-grid entries">
       {feat.map((e) => <li><ArtifactCard entry={e} detail /></li>)}
     </ul>
   </section>
