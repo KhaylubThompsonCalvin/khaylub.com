@@ -31,7 +31,7 @@ One visual language, a different atmosphere per room, the same header and footer
 5. Numbers only where content is ranked (the Top 8) or counted (the counts rows). No numbered markers as decoration.
 6. Mobile is designed, not stacked: the hero's first screen, the climb band as a poster over a dark panel, two-across tiles with captions (rows under 360 px), module heads on rules. Overflow 0 at 320.
 7. Accessibility is the floor: axe 0 at every impact in both palettes, the keyboard walk with the blue ring, 44 px controls and 24 px text links, reduced motion respected, colour never the only cue.
-8. Performance is the floor: the Lighthouse gates (LCP 2,000 ms, CLS 0.05) and the budgets; the one stylesheet inside the 38 KiB line (a change that approaches it investigates the cause first; the line is never raised without an owner decision).
+8. Performance is the floor: the Lighthouse gates (LCP 2,000 ms, CLS 0.05) and the budgets; the one stylesheet inside the 38.5 KiB line (D-43) (a change that approaches it investigates the cause first; the line is never raised without an owner decision).
 9. Anti-slop: no identical rounded cards, no every-section-in-a-box, no SaaS or bento grids, no gradient blobs (the scrim under words on a still is the only gradient), no glassmorphism, no viewport-tall hero, no pill badges, no meaningless icons, no startup copy, no motion for its own sake, no tracked-out all-caps eyebrows, no purple or blue palette, no fake statistics or testimonials, no dashboard.
 10. Preserve the architecture: Astro, the content schemas, Keystatic and the Studio, the publishing workflows, Render, search, the feeds, the sitemap, provenance, the climb's Three.js island. Presentation freedom is not an infrastructure rewrite.
 
